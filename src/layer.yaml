@@ -1,0 +1,13 @@
+includes:
+  - layer:openstack-api
+  - interface:mysql-shared
+  - interface:rabbitmq
+  - interface:keystone
+options:
+  basic:
+    use_venv: True
+    include_system_packages: True
+repo: https://github.com/openstack/charm-octavia
+config:
+  deletes:
+    - verbose

@@ -57,15 +57,8 @@ class TestRender(test_utils.PatchHelper):
                           new=mock.MagicMock())
         self.provide_charm_instance().__enter__.return_value = octavia_charm
         self.provide_charm_instance().__exit__.return_value = None
-        self.patch_object(handlers.charm, 'optional_interfaces')
-
-        def _optional_interfaces(args, *interfaces):
-            self.assertEqual(interfaces, ('tls-certificates.available', ))
-            return args + ('tls-certificates', )
-
-        self.optional_interfaces.side_effect = _optional_interfaces
 
         handlers.render('arg1', 'arg2')
         octavia_charm.render_with_interfaces.assert_called_once_with(
-            ('arg1', 'arg2', 'tls-certificates'))
+            ('arg1', 'arg2'))
         octavia_charm.assess_status.assert_called_once_with()

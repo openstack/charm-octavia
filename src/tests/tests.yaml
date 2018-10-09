@@ -1,0 +1,5 @@
+charm_name: octavia
+smoke_bundles:
+- smoke-bionic-rocky
+configure:
+tests:

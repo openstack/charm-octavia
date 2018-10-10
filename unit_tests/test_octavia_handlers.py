@@ -37,11 +37,11 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
             'when': {
                 'render': ('shared-db.available',
                            'identity-service.available',
-                           'amqp.available'),
-                'init_db': ('config.rendered'),
+                           'amqp.available',),
+                'init_db': ('config.rendered',),
             },
             'when_not': {
-                'init_db': ('db.synced'),
+                'init_db': ('db.synced',),
             },
         }
         # test that the hooks were registered via the

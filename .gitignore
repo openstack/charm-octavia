@@ -2,3 +2,4 @@
 .stestr
 *__pycache__*
 *.pyc
+build

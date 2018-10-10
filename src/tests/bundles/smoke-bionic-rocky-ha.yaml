@@ -1,0 +1,33 @@
+series: bionic
+relations:
+- - keystone
+  - mysql
+- - octavia
+  - mysql
+- - octavia
+  - keystone
+- - octavia
+  - rabbitmq-server
+- - octavia
+  - hacluster-octavia
+applications:
+  keystone:
+    charm: cs:~openstack-charmers-next/keystone
+    num_units: 1
+    options:
+      openstack-origin: cloud:bionic-rocky
+  mysql:
+    charm: cs:~openstack-charmers-next/percona-cluster
+    num_units: 1
+  hacluster-octavia:
+    charm: cs:~openstack-charmers-next/hacluster
+    num_units: 0
+  octavia:
+    charm: octavia
+    num_units: 3
+    options:
+      openstack-origin: cloud:bionic-rocky
+      vip: 'ADD YOUR VIP HERE'
+  rabbitmq-server:
+    charm: cs:~openstack-charmers-next/rabbitmq-server
+    num_units: 1

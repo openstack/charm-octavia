@@ -51,3 +51,12 @@ def init_db():
         octavia_charm.restart_all()
         reactive.set_state('db.synced')
         octavia_charm.assess_status()
+
+
+@reactive.when('ha.connected')
+@reactive.when_not('ha.available')
+def cluster_connected(hacluster):
+    """Configure HA resources in corosync."""
+    with charm.provide_charm_instance() as octavia_charm:
+        octavia_charm.configure_ha_resources(hacluster)
+        octavia_charm.assess_status()

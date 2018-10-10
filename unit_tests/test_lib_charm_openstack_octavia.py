@@ -39,3 +39,19 @@ class TestOctaviaCharm(Helper):
         result = c.get_database_setup()
         self.assertEqual(result, [{'database': 'octavia',
                                    'username': 'octavia'}])
+
+    def test_enable_webserver_site(self):
+        self.patch('os.path.exists', 'exists')
+        self.patch('subprocess.call', 'sp_call')
+        self.patch('subprocess.check_call', 'sp_check_call')
+        self.patch('charmhelpers.core.host.service_reload', 'service_reload')
+        self.exists.return_value = True
+        self.sp_call.return_value = True
+        c = octavia.OctaviaCharm()
+        c.enable_webserver_site()
+        self.exists.assert_called_with(
+            '/etc/apache2/sites-available/octavia-api.conf')
+        self.sp_call.assert_called_with(['a2query', '-s', 'octavia-api'])
+        self.sp_check_call.assert_called_with(['a2ensite', 'octavia-api'])
+        self.service_reload.assert_called_with(
+            'apache2', restart_on_failure=True)

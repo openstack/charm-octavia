@@ -39,9 +39,11 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                            'identity-service.available',
                            'amqp.available',),
                 'init_db': ('config.rendered',),
+                'cluster_connected': ('ha.connected',),
             },
             'when_not': {
                 'init_db': ('db.synced',),
+                'cluster_connected': ('ha.available',),
             },
         }
         # test that the hooks were registered via the
@@ -51,14 +53,34 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
 
 class TestRender(test_utils.PatchHelper):
 
-    def test_render(self):
-        octavia_charm = mock.MagicMock()
+    def setUp(self):
+        super().setUp()
+        self.octavia_charm = mock.MagicMock()
         self.patch_object(handlers.charm, 'provide_charm_instance',
                           new=mock.MagicMock())
-        self.provide_charm_instance().__enter__.return_value = octavia_charm
+        self.provide_charm_instance().__enter__.return_value = \
+            self.octavia_charm
         self.provide_charm_instance().__exit__.return_value = None
 
+    def test_render(self):
+        self.patch('charms.reactive.set_state', 'set_state')
         handlers.render('arg1', 'arg2')
-        octavia_charm.render_with_interfaces.assert_called_once_with(
+        self.octavia_charm.render_with_interfaces.assert_called_once_with(
             ('arg1', 'arg2'))
-        octavia_charm.assess_status.assert_called_once_with()
+        self.octavia_charm.assess_status.assert_called_once_with()
+        self.set_state.assert_called_once_with('config.rendered')
+
+    def test_init_db(self):
+        self.patch('charms.reactive.set_state', 'set_state')
+        handlers.init_db()
+        self.octavia_charm.db_sync.assert_called_once_with()
+        self.octavia_charm.restart_all.assert_called_once_with()
+        self.set_state.assert_called_once_with('db.synced')
+        self.octavia_charm.assess_status.assert_called_once_with()
+
+    def test_cluster_connected(self):
+        hacluster = mock.MagicMock()
+        handlers.cluster_connected(hacluster)
+        self.octavia_charm.configure_ha_resources.assert_called_once_with(
+            hacluster)
+        self.octavia_charm.assess_status.assert_called_once_with()

@@ -1,5 +1,10 @@
 charm_name: octavia
+gate_bundles:
+- smoke-bionic-rocky
+- smoke-bionic-rocky-ha
 smoke_bundles:
 - smoke-bionic-rocky
 configure:
+- zaza.charm_tests.noop.setup.basic_setup
 tests:
+- zaza.charm_tests.noop.tests.NoopTest

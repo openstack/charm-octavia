@@ -23,6 +23,7 @@ applications:
     charm: cs:~openstack-charmers-next/hacluster
     num_units: 0
   octavia:
+    series: bionic
     charm: octavia
     num_units: 3
     options:

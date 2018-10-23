@@ -18,6 +18,7 @@ applications:
     charm: cs:~openstack-charmers-next/percona-cluster
     num_units: 1
   octavia:
+    series: bionic
     charm: octavia
     num_units: 1
     options:

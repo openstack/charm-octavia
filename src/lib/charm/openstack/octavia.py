@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import base64
 import collections
 import os
 import subprocess
@@ -22,9 +23,10 @@ import charms_openstack.ip as os_ip
 
 import charms.leadership as leadership
 
-import charmhelpers.core.host as ch_host
+import charmhelpers.core as ch_core
 
 OCTAVIA_DIR = '/etc/octavia'
+OCTAVIA_CACERT_DIR = os.path.join(OCTAVIA_DIR, 'certs')
 OCTAVIA_CONF = os.path.join(OCTAVIA_DIR, 'octavia.conf')
 OCTAVIA_WEBSERVER_SITE = 'octavia-api'
 OCTAVIA_WSGI_CONF = '/etc/apache2/sites-available/octavia-api.conf'
@@ -41,6 +43,91 @@ class OctaviaAdapters(charms_openstack.adapters.OpenStackAPIRelationAdapters):
                 service_name='octavia',
                 port_map=OctaviaCharm.api_ports),
             charm_intance=charm_instance)
+
+
+@charms_openstack.adapters.config_property
+def issuing_cacert(cls):
+    """Get path to certificate provided in ``lb-mgmt-issuing-cacert`` option.
+
+    Side effect of reading this property is that the on-disk certificate
+    data is updated if it has changed.
+
+    :param cls: charms_openstack.adapters.ConfigurationAdapter derived class
+                instance.  Charm class instance is at cls.charm_instance.
+    :type: cls: charms_openstack.adapters.ConfiguartionAdapter
+    """
+    config = ch_core.hookenv.config('lb-mgmt-issuing-cacert')
+    if config:
+        return cls.charm_instance.decode_and_write_cert(
+            'issuing_ca.pem',
+            config)
+
+
+@charms_openstack.adapters.config_property
+def issuing_ca_private_key(cls):
+    """Get path to key provided in ``lb-mgmt-issuing-ca-private-key`` option.
+
+    Side effect of reading this property is that the on-disk key
+    data is updated if it has changed.
+
+    :param cls: charms_openstack.adapters.ConfigurationAdapter derived class
+                instance.  Charm class instance is at cls.charm_instance.
+    :type: cls: charms_openstack.adapters.ConfiguartionAdapter
+    """
+    config = ch_core.hookenv.config('lb-mgmt-issuing-ca-private-key')
+    if config:
+        return cls.charm_instance.decode_and_write_cert(
+            'issuing_ca_key.pem',
+            config)
+
+
+@charms_openstack.adapters.config_property
+def issuing_ca_private_key_passphrase(cls):
+    """Get value provided in in ``lb-mgmt-issuing-ca-key-passphrase`` option.
+
+    :param cls: charms_openstack.adapters.ConfigurationAdapter derived class
+                instance.  Charm class instance is at cls.charm_instance.
+    :type: cls: charms_openstack.adapters.ConfiguartionAdapter
+    """
+    config = ch_core.hookenv.config('lb-mgmt-issuing-ca-key-passphrase')
+    if config:
+        return config
+
+
+@charms_openstack.adapters.config_property
+def controller_cacert(cls):
+    """Get path to certificate provided in ``lb-mgmt-controller-cacert`` opt.
+
+    Side effect of reading this property is that the on-disk certificate
+    data is updated if it has changed.
+
+    :param cls: charms_openstack.adapters.ConfigurationAdapter derived class
+                instance.  Charm class instance is at cls.charm_instance.
+    :type: cls: charms_openstack.adapters.ConfiguartionAdapter
+    """
+    config = ch_core.hookenv.config('lb-mgmt-controller-cacert')
+    if config:
+        return cls.charm_instance.decode_and_write_cert(
+            'controller_ca.pem',
+            config)
+
+
+@charms_openstack.adapters.config_property
+def controller_cert(cls):
+    """Get path to certificate provided in ``lb-mgmt-controller-cert`` option.
+
+    Side effect of reading this property is that the on-disk certificate
+    data is updated if it has changed.
+
+    :param cls: charms_openstack.adapters.ConfigurationAdapter derived class
+                instance.  Charm class instance is at cls.charm_instance.
+    :type: cls: charms_openstack.adapters.ConfiguartionAdapter
+    """
+    config = ch_core.hookenv.config('lb-mgmt-controller-cert')
+    if config:
+        return cls.charm_instance.decode_and_write_cert(
+            'controller_cert.pem',
+            config)
 
 
 class OctaviaCharm(charms_openstack.charm.HAOpenStackCharm):
@@ -95,8 +182,27 @@ class OctaviaCharm(charms_openstack.charm.HAOpenStackCharm):
             if check_enabled != 0:
                 subprocess.check_call(['a2ensite',
                                        OCTAVIA_WEBSERVER_SITE])
-                ch_host.service_reload('apache2',
-                                       restart_on_failure=True)
+                ch_core.host.service_reload('apache2',
+                                            restart_on_failure=True)
+
+    def decode_and_write_cert(self, filename, encoded_data):
+        """Write certificate data to disk.
+
+        :param filename: Name of file
+        :type filename: str
+        :param group: Group ownership
+        :type group: str
+        :param encoded_data: Base64 encoded data
+        :type encoded_data: str
+        :returns: Full path to file
+        :rtype: str
+        """
+        filename = os.path.join(OCTAVIA_CACERT_DIR, filename)
+        ch_core.host.mkdir(OCTAVIA_CACERT_DIR, group=self.group,
+                           perms=0o750)
+        ch_core.host.write_file(filename, base64.b64decode(encoded_data),
+                                group=self.group, perms=0o440)
+        return filename
 
     @charms_openstack.adapters.config_property
     def heartbeat_key(self):

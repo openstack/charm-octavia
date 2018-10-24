@@ -24,9 +24,13 @@ charms_openstack.test_mocks.mock_charmhelpers()
 import mock
 import charms
 charms.leadership = mock.MagicMock()
+keystoneauth1 = mock.MagicMock()
+neutronclient = mock.MagicMock()
 sys.modules['charms.leadership'] = charms.leadership
 keystoneauth1 = mock.MagicMock()
 novaclient = mock.MagicMock()
 sys.modules['charms.leadership'] = charms.leadership
 sys.modules['keystoneauth1'] = keystoneauth1
 sys.modules['novaclient'] = novaclient
+sys.modules['neutronclient'] = neutronclient
+sys.modules['neutronclient.v2_0'] = neutronclient.v2_0

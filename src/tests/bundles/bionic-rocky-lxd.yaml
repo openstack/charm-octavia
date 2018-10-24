@@ -1,0 +1,148 @@
+series: bionic
+machines:
+  '0':
+    constraints: mem=3072M
+  '1':
+    constraints: mem=3072M
+  '2':
+    constraints: mem=3072M
+  '3':
+    constraints: mem=3072M
+relations:
+- - glance:image-service
+  - nova-cloud-controller:image-service
+- - glance:image-service
+  - nova-compute:image-service
+- - mysql:shared-db
+  - glance:shared-db
+- - mysql:shared-db
+  - keystone:shared-db
+- - mysql:shared-db
+  - neutron-api:shared-db
+- - mysql:shared-db
+  - nova-cloud-controller:shared-db
+- - mysql:shared-db
+  - octavia:shared-db
+- - keystone:identity-service
+  - glance:identity-service
+- - keystone:identity-service
+  - nova-cloud-controller:identity-service
+- - keystone:identity-service
+  - neutron-api:identity-service
+- - keystone:identity-service
+  - octavia:identity-service
+- - nova-compute:cloud-compute
+  - nova-cloud-controller:cloud-compute
+- - rabbitmq-server:amqp
+  - neutron-api:amqp
+- - rabbitmq-server:amqp
+  - glance:amqp
+- - rabbitmq-server:amqp
+  - neutron-gateway:amqp
+- - rabbitmq-server:amqp
+  - nova-cloud-controller:amqp
+- - rabbitmq-server:amqp
+  - nova-compute:amqp
+- - rabbitmq-server:amqp
+  - octavia:amqp
+- - neutron-api:neutron-api
+  - nova-cloud-controller:neutron-api
+- - neutron-api:neutron-load-balancer
+  - octavia:neutron-api
+- - neutron-gateway:quantum-network-service
+  - nova-cloud-controller:quantum-network-service
+- - rabbitmq-server:amqp
+  - neutron-openvswitch:amqp
+- - neutron-api:neutron-plugin-api
+  - neutron-openvswitch:neutron-plugin-api
+- - neutron-openvswitch:neutron-plugin
+  - nova-compute:neutron-plugin
+- - neutron-openvswitch:neutron-plugin
+  - octavia:neutron-openvswitch
+applications:
+  glance:
+    charm: cs:~openstack-charmers-next/glance
+    num_units: 1
+    options:
+      openstack-origin: cloud:bionic-rocky
+    to:
+    - lxd:1
+  keystone:
+    charm: cs:~openstack-charmers-next/keystone
+    num_units: 1
+    options:
+      openstack-origin: cloud:bionic-rocky
+    to:
+    - lxd:0
+  mysql:
+    constraints: mem=3072M
+    charm: cs:~openstack-charmers-next/percona-cluster
+    num_units: 1
+    to:
+    - lxd:0
+  neutron-api:
+    charm: cs:~openstack-charmers-next/neutron-api
+    num_units: 1
+    options:
+      openstack-origin: cloud:bionic-rocky
+      debug: True
+      flat-network-providers: physnet1
+      neutron-security-groups: True
+    to:
+    - lxd:1
+  neutron-gateway:
+    charm: cs:~openstack-charmers-next/neutron-gateway
+    num_units: 1
+    options:
+      openstack-origin: cloud:bionic-rocky
+      bridge-mappings: physnet1:br-ex
+      os-data-network: 252.0.0.0/8
+      instance-mtu: 1300
+      debug: True
+    to:
+    - 3
+  neutron-openvswitch:
+    series: bionic
+    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    num_units: 0
+    options:
+      debug: True
+      os-data-network: 252.0.0.0/8
+      instance-mtu: 1300
+      prevent-arp-spoofing: False
+      firewall-driver: openvswitch
+  nova-cloud-controller:
+    constraints: mem=3072M
+    charm: cs:~openstack-charmers-next/nova-cloud-controller
+    num_units: 1
+    options:
+      openstack-origin: cloud:bionic-rocky
+      debug: True
+      network-manager: Neutron
+    to:
+    - lxd:1
+  nova-compute:
+    constraints: mem=7168M
+    charm: cs:~openstack-charmers-next/nova-compute
+    num_units: 1
+    options:
+      openstack-origin: cloud:bionic-rocky
+      debug: True
+    to:
+    - 2
+  octavia:
+    series: bionic
+    charm: ../../../octavia
+    num_units: 3
+    options:
+      openstack-origin: cloud:bionic-rocky
+      debug: True
+    to:
+    - lxd:0
+    - lxd:1
+    - lxd:2
+  rabbitmq-server:
+    charm: cs:~openstack-charmers-next/rabbitmq-server
+    num_units: 1
+    to:
+    - lxd:0

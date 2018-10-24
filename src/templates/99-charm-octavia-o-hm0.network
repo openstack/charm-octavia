@@ -1,0 +1,16 @@
+[Match]
+Name=o-hm0
+
+[Link]
+{% if options.health_manager_hwaddr -%}
+MACAddress={{ options.health_manager_hwaddr }}
+{% endif -%}
+RequiredForOnline=no
+
+[Network]
+DHCP=yes
+
+[DHCP]
+UseMTU=true
+UseRoutes=false
+RouteMetric=100

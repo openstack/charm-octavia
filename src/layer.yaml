@@ -5,6 +5,7 @@ includes:
   - interface:rabbitmq
   - interface:keystone
   - interface:neutron-load-balancer
+  - interface:neutron-plugin
 options:
   basic:
     use_venv: True

@@ -31,6 +31,37 @@ class Helper(test_utils.PatchHelper):
 
 class TestOctaviaCharmConfigProperties(Helper):
 
+    def test_health_manager_hwaddr(self):
+        cls = mock.MagicMock()
+        self.patch('json.loads', 'json_loads')
+        self.patch('subprocess.check_output', 'check_output')
+        self.check_output.side_effect = OSError
+        self.check_output.return_value = '""'
+        self.assertEqual(octavia.health_manager_hwaddr(cls), None)
+        self.check_output.side_effect = None
+        self.assertEqual(octavia.health_manager_hwaddr(cls), self.json_loads())
+        self.json_loads.assert_called()
+        self.check_output.assert_any_call(
+            ['ovs-vsctl', 'get', 'Interface', octavia.OCTAVIA_MGMT_INTF,
+             'external_ids:attached-mac'], universal_newlines=True)
+
+    def test_health_manager_bind_ip(self):
+        cls = mock.MagicMock()
+        self.patch_object(octavia.ch_net_ip, 'get_iface_addr')
+        data = ['fe80:db8:42%eth0', '2001:db8:42::42', '127.0.0.1']
+        self.get_iface_addr.return_value = data
+        self.assertEqual(octavia.health_manager_bind_ip(cls), data[1])
+        self.get_iface_addr.assert_any_call(iface=octavia.OCTAVIA_MGMT_INTF,
+                                            inet_type='AF_INET6')
+        self.get_iface_addr.assert_any_call(iface=octavia.OCTAVIA_MGMT_INTF,
+                                            inet_type='AF_INET')
+        self.get_iface_addr.return_value = [data[2]]
+        self.assertEqual(octavia.health_manager_bind_ip(cls), data[2])
+        self.get_iface_addr.assert_any_call(iface=octavia.OCTAVIA_MGMT_INTF,
+                                            inet_type='AF_INET6')
+        self.get_iface_addr.assert_any_call(iface=octavia.OCTAVIA_MGMT_INTF,
+                                            inet_type='AF_INET')
+
     def test_heartbeat_key(self):
         cls = mock.MagicMock()
         self.patch('charms.leadership.leader_get', 'leader_get')
@@ -52,8 +83,68 @@ class TestOctaviaCharmConfigProperties(Helper):
         octavia.amp_flavor_id(cls)
         self.leader_get.assert_called_with('amp-flavor-id')
 
+    def test_controller_ip_port_list(self):
+        cls = mock.MagicMock()
+        self.patch('json.loads', 'json_loads')
+        self.patch('charms.leadership.leader_get', 'leader_get')
+        ip_list = ['2001:db8:42::42', '2001:db8:42::51']
+        self.json_loads.return_value = ip_list
+        self.assertEqual(
+            octavia.controller_ip_port_list(cls),
+            '2001:db8:42::42:{}, 2001:db8:42::51:{}'
+            .format(octavia.OCTAVIA_HEALTH_LISTEN_PORT,
+                    octavia.OCTAVIA_HEALTH_LISTEN_PORT))
+        self.json_loads.assert_called_with(
+            self.leader_get('controller-ip-port-list'))
+
+    def test_amp_secgroup_list(self):
+        cls = mock.MagicMock()
+        self.patch('charms.leadership.leader_get', 'leader_get')
+        octavia.amp_secgroup_list(cls)
+        self.leader_get.assert_called_with('amp-secgroup-list')
+
+    def test_amp_boot_network_list(self):
+        cls = mock.MagicMock()
+        self.patch('charms.leadership.leader_get', 'leader_get')
+        octavia.amp_boot_network_list(cls)
+        self.leader_get.assert_called_with('amp-boot-network-list')
+
 
 class TestOctaviaCharm(Helper):
+
+    def test_install(self):
+        # we do not care about the internals of the function we are overriding
+        # and expanding so mock out the call to super()
+        self.patch('builtins.super', 'super')
+        self.patch_object(octavia.ch_core, 'host')
+        c = octavia.OctaviaCharm()
+        c.install()
+        self.super.assert_called()
+        self.host.add_user_to_group.assert_called_once_with('systemd-network',
+                                                            'octavia')
+        self.host.service_pause.assert_called_once_with('octavia-api')
+
+    def test_states_to_check(self):
+        # we do not care about the internals of the function we are overriding
+        # and expanding so mock out the call to super()
+        self.patch('builtins.super', 'super')
+        self.patch_object(octavia.leadership, 'leader_get')
+        self.patch_object(octavia.reactive, 'is_flag_set')
+        self.leader_get.return_value = True
+        self.is_flag_set.return_value = True
+        override_relation = 'neutron-openvswitch'
+        states_to_check = {
+            override_relation: 'something-we-are-replacing',
+        }
+        self.super().states_to_check.return_value = states_to_check
+        c = octavia.OctaviaCharm()
+        c.states_to_check()
+        self.super().states_to_check.assert_called_once_with(None)
+        self.leader_get.assert_called_once_with(
+            'amp-boot-network-list')
+        self.is_flag_set.assert_has_calls([
+            mock.call('config.default.lb-mgmt-issuing-cacert')])
+        self.super.assert_called()
 
     def test_get_amqp_credentials(self):
         c = octavia.OctaviaCharm()
@@ -81,3 +172,16 @@ class TestOctaviaCharm(Helper):
         self.sp_check_call.assert_called_with(['a2ensite', 'octavia-api'])
         self.service_reload.assert_called_with(
             'apache2', restart_on_failure=True)
+
+    def test_local_address(self):
+        c = octavia.OctaviaCharm()
+        configuration_class = mock.MagicMock()
+        c.configuration_class = configuration_class
+        self.assertEqual(c.local_address, configuration_class().local_address)
+
+    def test_local_unit_name(self):
+        c = octavia.OctaviaCharm()
+        configuration_class = mock.MagicMock()
+        c.configuration_class = configuration_class
+        self.assertEqual(c.local_unit_name,
+                         configuration_class().local_unit_name)

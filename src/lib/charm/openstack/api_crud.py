@@ -21,18 +21,62 @@
 # and YAML for the ``fixed_ips`` field when providing details for a Neutron
 # port.
 
+import neutronclient
+import subprocess
+
 from keystoneauth1 import identity as keystone_identity
 from keystoneauth1 import session as keystone_session
 from keystoneauth1 import exceptions as keystone_exceptions
+from neutronclient.v2_0 import client as neutron_client
 from novaclient import client as nova_client
+
+import charm.openstack.octavia as octavia  # for constants
+
+import charmhelpers.core as ch_core
+import charmhelpers.contrib.network.ip as ch_net_ip
+
+
+NEUTRON_TEMP_EXCS = (keystone_exceptions.catalog.EndpointNotFound,
+                     keystone_exceptions.connection.ConnectFailure,
+                     neutronclient.common.exceptions.ServiceUnavailable)
 
 
 class APIUnavailable(Exception):
+    """Exception raised when a temporary availability issue occurs."""
 
     def __init__(self, service_type, resource_type, upstream_exception):
+        """Initialize APIUnavailable exception.
+
+        :param service_type: Name of service we had issues with (e.g. `nova`).
+        :type service_type: str
+        :param resource_type: Name of resource we had issues with
+                              (e.g. `flavors`)
+        :type resource_type: str
+        :param upstream_exception: Reference to the exception caught
+        :type upstream_exception: BaseException derived object
+        """
         self.service_type = service_type
         self.resource_type = resource_type
         self.upstream_exception = upstream_exception
+
+
+class DuplicateResource(Exception):
+    """Exception raised when resource query result in multiple entries."""
+
+    def __init__(self, service_type, resource_type, data=None):
+        """Initialize DuplicateResource exception.
+
+        :param service_type: Name of service we had issues with (e.g. `nova`).
+        :type service_type: str
+        :param resource_type: Name of resource we had issues with
+                              (e.g. `flavors`)
+        :type resource_type: str
+        :param data: Data from search result
+        :type data: (Optional)any
+        """
+        self.service_type = service_type
+        self.resource_type = resource_type
+        self.data = data
 
 
 def session_from_identity_service(identity_service):
@@ -63,11 +107,6 @@ def get_nova_flavor(identity_service):
     A side effect of calling this function is that Nova flavors are
     created if they do not already exist.
 
-    Handle exceptions ourself without Tenacity so we can detect Nova API
-    readiness.  At present we do not have a relation or interface to inform us
-    about Nova API readiness.  This function also executes just one or two API
-    calls.
-
     :param identity_service: reactive Endpoint of type ``identity-service``
     :type identity_service: RelationBase class
     :returns: Nova Flavor Resource object
@@ -89,3 +128,468 @@ def get_nova_flavor(identity_service):
             nova_client.exceptions.ConnectionRefused,
             nova_client.exceptions.ClientException) as e:
         raise APIUnavailable('nova', 'flavors', e)
+
+
+def get_hm_port(identity_service, local_unit_name, local_unit_address):
+    """Get or create a per unit Neutron port for Octavia Health Manager.
+
+    A side effect of calling this function is that a port is created if one
+    does not already exist.
+
+    :param identity_service: reactive Endpoint of type ``identity-service``
+    :type identity_service: RelationBase class
+    :param local_unit_name: Name of juju unit, used to build tag name for port
+    :type local_unit_name: str
+    :param local_unit_address: DNS resolvable IP address of unit, used to
+                               build Neutron port ``binding:host_id``
+    :type local_unit_address: str
+    :returns: Port details extracted from result of call to
+              neutron_client.list_ports or neutron_client.create_port
+    :rtype: dict
+    :raises: api_crud.APIUnavailable, api_crud.DuplicateResource
+    """
+    session = session_from_identity_service(identity_service)
+    try:
+        nc = neutron_client.Client(session=session)
+        resp = nc.list_networks(tags='charm-octavia')
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'networks', e)
+
+    network = None
+    n_resp = len(resp.get('networks', []))
+    if n_resp == 1:
+        network = resp['networks'][0]
+    elif n_resp > 1:
+        raise DuplicateResource('neutron', 'networks', data=resp)
+    else:
+        ch_core.hookenv.log('No network tagged with `charm-octavia` exists, '
+                            'deferring port setup awaiting network and port '
+                            '(re-)creation.', level=ch_core.hookenv.WARNING)
+        return
+    health_secgrp = None
+
+    try:
+        resp = nc.list_security_groups(tags='charm-octavia-health')
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'security_groups', e)
+
+    n_resp = len(resp.get('security_groups', []))
+    if n_resp == 1:
+        health_secgrp = resp['security_groups'][0]
+    elif n_resp > 1:
+        raise DuplicateResource('neutron', 'security_groups', data=resp)
+    else:
+        ch_core.hookenv.log('No security group tagged with '
+                            '`charm-octavia-health` exists, deferring '
+                            'port setup awaiting network and port '
+                            '(re-)creation...',
+                            level=ch_core.hookenv.WARNING)
+        return
+
+    try:
+        resp = nc.list_ports(tags='charm-octavia-{}'
+                                  .format(local_unit_name))
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'ports', e)
+
+    n_resp = len(resp.get('ports', []))
+    if n_resp == 1:
+        hm_port = resp['ports'][0]
+    elif n_resp > 1:
+        raise DuplicateResource('neutron', 'ports', data=resp)
+    else:
+        # create new port
+        try:
+            resp = nc.create_port(
+                {
+                    'port': {
+                        # avoid race with OVS agent attempting to bind port
+                        # before it is created in the local units OVSDB
+                        'admin_state_up': False,
+                        'binding:host_id': ch_net_ip.get_hostname(
+                            local_unit_address, fqdn=False),
+                        'device_owner': 'Octavia:health-mgr',
+                        'security_groups': [
+                            health_secgrp['id'],
+                        ],
+                        'name': 'octavia-health-manager-{}-listen-port'
+                                .format(local_unit_name),
+                        'network_id': network['id'],
+                    },
+                })
+            hm_port = resp['port']
+            ch_core.hookenv.log('Created port {}'.format(hm_port['id']),
+                                ch_core.hookenv.INFO)
+            # unit specific tag is used by each unit to load their state
+            nc.add_tag('ports', hm_port['id'],
+                       'charm-octavia-{}'
+                       .format(local_unit_name))
+            # charm-wide tag is used by leader to load cluster state and build
+            # ``controller_ip_port_list`` configuration property
+            nc.add_tag('ports', hm_port['id'], 'charm-octavia')
+        except NEUTRON_TEMP_EXCS as e:
+            raise APIUnavailable('neutron', 'ports', e)
+    return hm_port
+
+
+def toggle_hm_port(identity_service, local_unit_name, enabled=True):
+    """Toggle administrative state of Neutron port for local unit.
+
+    :param identity_service: reactive Endpoint of type ``identity-service``
+    :type identity_service: RelationBase class
+    :param local_unit_name: Name of juju unit, used to build tag name for port
+    :type local_unit_name: str
+    :param enabled: Desired state
+    :type enabled: bool
+    :raises: api_crud.APIUnavailable
+    """
+    session = session_from_identity_service(identity_service)
+    try:
+        nc = neutron_client.Client(session=session)
+        resp = nc.list_ports(tags='charm-octavia-{}'
+                                  .format(local_unit_name))
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'ports', e)
+    for port in (resp['ports']):
+        nc.update_port(port['id'], {'port': {'admin_state_up': enabled}})
+
+
+def setup_hm_port(identity_service, octavia_charm):
+    """Create a per unit Neutron and OVS port for Octavia Health Manager.
+
+    This is used to plug the unit into the overlay network for direct
+    communication with the octavia managed load balancer instances running
+    within the deployed cloud.
+
+    :param identity_service: reactive Endpoint of type ``identity-service``
+    :type identity_service: RelationBase class
+    :param ocataiva_charm: charm instance
+    :type octavia_charm: OctaviaCharm class instance
+    :retruns: True on change to local unit, False otherwise
+    :rtype: bool
+    :raises: api_crud.APIUnavailable, api_crud.DuplicateResource
+    """
+    unit_changed = False
+    hm_port = get_hm_port(
+        identity_service,
+        octavia_charm.local_unit_name,
+        octavia_charm.local_address)
+    if not hm_port:
+        ch_core.hookenv.log('No network tagged with `charm-octavia` '
+                            'exists, deferring port setup awaiting '
+                            'network and port (re-)creation...',
+                            level=ch_core.hookenv.WARNING)
+        return
+    HM_PORT_MAC = hm_port['mac_address']
+    HM_PORT_ID = hm_port['id']
+    try:
+        subprocess.check_output(
+            ['ip', 'link', 'show', octavia.OCTAVIA_MGMT_INTF],
+            stderr=subprocess.STDOUT, universal_newlines=True)
+    except subprocess.CalledProcessError as e:
+        if 'does not exist' in e.output:
+            subprocess.check_call(
+                ['ovs-vsctl', '--', 'add-port',
+                 octavia.OCTAVIA_INT_BRIDGE, octavia.OCTAVIA_MGMT_INTF,
+                 '--', 'set', 'Interface', octavia.OCTAVIA_MGMT_INTF,
+                 'type=internal',
+                 '--', 'set', 'Interface', octavia.OCTAVIA_MGMT_INTF,
+                 'external-ids:iface-status=active',
+                 '--', 'set', 'Interface', octavia.OCTAVIA_MGMT_INTF,
+                 'external-ids:attached-mac={}'.format(HM_PORT_MAC),
+                 '--', 'set', 'Interface', octavia.OCTAVIA_MGMT_INTF,
+                 'external-ids:iface-id={}'.format(HM_PORT_ID),
+                 '--', 'set', 'Interface', octavia.OCTAVIA_MGMT_INTF,
+                 'external-ids:skip_cleanup=true',
+                 ])
+            ch_core.hookenv.log('add OVS port', level=ch_core.hookenv.INFO)
+            # post boot reconfiguration of systemd-networkd does not appear to
+            # set the MAC addresss on the interface, do it ourself.
+            subprocess.check_call(
+                ['ip', 'link', 'set', octavia.OCTAVIA_MGMT_INTF,
+                 'up', 'address', HM_PORT_MAC])
+            # Signal that change has been made to local unit
+            unit_changed = True
+        else:
+            # unknown error, raise
+            raise e
+    if not hm_port['admin_state_up'] or hm_port['status'] == 'DOWN':
+        # NOTE(fnordahl) there appears to be a handful of race conditions
+        # hitting us sometimes making the newly created ports unusable.
+        # as a workaround we toggle the port belonging to us.
+        # a disable/enable round trip makes Neutron reset the port
+        # configuration which resolves these situations.
+        ch_core.hookenv.log('toggling port {} (admin_state_up: {} '
+                            'status: {})'
+                            .format(hm_port['id'],
+                                    hm_port['admin_state_up'],
+                                    hm_port['status']),
+                            level=ch_core.hookenv.INFO)
+
+        toggle_hm_port(identity_service,
+                       octavia_charm.local_unit_name,
+                       enabled=False)
+        toggle_hm_port(identity_service,
+                       octavia_charm.local_unit_name,
+                       enabled=True)
+    return unit_changed
+
+
+def get_port_ips(identity_service):
+    """Extract IP information from Neutron ports tagged with ``charm-octavia``
+
+    :param identity_service: reactive Endpoint of type ``identity-service``
+    :type identity_service: RelationBase class
+    :returns: List of IP addresses extracted from port details in search result
+    :rtype: list of str
+    :raises: api_crud.APIUnavailable
+    """
+    session = session_from_identity_service(identity_service)
+    try:
+        nc = neutron_client.Client(session=session)
+        resp = nc.list_ports(tags='charm-octavia')
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'ports', e)
+
+    neutron_ip_list = []
+    for port in resp['ports']:
+        for ip_info in port['fixed_ips']:
+            neutron_ip_list.append(ip_info['ip_address'])
+
+    return neutron_ip_list
+
+
+def get_mgmt_network(identity_service, create=True):
+    """Get or create Neutron network resources for Octavia.
+
+    A side effect of calling this function is that network resources are
+    created if they do not already exist, unless ``create`` is set to False.
+
+    :param identity_service: reactive Endpoint of type ``identity-service``
+    :type identity_service: RelationBase class
+    :param create: (Optional and default) Create resources that do not exist
+    :type: create: bool
+    :returns: List of IP addresses extracted from port details in search result
+    :rtype: list of str
+    :raises: api_crud.APIUnavailable, api_crud.DuplicateResource
+    """
+    session = session_from_identity_service(identity_service)
+    try:
+        nc = neutron_client.Client(session=session)
+        resp = nc.list_networks(tags='charm-octavia')
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'networks', e)
+
+    n_resp = len(resp.get('networks', []))
+    if n_resp == 1:
+        network = resp['networks'][0]
+    elif n_resp > 1:
+        raise DuplicateResource('neutron', 'networks', data=resp)
+    elif not create:
+        ch_core.hookenv.log('No network tagged with `charm-octavia` exists, '
+                            'and we are configured to not create resources.'
+                            'Awaiting end user resource creation.',
+                            level=ch_core.hookenv.WARNING)
+        return
+    else:
+        try:
+            resp = nc.create_network({
+                'network': {'name': octavia.OCTAVIA_MGMT_NET}})
+            network = resp['network']
+            nc.add_tag('networks', network['id'], 'charm-octavia')
+            ch_core.hookenv.log('Created network {}'.format(network['id']),
+                                level=ch_core.hookenv.INFO)
+        except NEUTRON_TEMP_EXCS as e:
+            raise APIUnavailable('neutron', 'networks', e)
+
+    try:
+        resp = nc.list_subnets(tags='charm-octavia')
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'subnets', e)
+
+    n_resp = len(resp.get('subnets', []))
+    subnets = None
+    if n_resp < 1 and create:
+        # make rfc4193 Unique Local IPv6 Unicast Addresses from network UUID
+        rfc4193_addr = 'fc00'
+        for n in [0, 4, 8]:
+            rfc4193_addr += ':' + network['id'].split('-')[4][n:n + 4]
+        rfc4193_addr += '::/64'
+        try:
+            resp = nc.create_subnet(
+                {
+                    'subnets': [
+                        {
+                            'name': octavia.OCTAVIA_MGMT_SUBNET + 'v6',
+                            'ip_version': 6,
+                            'ipv6_address_mode': 'slaac',
+                            'ipv6_ra_mode': 'slaac',
+                            'cidr': rfc4193_addr,
+                            'network_id': network['id'],
+                        },
+                    ],
+                })
+            subnets = resp['subnets']
+            for subnet in resp['subnets']:
+                nc.add_tag('subnets', subnet['id'], 'charm-octavia')
+                ch_core.hookenv.log('Created subnet {} with cidr {}'
+                                    .format(subnet['id'], subnet['cidr']),
+                                    level=ch_core.hookenv.INFO)
+        except NEUTRON_TEMP_EXCS as e:
+            raise APIUnavailable('neutron', 'subnets', e)
+
+    try:
+        resp = nc.list_routers(tags='charm-octavia')
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'routers', e)
+
+    n_resp = len(resp.get('routers', []))
+    router = None
+    if n_resp < 1 and create:
+        try:
+            resp = nc.create_router(
+                {
+                    'router': {
+                        'name': octavia.OCTAVIA_MGMT_NAME_PREFIX,
+
+                    }
+                })
+            router = resp['router']
+            nc.add_tag('routers', router['id'], 'charm-octavia')
+            ch_core.hookenv.log('Created router {}'.format(router['id']),
+                                level=ch_core.hookenv.INFO)
+            for subnet in subnets:
+                nc.add_interface_router(router['id'],
+                                        {'subnet_id': subnet['id']})
+                ch_core.hookenv.log('Added interface from router {} '
+                                    'to subnet {}'
+                                    .format(router['id'], subnet['id']),
+                                    level=ch_core.hookenv.INFO)
+        except NEUTRON_TEMP_EXCS as e:
+            raise APIUnavailable('neutron', 'routers', e)
+
+    try:
+        resp = nc.list_security_groups(tags='charm-octavia')
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'security_groups', e)
+
+    n_resp = len(resp.get('security_groups', []))
+    if n_resp == 1:
+        secgrp = resp['security_groups'][0]
+    elif n_resp > 1:
+        raise DuplicateResource('neutron', 'security_groups', data=resp)
+    elif not create:
+        ch_core.hookenv.log('No security group tagged with `charm-octavia` '
+                            'exists, and we are configured to not create '
+                            'resources.  Awaiting end user resource '
+                            'creation.',
+                            level=ch_core.hookenv.WARNING)
+        return
+    else:
+        try:
+            resp = nc.create_security_group(
+                {
+                    'security_group': {
+                        'name': octavia.OCTAVIA_MGMT_SECGRP,
+                    },
+                })
+            secgrp = resp['security_group']
+            nc.add_tag('security_groups', secgrp['id'], 'charm-octavia')
+            ch_core.hookenv.log('Created security group "{}"'
+                                .format(secgrp['id']),
+                                level=ch_core.hookenv.INFO)
+        except NEUTRON_TEMP_EXCS as e:
+            raise APIUnavailable('neutron', 'security_groups', e)
+
+    if create:
+        security_group_rules = [
+            {
+                'direction': 'ingress',
+                'protocol': 'icmpv6',
+                'ethertype': 'IPv6',
+                'security_group_id': secgrp['id'],
+            },
+            {
+                'direction': 'ingress',
+                'protocol': 'tcp',
+                'ethertype': 'IPv6',
+                'port_range_min': '22',
+                'port_range_max': '22',
+                'security_group_id': secgrp['id'],
+            },
+            {
+                'direction': 'ingress',
+                'protocol': 'tcp',
+                'ethertype': 'IPv6',
+                'port_range_min': '9443',
+                'port_range_max': '9443',
+                'security_group_id': secgrp['id'],
+            },
+        ]
+        for rule in security_group_rules:
+            try:
+                nc.create_security_group_rule({'security_group_rule': rule})
+            except neutronclient.common.exceptions.Conflict:
+                pass
+            except NEUTRON_TEMP_EXCS as e:
+                raise APIUnavailable('neutron', 'security_group_rules', e)
+
+    try:
+        resp = nc.list_security_groups(tags='charm-octavia-health')
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'security_groups', e)
+
+    n_resp = len(resp.get('security_groups', []))
+    if n_resp == 1:
+        health_secgrp = resp['security_groups'][0]
+    elif n_resp > 1:
+        raise DuplicateResource('neutron', 'security_groups', data=resp)
+    elif not create:
+        ch_core.hookenv.log('No security group tagged with '
+                            '`charm-octavia-health` exists, and we are '
+                            'configured to not create resources.  Awaiting '
+                            'end user resource creation.',
+                            level=ch_core.hookenv.WARNING)
+        return
+    else:
+        try:
+            resp = nc.create_security_group(
+                {
+                    'security_group': {
+                        'name': octavia.OCTAVIA_HEALTH_SECGRP,
+                    },
+                })
+            health_secgrp = resp['security_group']
+            nc.add_tag('security_groups', health_secgrp['id'],
+                       'charm-octavia-health')
+            ch_core.hookenv.log('Created security group "{}"'
+                                .format(health_secgrp['id']),
+                                level=ch_core.hookenv.INFO)
+        except NEUTRON_TEMP_EXCS as e:
+            raise APIUnavailable('neutron', 'security_groups', e)
+    if create:
+        health_security_group_rules = [
+            {
+                'direction': 'ingress',
+                'protocol': 'icmpv6',
+                'ethertype': 'IPv6',
+                'security_group_id': health_secgrp['id'],
+            },
+            {
+                'direction': 'ingress',
+                'protocol': 'udp',
+                'ethertype': 'IPv6',
+                'port_range_min': octavia.OCTAVIA_HEALTH_LISTEN_PORT,
+                'port_range_max': octavia.OCTAVIA_HEALTH_LISTEN_PORT,
+                'security_group_id': health_secgrp['id'],
+            },
+        ]
+        for rule in health_security_group_rules:
+            try:
+                nc.create_security_group_rule({'security_group_rule': rule})
+            except neutronclient.common.exceptions.Conflict:
+                pass
+            except NEUTRON_TEMP_EXCS as e:
+                raise APIUnavailable('neutron', 'security_groups', e)
+    resp = nc.list_security_group_rules(security_group_id=health_secgrp['id'])
+    return (network, secgrp)

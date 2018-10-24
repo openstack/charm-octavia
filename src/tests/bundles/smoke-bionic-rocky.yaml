@@ -19,7 +19,7 @@ applications:
     num_units: 1
   octavia:
     series: bionic
-    charm: octavia
+    charm: ../../../octavia
     num_units: 1
     options:
       openstack-origin: cloud:bionic-rocky

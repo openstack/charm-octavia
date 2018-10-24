@@ -20,3 +20,8 @@ sys.path.append('src/lib')
 # Mock out charmhelpers so that we can test without it.
 import charms_openstack.test_mocks  # noqa
 charms_openstack.test_mocks.mock_charmhelpers()
+
+import mock
+import charms
+charms.leadership = mock.MagicMock()
+sys.modules['charms.leadership'] = charms.leadership

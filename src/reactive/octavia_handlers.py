@@ -12,7 +12,10 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import uuid
+
 import charms.reactive as reactive
+import charms.leadership as leadership
 
 import charms_openstack.charm as charm
 
@@ -28,9 +31,17 @@ charm.use_defaults(
     'update-status')
 
 
+@reactive.when('leadership.is_leader')
+@reactive.when_not('leadership.set.heartbeat-key')
+def generate_heartbeat_key():
+    """Generate a unique key for ``heartbeat_key`` configuration option."""
+    leadership.leader_set({'heartbeat-key': str(uuid.uuid4())})
+
+
 @reactive.when('shared-db.available')
 @reactive.when('identity-service.available')
 @reactive.when('amqp.available')
+@reactive.when('leadership.set.heartbeat-key')
 def render(*args):
     """
     Render the configuration for Octavia when all interfaces are available.

@@ -55,3 +55,12 @@ class TestOctaviaCharm(Helper):
         self.sp_check_call.assert_called_with(['a2ensite', 'octavia-api'])
         self.service_reload.assert_called_with(
             'apache2', restart_on_failure=True)
+
+    def test_heartbeat_key(self):
+        self.patch('charms.leadership.leader_get', 'leader_get')
+        self.leader_get.return_value = None
+        c = octavia.OctaviaCharm()
+        self.assertEqual(c.heartbeat_key(), None)
+        self.leader_get.return_value = 'FAKE-STORED-UUID-STRING'
+        self.assertEqual(c.heartbeat_key(), 'FAKE-STORED-UUID-STRING')
+        self.leader_get.assert_called_with('heartbeat-key')

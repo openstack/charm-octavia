@@ -20,6 +20,8 @@ import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.ip as os_ip
 
+import charms.leadership as leadership
+
 import charmhelpers.core.host as ch_host
 
 OCTAVIA_DIR = '/etc/octavia'
@@ -95,3 +97,7 @@ class OctaviaCharm(charms_openstack.charm.HAOpenStackCharm):
                                        OCTAVIA_WEBSERVER_SITE])
                 ch_host.service_reload('apache2',
                                        restart_on_failure=True)
+
+    @charms_openstack.adapters.config_property
+    def heartbeat_key(self):
+        return leadership.leader_get('heartbeat-key')

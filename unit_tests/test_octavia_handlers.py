@@ -37,13 +37,16 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
             'when': {
                 'render': ('shared-db.available',
                            'identity-service.available',
-                           'amqp.available',),
+                           'amqp.available',
+                           'leadership.set.heartbeat-key',),
                 'init_db': ('config.rendered',),
                 'cluster_connected': ('ha.connected',),
+                'generate_heartbeat_key': ('leadership.is_leader',),
             },
             'when_not': {
                 'init_db': ('db.synced',),
                 'cluster_connected': ('ha.available',),
+                'generate_heartbeat_key': ('leadership.set.heartbeat-key',),
             },
         }
         # test that the hooks were registered via the
@@ -51,7 +54,7 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
         self.registered_hooks_test_helper(handlers, hook_set, defaults)
 
 
-class TestRender(test_utils.PatchHelper):
+class TestOctaviaHandlers(test_utils.PatchHelper):
 
     def setUp(self):
         super().setUp()
@@ -61,6 +64,15 @@ class TestRender(test_utils.PatchHelper):
         self.provide_charm_instance().__enter__.return_value = \
             self.octavia_charm
         self.provide_charm_instance().__exit__.return_value = None
+
+    def test_generate_heartbeat_key(self):
+        self.patch('charms.leadership.leader_set', 'leader_set')
+        self.patch('uuid.uuid4', 'uuid4')
+        self.uuid4.return_value = fake_uuid4 = 'FAKE-UUID4-STRING'
+        handlers.generate_heartbeat_key()
+        self.leader_set.assert_called_once_with(
+            {'heartbeat-key': fake_uuid4})
+        self.uuid4.assert_called_once_with()
 
     def test_render(self):
         self.patch('charms.reactive.set_state', 'set_state')

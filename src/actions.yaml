@@ -1,0 +1,6 @@
+configure-resources:
+  description: |
+    Create or discover Neutron and Nova resources for Octavia in the deployed
+    cloud.  This action must be run after deployment is complete and is a
+    prerequisite for successful consumption of the Octavia load balancer
+    service.

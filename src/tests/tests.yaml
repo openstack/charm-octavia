@@ -1,10 +1,31 @@
 charm_name: octavia
 gate_bundles:
-- smoke-bionic-rocky
-- smoke-bionic-rocky-ha
+- bionic-rocky
+- bionic-rocky-ha
+- cosmic-rocky
+- cosmic-rocky-ha
 smoke_bundles:
-- smoke-bionic-rocky
+- bionic-rocky
+comment: |
+  The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
+  https://github.com/lxc/lxd/issues/4947
+  Holding the `cosmic-rocky-lxd` bundle awaiting required changes to CI.
+dev_bundles:
+- bionic-rocky-lxd
+- cosmic-rocky-lxd
+target_deploy_status:
+  octavia:
+    workload-status: blocked
+    workload-status-message: Awaiting
 configure:
-- zaza.charm_tests.noop.setup.basic_setup
+- zaza.charm_tests.octavia.setup.configure_octavia
+- zaza.charm_tests.octavia.setup.add_amphora_image
+- zaza.charm_tests.glance.setup.add_lts_image
+- zaza.charm_tests.nova.setup.create_flavors
+- zaza.charm_tests.nova.setup.manage_ssh_key
+- zaza.charm_tests.neutron.setup.basic_overcloud_network
 tests:
-- zaza.charm_tests.noop.tests.NoopTest
+- zaza.charm_tests.neutron_openvswitch.tests.NeutronOpenvSwitchOverlayTest
+- zaza.charm_tests.nova.tests.LTSGuestCreateTest
+- zaza.charm_tests.octavia.tests.LBAASv2Test
+- zaza.charm_tests.octavia.tests.CharmOperationTest

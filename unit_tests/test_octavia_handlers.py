@@ -15,6 +15,7 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
+import json
 import mock
 
 import reactive.octavia_handlers as handlers
@@ -43,11 +44,17 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'cluster_connected': ('ha.connected',),
                 'generate_heartbeat_key': ('leadership.is_leader',),
                 'setup_neutron_lbaas_proxy': (
-                    'neutron-load-balancer.available',),
-                'get_nova_flavor': (
+                    'neutron-api.available',),
+                'setup_hm_port': (
+                    'identity-service.available',
+                    'neutron-api.available',
+                    'neutron-openvswitch.connected',
+                    'amqp.available',),
+                'update_controller_ip_port_list': (
                     'leadership.is_leader',
                     'identity-service.available',
-                    'config.default.custom-amp-flavor-id',),
+                    'neutron-api.available',
+                    'amqp.available',),
             },
             'when_not': {
                 'init_db': ('db.synced',),
@@ -81,40 +88,42 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
         self.uuid4.assert_called_once_with()
 
     def test_neutron_lbaas_proxy(self):
-        octavia_charm = mock.MagicMock()
-        self.patch_object(handlers.charm, 'provide_charm_instance',
-                          new=mock.MagicMock())
-        self.provide_charm_instance().__enter__.return_value = octavia_charm
-        self.provide_charm_instance().__exit__.return_value = None
-
         self.patch('charms.reactive.endpoint_from_flag', 'endpoint_from_flag')
         endpoint = mock.MagicMock()
         self.endpoint_from_flag.return_value = endpoint
         self.patch('charms_openstack.ip.canonical_url', 'canonical_url')
         self.canonical_url.return_value = 'http://1.2.3.4'
-        octavia_charm.api_port.return_value = '1234'
+        self.octavia_charm.api_port.return_value = '1234'
         handlers.setup_neutron_lbaas_proxy()
         self.canonical_url.assert_called_with(endpoint_type='int')
         endpoint.publish_load_balancer_info.assert_called_with(
             'octavia', 'http://1.2.3.4:1234')
 
-    def test_get_nova_flavor(self):
+    def test_setup_hm_port(self):
         self.patch('charms.reactive.endpoint_from_flag', 'endpoint_from_flag')
-        self.patch_object(handlers.api_crud, 'get_nova_flavor',
-                          name='api_crud_get_nova_flavor')
+        self.patch('charms.reactive.set_flag', 'set_flag')
+        self.patch_object(handlers.api_crud, 'setup_hm_port')
+        handlers.setup_hm_port()
+        self.setup_hm_port.assert_called_with(self.endpoint_from_flag(),
+                                              self.octavia_charm)
+        self.set_flag.assert_called_once_with('config.changed')
+
+    def test_update_controller_ip_port_list(self):
+        self.patch('charms.reactive.endpoint_from_flag', 'endpoint_from_flag')
         self.patch('charms.leadership.leader_set', 'leader_set')
-        flavor = mock.MagicMock()
-        flavor.id = 'fake-id'
-        self.api_crud_get_nova_flavor.side_effect = \
-            handlers.api_crud.APIUnavailable('nova', 'flavors', Exception)
-        handlers.get_nova_flavor()
-        self.assertFalse(self.leader_set.called)
-        self.api_crud_get_nova_flavor.side_effect = None
-        self.api_crud_get_nova_flavor.return_value = flavor
-        handlers.get_nova_flavor()
-        self.api_crud_get_nova_flavor.assert_called_with(
-            self.endpoint_from_flag())
-        self.leader_set.assert_called_with({'amp-flavor-id': 'fake-id'})
+        self.patch('charms.leadership.leader_get', 'leader_get')
+        self.patch_object(handlers.api_crud, 'get_port_ips')
+        self.get_port_ips.return_value = [
+            '2001:db8:42::42',
+            '2001:db8:42::51',
+        ]
+        handlers.update_controller_ip_port_list()
+        self.leader_set.assert_called_once_with(
+            {
+                'controller-ip-port-list': json.dumps([
+                    '2001:db8:42::42',
+                    '2001:db8:42::51',
+                ])})
 
     def test_render(self):
         self.patch('charms.reactive.set_state', 'set_state')

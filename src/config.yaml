@@ -10,6 +10,8 @@ options:
     type: string
     default:
     description: |
+      Note that setting this configuration option is mandatory.
+      .
       Certificate Authority Certificate used to issue new certificates stored
       on the ``Amphora`` load balancer instances.  The ``Amphorae`` use them to
       authenticate themselves to the ``Octavia`` controller services.
@@ -26,6 +28,8 @@ options:
     type: string
     default:
     description: |
+      Note that setting this configuration option is mandatory.
+      .
       Private key for the Certificate Authority set in ``lb-mgmt-issuing-ca``.
       .
       Note that these certificates are not used for any load balancer payload
@@ -34,6 +38,8 @@ options:
     type: string
     default:
     description: |
+      Note that setting this configuration option is mandatory.
+      .
       Passphrase for the key set in ``lb-mgmt-ca-private-key``.
       .
       NOTE: As of this writing Octavia requires the private key to be protected
@@ -45,6 +51,8 @@ options:
     type: string
     default:
     description: |
+      Note that setting this configuration option is mandatory.
+      .
       Certificate Authority Certificate installed on ``Amphorae`` with the
       purpose of the ``Amphora`` agent using it to authenticate connections
       from ``Octavia`` controller services.
@@ -61,6 +69,8 @@ options:
     type: string
     default:
     description: |
+      Note that setting this configuration option is mandatory.
+      .
       Certificate used by the ``Octavia`` controller to authenticate itself to
       its ``Amphorae``.
       .
@@ -74,3 +84,31 @@ options:
       instances.
       .
       The default behaviour is to let the charm create and maintain the flavor.
+  create-mgmt-network:
+    type: boolean
+    default: True
+    description: |
+      The ``octavia`` charm utilizes Neutron Resource tags to locate networks,
+      security groups and ports for use with the service.
+      .
+      If none are found the default behaviour is to create the resources
+      required for management of the load balancer instances.
+      .
+      Set this to False if you want to be in control of creation and management
+      of these resources yourself.  Please note that the service will not be
+      fully operational until they are available.
+      .
+      Refer to the documentation on https://jujucharms.com/octavia/ for a
+      complete list of resources required and how they should be tagged.
+  amp-image-tag:
+    type: string
+    default: octavia-amphora
+    description: |
+      Glance image tag for selection of Amphorae image to boot load balancer
+      instances.
+  amp-image-owner-id:
+    type: string
+    default:
+    description: |
+      Restrict glance image selection to a specific owner ID. This is a
+      recommended security setting.

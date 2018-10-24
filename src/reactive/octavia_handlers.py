@@ -12,18 +12,21 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import json
 import uuid
 
 import charms.reactive as reactive
 import charms.leadership as leadership
 
+import charms_openstack.bus
 import charms_openstack.charm as charm
 import charms_openstack.ip as os_ip
 
 import charmhelpers.core as ch_core
 
-import charm.openstack.octavia as octavia  # noqa
 import charm.openstack.api_crud as api_crud
+
+charms_openstack.bus.discover()
 
 charm.use_defaults(
     'charm.installed',
@@ -42,9 +45,20 @@ def generate_heartbeat_key():
     leadership.leader_set({'heartbeat-key': str(uuid.uuid4())})
 
 
-@reactive.when('neutron-load-balancer.available')
+@reactive.when('neutron-api.available')
 def setup_neutron_lbaas_proxy():
-    neutron = reactive.endpoint_from_flag('neutron-load-balancer.available')
+    """Publish our URL to Neutron API units.
+
+    The Neutron API unit will use this information to set up the
+    ``lbaasv2-proxy`` service_plugin.
+
+    This is to help migrate workloads expecting to talk to the Neutron API for
+    their Load Balancing needs.
+
+    Software should be updated to look up load balancer in the Keystone service
+    catalog and talk directly to the Octavia endpoint.
+    """
+    neutron = reactive.endpoint_from_flag('neutron-api.available')
     with charm.provide_charm_instance() as octavia_charm:
         octavia_url = '{}:{}'.format(
             os_ip.canonical_url(endpoint_type=os_ip.INTERNAL),
@@ -52,22 +66,58 @@ def setup_neutron_lbaas_proxy():
         neutron.publish_load_balancer_info('octavia', octavia_url)
 
 
+@reactive.when('identity-service.available')
+@reactive.when('neutron-api.available')
+@reactive.when('neutron-openvswitch.connected')
+# Neutron API calls will consistently fail as long as AMQP is unavailable
+@reactive.when('amqp.available')
+def setup_hm_port():
+    """Create a per unit Neutron and OVS port for Octavia Health Manager.
+
+    This is used to plug the unit into the overlay network for direct
+    communication with the octavia managed load balancer instances running
+    within the deployed cloud.
+    """
+    with charm.provide_charm_instance() as octavia_charm:
+        identity_service = reactive.endpoint_from_flag(
+            'identity-service.available')
+        try:
+            if api_crud.setup_hm_port(
+                    identity_service,
+                    octavia_charm):
+                # trigger config render to make systemd-networkd bring up
+                # automatic IP configuration of the new port right now.
+                reactive.set_flag('config.changed')
+        except api_crud.APIUnavailable as e:
+            ch_core.hookenv.log('Neutron API not available yet, deferring '
+                                'port discovery. ("{}")'
+                                .format(e),
+                                level=ch_core.hookenv.DEBUG)
+            return
+
+
 @reactive.when('leadership.is_leader')
 @reactive.when('identity-service.available')
-@reactive.when('config.default.custom-amp-flavor-id')
-def get_nova_flavor():
-    """Get or create private Nova flavor for use with Octavia."""
+@reactive.when('neutron-api.available')
+# Neutron API calls will consistently fail as long as AMQP is unavailable
+@reactive.when('amqp.available')
+def update_controller_ip_port_list():
+    """Load state from Neutron and update ``controller-ip-port-list``."""
     identity_service = reactive.endpoint_from_flag(
         'identity-service.available')
+    leader_ip_list = leadership.leader_get('controller-ip-port-list') or []
+
     try:
-        flavor = api_crud.get_nova_flavor(identity_service)
+        neutron_ip_list = sorted(api_crud.get_port_ips(identity_service))
     except api_crud.APIUnavailable as e:
-        ch_core.hookenv.log('Nova API not available yet, deferring '
-                            'flavor discovery/creation. ("{}")'
+        ch_core.hookenv.log('Neutron API not available yet, deferring '
+                            'port discovery. ("{}")'
                             .format(e),
                             level=ch_core.hookenv.DEBUG)
-    else:
-        leadership.leader_set({'amp-flavor-id': flavor.id})
+        return
+    if neutron_ip_list != sorted(leader_ip_list):
+        leadership.leader_set(
+            {'controller-ip-port-list': json.dumps(neutron_ip_list)})
 
 
 @reactive.when('shared-db.available')
@@ -75,8 +125,7 @@ def get_nova_flavor():
 @reactive.when('amqp.available')
 @reactive.when('leadership.set.heartbeat-key')
 def render(*args):
-    """
-    Render the configuration for Octavia when all interfaces are available.
+    """Render the configuration for Octavia when all interfaces are available.
     """
     with charm.provide_charm_instance() as octavia_charm:
         octavia_charm.render_with_interfaces(args)

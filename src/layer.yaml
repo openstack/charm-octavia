@@ -4,6 +4,7 @@ includes:
   - interface:mysql-shared
   - interface:rabbitmq
   - interface:keystone
+  - interface:neutron-load-balancer
 options:
   basic:
     use_venv: True

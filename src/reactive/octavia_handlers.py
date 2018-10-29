@@ -18,6 +18,7 @@ import charms.reactive as reactive
 import charms.leadership as leadership
 
 import charms_openstack.charm as charm
+import charms_openstack.ip as os_ip
 
 import charm.openstack.octavia as octavia  # noqa
 
@@ -36,6 +37,16 @@ charm.use_defaults(
 def generate_heartbeat_key():
     """Generate a unique key for ``heartbeat_key`` configuration option."""
     leadership.leader_set({'heartbeat-key': str(uuid.uuid4())})
+
+
+@reactive.when('neutron-load-balancer.available')
+def setup_neutron_lbaas_proxy():
+    neutron = reactive.endpoint_from_flag('neutron-load-balancer.available')
+    with charm.provide_charm_instance() as octavia_charm:
+        octavia_url = '{}:{}'.format(
+            os_ip.canonical_url(endpoint_type=os_ip.INTERNAL),
+            octavia_charm.api_port('octavia-api'))
+        neutron.publish_load_balancer_info('octavia', octavia_url)
 
 
 @reactive.when('shared-db.available')

@@ -19,3 +19,6 @@ tags:
 series:
   - bionic
 subordinate: false
+requires:
+  neutron-load-balancer:
+    interface: neutron-load-balancer

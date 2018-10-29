@@ -42,6 +42,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'init_db': ('config.rendered',),
                 'cluster_connected': ('ha.connected',),
                 'generate_heartbeat_key': ('leadership.is_leader',),
+                'setup_neutron_lbaas_proxy': (
+                    'neutron-load-balancer.available',),
             },
             'when_not': {
                 'init_db': ('db.synced',),
@@ -73,6 +75,24 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
         self.leader_set.assert_called_once_with(
             {'heartbeat-key': fake_uuid4})
         self.uuid4.assert_called_once_with()
+
+    def test_neutron_lbaas_proxy(self):
+        octavia_charm = mock.MagicMock()
+        self.patch_object(handlers.charm, 'provide_charm_instance',
+                          new=mock.MagicMock())
+        self.provide_charm_instance().__enter__.return_value = octavia_charm
+        self.provide_charm_instance().__exit__.return_value = None
+
+        self.patch('charms.reactive.endpoint_from_flag', 'endpoint_from_flag')
+        endpoint = mock.MagicMock()
+        self.endpoint_from_flag.return_value = endpoint
+        self.patch('charms_openstack.ip.canonical_url', 'canonical_url')
+        self.canonical_url.return_value = 'http://1.2.3.4'
+        octavia_charm.api_port.return_value = '1234'
+        handlers.setup_neutron_lbaas_proxy()
+        self.canonical_url.assert_called_with(endpoint_type='int')
+        endpoint.publish_load_balancer_info.assert_called_with(
+            'octavia', 'http://1.2.3.4:1234')
 
     def test_render(self):
         self.patch('charms.reactive.set_state', 'set_state')

@@ -14,6 +14,8 @@ description: |
   known as amphorae which it spins up on demand. This on-demand, horizontal
   scaling feature differentiates Octavia from other load balancing solutions,
   thereby making Octavia truly suited "for the cloud."
+  .
+  OpenStack Rocky or later is required.
 tags:
   - openstack
 series:

@@ -2,6 +2,8 @@
 
 This charm provides the Octavia load balancer service for an OpenStack Cloud.
 
+OpenStack Rocky or later is required.
+
 # Usage
 
 Octavia relies on services from a fully functional OpenStack Cloud and expects

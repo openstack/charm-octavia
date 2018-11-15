@@ -66,3 +66,11 @@ options:
       .
       Note that these certificates are not used for any load balancer payload
       data.
+  custom-amp-flavor-id:
+    type: string
+    default:
+    description: |
+      ID of Nova flavor Octavia should use when launching ``Amphorae``
+      instances.
+      .
+      The default behaviour is to let the charm create and maintain the flavor.

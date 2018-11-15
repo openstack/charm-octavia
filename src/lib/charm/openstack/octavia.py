@@ -46,6 +46,11 @@ class OctaviaAdapters(charms_openstack.adapters.OpenStackAPIRelationAdapters):
 
 
 @charms_openstack.adapters.config_property
+def heartbeat_key(cls):
+    return leadership.leader_get('heartbeat-key')
+
+
+@charms_openstack.adapters.config_property
 def issuing_cacert(cls):
     """Get path to certificate provided in ``lb-mgmt-issuing-cacert`` option.
 
@@ -130,6 +135,24 @@ def controller_cert(cls):
             config)
 
 
+@charms_openstack.adapters.config_property
+def amp_flavor_id(cls):
+    """Flavor to use when creating Amphorae instances.
+
+    ID from charm managed flavor shared among all units through leader
+    storage.
+
+    :param cls: charms_openstack.adapters.ConfigurationAdapter derived class
+                instance.  Charm class instance is at cls.charm_instance.
+    :type: cls: charms_openstack.adapters.ConfiguartionAdapter
+    :returns: Nova flavor UUID.
+    :rtype: str
+    """
+    return (
+        ch_core.hookenv.config('custom-amp-flavor-id') or
+        leadership.leader_get('amp-flavor-id'))
+
+
 class OctaviaCharm(charms_openstack.charm.HAOpenStackCharm):
     """Charm class for the Octavia charm."""
     # layer-openstack-api uses service_type as service name in endpoint catalog
@@ -203,7 +226,3 @@ class OctaviaCharm(charms_openstack.charm.HAOpenStackCharm):
         ch_core.host.write_file(filename, base64.b64decode(encoded_data),
                                 group=self.group, perms=0o440)
         return filename
-
-    @charms_openstack.adapters.config_property
-    def heartbeat_key(self):
-        return leadership.leader_get('heartbeat-key')

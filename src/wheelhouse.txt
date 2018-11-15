@@ -1,0 +1,4 @@
+tenacity
+keystoneauth1
+pbr
+python-novaclient

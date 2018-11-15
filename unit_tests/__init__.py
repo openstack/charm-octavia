@@ -25,3 +25,8 @@ import mock
 import charms
 charms.leadership = mock.MagicMock()
 sys.modules['charms.leadership'] = charms.leadership
+keystoneauth1 = mock.MagicMock()
+novaclient = mock.MagicMock()
+sys.modules['charms.leadership'] = charms.leadership
+sys.modules['keystoneauth1'] = keystoneauth1
+sys.modules['novaclient'] = novaclient

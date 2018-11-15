@@ -9,6 +9,7 @@ options:
   basic:
     use_venv: True
     include_system_packages: True
+    packages: [ 'libffi-dev', 'libssl-dev' ]
 repo: https://github.com/openstack/charm-octavia
 config:
   deletes:

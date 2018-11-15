@@ -15,6 +15,8 @@
 from __future__ import absolute_import
 from __future__ import print_function
 
+import mock
+
 import charms_openstack.test_utils as test_utils
 
 import charm.openstack.octavia as octavia
@@ -25,6 +27,30 @@ class Helper(test_utils.PatchHelper):
     def setUp(self):
         super().setUp()
         self.patch_release(octavia.OctaviaCharm.release)
+
+
+class TestOctaviaCharmConfigProperties(Helper):
+
+    def test_heartbeat_key(self):
+        cls = mock.MagicMock()
+        self.patch('charms.leadership.leader_get', 'leader_get')
+        self.leader_get.return_value = None
+        self.assertEqual(octavia.heartbeat_key(cls), None)
+        self.leader_get.return_value = 'FAKE-STORED-UUID-STRING'
+        self.assertEqual(octavia.heartbeat_key(cls), 'FAKE-STORED-UUID-STRING')
+        self.leader_get.assert_called_with('heartbeat-key')
+
+    def test_amp_flavor_id(self):
+        cls = mock.MagicMock()
+        self.patch('charmhelpers.core.hookenv.config', 'config')
+        self.patch('charms.leadership.leader_get', 'leader_get')
+        self.config.return_value = 'something'
+        octavia.amp_flavor_id(cls)
+        self.config.assert_called_with('custom-amp-flavor-id')
+        self.assertFalse(self.leader_get.called)
+        self.config.return_value = None
+        octavia.amp_flavor_id(cls)
+        self.leader_get.assert_called_with('amp-flavor-id')
 
 
 class TestOctaviaCharm(Helper):
@@ -55,12 +81,3 @@ class TestOctaviaCharm(Helper):
         self.sp_check_call.assert_called_with(['a2ensite', 'octavia-api'])
         self.service_reload.assert_called_with(
             'apache2', restart_on_failure=True)
-
-    def test_heartbeat_key(self):
-        self.patch('charms.leadership.leader_get', 'leader_get')
-        self.leader_get.return_value = None
-        c = octavia.OctaviaCharm()
-        self.assertEqual(c.heartbeat_key(), None)
-        self.leader_get.return_value = 'FAKE-STORED-UUID-STRING'
-        self.assertEqual(c.heartbeat_key(), 'FAKE-STORED-UUID-STRING')
-        self.leader_get.assert_called_with('heartbeat-key')

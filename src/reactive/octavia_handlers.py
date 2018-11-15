@@ -20,7 +20,10 @@ import charms.leadership as leadership
 import charms_openstack.charm as charm
 import charms_openstack.ip as os_ip
 
+import charmhelpers.core as ch_core
+
 import charm.openstack.octavia as octavia  # noqa
+import charm.openstack.api_crud as api_crud
 
 charm.use_defaults(
     'charm.installed',
@@ -47,6 +50,24 @@ def setup_neutron_lbaas_proxy():
             os_ip.canonical_url(endpoint_type=os_ip.INTERNAL),
             octavia_charm.api_port('octavia-api'))
         neutron.publish_load_balancer_info('octavia', octavia_url)
+
+
+@reactive.when('leadership.is_leader')
+@reactive.when('identity-service.available')
+@reactive.when('config.default.custom-amp-flavor-id')
+def get_nova_flavor():
+    """Get or create private Nova flavor for use with Octavia."""
+    identity_service = reactive.endpoint_from_flag(
+        'identity-service.available')
+    try:
+        flavor = api_crud.get_nova_flavor(identity_service)
+    except api_crud.APIUnavailable as e:
+        ch_core.hookenv.log('Nova API not available yet, deferring '
+                            'flavor discovery/creation. ("{}")'
+                            .format(e),
+                            level=ch_core.hookenv.DEBUG)
+    else:
+        leadership.leader_set({'amp-flavor-id': flavor.id})
 
 
 @reactive.when('shared-db.available')

@@ -44,6 +44,10 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'generate_heartbeat_key': ('leadership.is_leader',),
                 'setup_neutron_lbaas_proxy': (
                     'neutron-load-balancer.available',),
+                'get_nova_flavor': (
+                    'leadership.is_leader',
+                    'identity-service.available',
+                    'config.default.custom-amp-flavor-id',),
             },
             'when_not': {
                 'init_db': ('db.synced',),
@@ -93,6 +97,24 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
         self.canonical_url.assert_called_with(endpoint_type='int')
         endpoint.publish_load_balancer_info.assert_called_with(
             'octavia', 'http://1.2.3.4:1234')
+
+    def test_get_nova_flavor(self):
+        self.patch('charms.reactive.endpoint_from_flag', 'endpoint_from_flag')
+        self.patch_object(handlers.api_crud, 'get_nova_flavor',
+                          name='api_crud_get_nova_flavor')
+        self.patch('charms.leadership.leader_set', 'leader_set')
+        flavor = mock.MagicMock()
+        flavor.id = 'fake-id'
+        self.api_crud_get_nova_flavor.side_effect = \
+            handlers.api_crud.APIUnavailable('nova', 'flavors', Exception)
+        handlers.get_nova_flavor()
+        self.assertFalse(self.leader_set.called)
+        self.api_crud_get_nova_flavor.side_effect = None
+        self.api_crud_get_nova_flavor.return_value = flavor
+        handlers.get_nova_flavor()
+        self.api_crud_get_nova_flavor.assert_called_with(
+            self.endpoint_from_flag())
+        self.leader_set.assert_called_with({'amp-flavor-id': 'fake-id'})
 
     def test_render(self):
         self.patch('charms.reactive.set_state', 'set_state')

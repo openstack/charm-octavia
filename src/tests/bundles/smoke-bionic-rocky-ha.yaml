@@ -12,15 +12,15 @@ relations:
   - hacluster-octavia
 applications:
   keystone:
-    charm: cs:~openstack-charmers-next/keystone
+    charm: cs:keystone
     num_units: 1
     options:
       openstack-origin: cloud:bionic-rocky
   mysql:
-    charm: cs:~openstack-charmers-next/percona-cluster
+    charm: cs:percona-cluster
     num_units: 1
   hacluster-octavia:
-    charm: cs:~openstack-charmers-next/hacluster
+    charm: cs:hacluster
     num_units: 0
   octavia:
     series: bionic
@@ -30,5 +30,5 @@ applications:
       openstack-origin: cloud:bionic-rocky
       vip: 'ADD YOUR VIP HERE'
   rabbitmq-server:
-    charm: cs:~openstack-charmers-next/rabbitmq-server
+    charm: cs:rabbitmq-server
     num_units: 1

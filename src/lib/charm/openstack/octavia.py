@@ -276,6 +276,22 @@ def amp_flavor_id(cls):
         leadership.leader_get('amp-flavor-id'))
 
 
+@charms_openstack.adapters.config_property
+def spare_amphora_pool_size(cls):
+    """Number of spare Amphora instances to pool
+
+    Octavia can maintain a pool of Amphora instance to reduce the spin up
+    time for new loadbalancer services.
+
+    :param cls: charms_openstack.adapters.ConfigurationAdapter derived class
+                instance.  Charm class instance is at cls.charm_instance.
+    :type: cls: charms_openstack.adapters.ConfiguartionAdapter
+    :returns: Number of amphora instances to pool.
+    :rtype: str
+    """
+    return ch_core.hookenv.config('spare-pool-size')
+
+
 class OctaviaCharm(charms_openstack.charm.HAOpenStackCharm):
     """Charm class for the Octavia charm."""
     # layer-openstack-api uses service_type as service name in endpoint catalog

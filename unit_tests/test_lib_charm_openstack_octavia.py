@@ -109,6 +109,15 @@ class TestOctaviaCharmConfigProperties(Helper):
         octavia.amp_boot_network_list(cls)
         self.leader_get.assert_called_with('amp-boot-network-list')
 
+    def test_spare_amphora_pool_size(self):
+        cls = mock.MagicMock()
+        self.patch('charmhelpers.core.hookenv.config', 'config')
+        self.config.return_value = None
+        self.assertEqual(octavia.spare_amphora_pool_size(cls), None)
+        self.config.return_value = 5
+        self.assertEqual(octavia.spare_amphora_pool_size(cls), 5)
+        self.config.assert_called_with('spare-pool-size')
+
 
 class TestOctaviaCharm(Helper):
 

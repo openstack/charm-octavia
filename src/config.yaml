@@ -112,3 +112,11 @@ options:
     description: |
       Restrict glance image selection to a specific owner ID. This is a
       recommended security setting.
+  spare-pool-size:
+    type: int
+    default:
+    description: |
+      Number of Amphora instances to hold in the spare pool to reduce spin-up
+      time for new load balancers.
+      .
+      The default behaviour is to not maintain any spare servers.

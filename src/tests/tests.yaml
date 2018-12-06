@@ -3,15 +3,16 @@ gate_bundles:
 - bionic-rocky
 - bionic-rocky-ha
 - cosmic-rocky
-- cosmic-rocky-ha
 smoke_bundles:
 - bionic-rocky
 comment: |
   The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
-  https://github.com/lxc/lxd/issues/4947
+    https://github.com/lxc/lxd/issues/4947
   Holding the `cosmic-rocky-lxd` bundle awaiting required changes to CI.
+  Holding the `cosmic-rocky-ha` bundle due to it consitently timing out atm.
 dev_bundles:
 - bionic-rocky-lxd
+- cosmic-rocky-ha
 - cosmic-rocky-lxd
 target_deploy_status:
   octavia:

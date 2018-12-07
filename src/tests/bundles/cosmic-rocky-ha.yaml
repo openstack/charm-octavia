@@ -54,31 +54,31 @@ relations:
   - octavia:ha
 applications:
   glance:
-    charm: cs:~openstack-charmers-next/glance
+    charm: cs:glance
     num_units: 1
   keystone:
-    charm: cs:~openstack-charmers-next/keystone
+    charm: cs:keystone
     num_units: 1
   mysql:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers-next/percona-cluster
+    charm: cs:percona-cluster
     num_units: 1
   neutron-api:
-    charm: cs:~openstack-charmers-next/neutron-api
+    charm: cs:neutron-api
     num_units: 1
     options:
       debug: True
       flat-network-providers: physnet1
       neutron-security-groups: True
   neutron-gateway:
-    charm: cs:~openstack-charmers-next/neutron-gateway
+    charm: cs:neutron-gateway
     num_units: 1
     options:
       bridge-mappings: physnet1:br-ex
       debug: True
   neutron-openvswitch:
     series: cosmic
-    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    charm: cs:neutron-openvswitch
     num_units: 0
     options:
       debug: True
@@ -86,19 +86,19 @@ applications:
       firewall-driver: openvswitch
   nova-cloud-controller:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers-next/nova-cloud-controller
+    charm: cs:nova-cloud-controller
     num_units: 1
     options:
       debug: True
       network-manager: Neutron
   nova-compute:
     constraints: mem=7168M
-    charm: cs:~openstack-charmers-next/nova-compute
+    charm: cs:nova-compute
     num_units: 1
     options:
       debug: True
   hacluster-octavia:
-    charm: cs:~openstack-charmers-next/hacluster
+    charm: cs:hacluster
     num_units: 0
   octavia:
     series: cosmic
@@ -108,5 +108,5 @@ applications:
       debug: True
       vip: 'ADD YOUR VIP HERE'
   rabbitmq-server:
-    charm: cs:~openstack-charmers-next/rabbitmq-server
+    charm: cs:rabbitmq-server
     num_units: 1

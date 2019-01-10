@@ -38,6 +38,8 @@ import charmhelpers.contrib.network.ip as ch_net_ip
 
 NEUTRON_TEMP_EXCS = (keystone_exceptions.catalog.EndpointNotFound,
                      keystone_exceptions.connection.ConnectFailure,
+                     keystone_exceptions.discovery.DiscoveryFailure,
+                     keystone_exceptions.http.ServiceUnavailable,
                      neutronclient.common.exceptions.ServiceUnavailable)
 
 

@@ -25,6 +25,7 @@ import charms_openstack.ip as os_ip
 import charmhelpers.core as ch_core
 
 import charm.openstack.api_crud as api_crud
+import charm.openstack.octavia as octavia
 
 charms_openstack.bus.discover()
 
@@ -32,10 +33,28 @@ charm.use_defaults(
     'charm.installed',
     'amqp.connected',
     'shared-db.connected',
-    'identity-service.connected',
     'identity-service.available',
     'config.changed',
     'update-status')
+
+
+@reactive.when('identity-service.connected')
+def setup_endpoint_connection(keystone):
+    """Custom register endpoint function for Octavia.
+
+    Octavia expects end users to have specifc roles assigned for access to the
+    load-balancer API [0].  Create these roles on charm deployment / upgrade.
+
+    0: https://docs.openstack.org/octavia/latest/configuration/policy.html
+    """
+    with charm.provide_charm_instance() as instance:
+        keystone.register_endpoints(instance.service_type,
+                                    instance.region,
+                                    instance.public_url,
+                                    instance.internal_url,
+                                    instance.admin_url,
+                                    requested_roles=octavia.OCTAVIA_ROLES)
+        instance.assess_status()
 
 
 @reactive.when('leadership.is_leader')

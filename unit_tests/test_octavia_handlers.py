@@ -18,6 +18,7 @@ from __future__ import print_function
 import json
 import mock
 
+import charm.openstack.octavia as octavia
 import reactive.octavia_handlers as handlers
 
 import charms_openstack.test_utils as test_utils
@@ -30,7 +31,6 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
             'charm.installed',
             'amqp.connected',
             'shared-db.connected',
-            'identity-service.connected',
             'identity-service.available',
             'config.changed',
             'update-status']
@@ -55,6 +55,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                     'identity-service.available',
                     'neutron-api.available',
                     'amqp.available',),
+                'setup_endpoint_connection': (
+                    'identity-service.connected',),
             },
             'when_not': {
                 'init_db': ('db.synced',),
@@ -71,12 +73,25 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
 
     def setUp(self):
         super().setUp()
+        self.patch_release(octavia.OctaviaCharm.release)
         self.octavia_charm = mock.MagicMock()
         self.patch_object(handlers.charm, 'provide_charm_instance',
                           new=mock.MagicMock())
         self.provide_charm_instance().__enter__.return_value = \
             self.octavia_charm
         self.provide_charm_instance().__exit__.return_value = None
+
+    def test_setup_endpoint_connection(self):
+        keystone = mock.MagicMock()
+        handlers.setup_endpoint_connection(keystone)
+        keystone.register_endpoints.assert_called_once_with(
+            self.octavia_charm.service_type,
+            self.octavia_charm.region,
+            self.octavia_charm.public_url,
+            self.octavia_charm.internal_url,
+            self.octavia_charm.admin_url,
+            requested_roles=octavia.OCTAVIA_ROLES)
+        self.octavia_charm.assess_status.assert_called_once_with()
 
     def test_generate_heartbeat_key(self):
         self.patch('charms.leadership.leader_set', 'leader_set')

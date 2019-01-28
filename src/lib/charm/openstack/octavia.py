@@ -45,6 +45,14 @@ OCTAVIA_MGMT_SECGRP = OCTAVIA_MGMT_NAME_PREFIX + '-sec-grp'
 OCTAVIA_HEALTH_SECGRP = 'lb-health-mgr-sec-grp'
 OCTAVIA_HEALTH_LISTEN_PORT = '5555'
 
+OCTAVIA_ROLES = [
+    'load-balancer_observer',
+    'load-balancer_global_observer',
+    'load-balancer_member',
+    'load-balancer_quota_admin',
+    'load-balancer_admin',
+]
+
 charms_openstack.charm.use_defaults('charm.default-select-release')
 
 

@@ -41,6 +41,7 @@ NEUTRON_TEMP_EXCS = (keystone_exceptions.catalog.EndpointNotFound,
                      keystone_exceptions.discovery.DiscoveryFailure,
                      keystone_exceptions.http.ServiceUnavailable,
                      neutronclient.common.exceptions.ServiceUnavailable)
+SYSTEM_CA_BUNDLE = '/etc/ssl/certs/ca-certificates.crt'
 
 
 class APIUnavailable(Exception):
@@ -100,7 +101,10 @@ def session_from_identity_service(identity_service):
         project_domain_name=identity_service.service_domain(),
         project_name=identity_service.service_tenant(),
     )
-    return keystone_session.Session(auth=auth)
+    # NOTE(fnordahl): LP: #1819205 since the charm bundles its dependencies we
+    # do not get the patched python ``certifi`` package that ponits at the
+    # system wide certificate store.  We need to point clients there ourself.
+    return keystone_session.Session(auth=auth, verify=SYSTEM_CA_BUNDLE)
 
 
 def get_nova_flavor(identity_service):

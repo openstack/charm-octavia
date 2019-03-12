@@ -87,7 +87,8 @@ class TestAPICrud(test_utils.PatchHelper):
             project_name=identity_service.service_tenant(),
         )
         self.keystone_session.Session.assert_called_once_with(
-            auth=self.keystone_identity.Password())
+            auth=self.keystone_identity.Password(),
+            verify='/etc/ssl/certs/ca-certificates.crt')
         self.assertEqual(result, self.keystone_session.Session())
 
     def test_get_nova_flavor(self):

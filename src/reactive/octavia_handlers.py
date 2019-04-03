@@ -35,7 +35,8 @@ charm.use_defaults(
     'shared-db.connected',
     'identity-service.available',
     'config.changed',
-    'update-status')
+    'update-status',
+    'upgrade-charm')
 
 
 @reactive.when('identity-service.connected')

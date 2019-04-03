@@ -134,7 +134,8 @@ class TestAPICrud(test_utils.PatchHelper):
         health_secgrp_uuid = 'fake-secgrp-uuid'
         nc.list_security_groups.return_value = {
             'security_groups': [{'id': health_secgrp_uuid}]}
-        self.patch_object(api_crud.ch_net_ip, 'get_hostname')
+        self.patch_object(api_crud.socket, 'gethostname')
+        self.gethostname.return_value = 'fakehostname'
         port_uuid = 'fake-port-uuid'
         port_mac_address = 'fake-mac-address'
         nc.create_port.return_value = {
@@ -155,7 +156,7 @@ class TestAPICrud(test_utils.PatchHelper):
             {
                 'port': {
                     'admin_state_up': False,
-                    'binding:host_id': self.get_hostname(),
+                    'binding:host_id': 'fakehostname',
                     'device_owner': 'Octavia:health-mgr',
                     'security_groups': ['fake-secgrp-uuid'],
                     'name': 'octavia-health-manager-'

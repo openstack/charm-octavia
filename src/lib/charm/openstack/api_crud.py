@@ -22,6 +22,7 @@
 # port.
 
 import neutronclient
+import socket
 import subprocess
 
 from keystoneauth1 import identity as keystone_identity
@@ -33,7 +34,6 @@ from novaclient import client as nova_client
 import charm.openstack.octavia as octavia  # for constants
 
 import charmhelpers.core as ch_core
-import charmhelpers.contrib.network.ip as ch_net_ip
 
 
 NEUTRON_TEMP_EXCS = (keystone_exceptions.catalog.EndpointNotFound,
@@ -212,8 +212,7 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address):
                         # avoid race with OVS agent attempting to bind port
                         # before it is created in the local units OVSDB
                         'admin_state_up': False,
-                        'binding:host_id': ch_net_ip.get_hostname(
-                            local_unit_address, fqdn=False),
+                        'binding:host_id': socket.gethostname(),
                         'device_owner': 'Octavia:health-mgr',
                         'security_groups': [
                             health_secgrp['id'],

@@ -33,7 +33,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
             'shared-db.connected',
             'identity-service.available',
             'config.changed',
-            'update-status']
+            'update-status',
+            'upgrade-charm']
         hook_set = {
             'when': {
                 'render': ('shared-db.available',

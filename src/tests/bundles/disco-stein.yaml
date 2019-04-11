@@ -1,0 +1,106 @@
+series: disco
+relations:
+- - glance:image-service
+  - nova-cloud-controller:image-service
+- - glance:image-service
+  - nova-compute:image-service
+- - mysql:shared-db
+  - glance:shared-db
+- - mysql:shared-db
+  - keystone:shared-db
+- - mysql:shared-db
+  - neutron-api:shared-db
+- - mysql:shared-db
+  - nova-cloud-controller:shared-db
+- - mysql:shared-db
+  - octavia:shared-db
+- - keystone:identity-service
+  - glance:identity-service
+- - keystone:identity-service
+  - nova-cloud-controller:identity-service
+- - keystone:identity-service
+  - neutron-api:identity-service
+- - keystone:identity-service
+  - octavia:identity-service
+- - nova-compute:cloud-compute
+  - nova-cloud-controller:cloud-compute
+- - rabbitmq-server:amqp
+  - neutron-api:amqp
+- - rabbitmq-server:amqp
+  - glance:amqp
+- - rabbitmq-server:amqp
+  - neutron-gateway:amqp
+- - rabbitmq-server:amqp
+  - nova-cloud-controller:amqp
+- - rabbitmq-server:amqp
+  - nova-compute:amqp
+- - rabbitmq-server:amqp
+  - octavia:amqp
+- - neutron-api:neutron-api
+  - nova-cloud-controller:neutron-api
+- - neutron-api:neutron-load-balancer
+  - octavia:neutron-api
+- - neutron-gateway:quantum-network-service
+  - nova-cloud-controller:quantum-network-service
+- - rabbitmq-server:amqp
+  - neutron-openvswitch:amqp
+- - neutron-api:neutron-plugin-api
+  - neutron-openvswitch:neutron-plugin-api
+- - neutron-openvswitch:neutron-plugin
+  - nova-compute:neutron-plugin
+- - neutron-openvswitch:neutron-plugin
+  - octavia:neutron-openvswitch
+applications:
+  glance:
+    charm: cs:~openstack-charmers-next/glance
+    num_units: 1
+  keystone:
+    charm: cs:~openstack-charmers-next/keystone
+    num_units: 1
+  mysql:
+    constraints: mem=3072M
+    charm: cs:~openstack-charmers-next/percona-cluster
+    num_units: 1
+  neutron-api:
+    charm: cs:~openstack-charmers-next/neutron-api
+    num_units: 1
+    options:
+      debug: True
+      flat-network-providers: physnet1
+      neutron-security-groups: True
+  neutron-gateway:
+    charm: cs:~openstack-charmers-next/neutron-gateway
+    num_units: 1
+    options:
+      bridge-mappings: physnet1:br-ex
+      debug: True
+  neutron-openvswitch:
+    series: disco
+    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    num_units: 0
+    options:
+      debug: True
+      prevent-arp-spoofing: False
+      firewall-driver: openvswitch
+  nova-cloud-controller:
+    constraints: mem=3072M
+    charm: cs:~openstack-charmers-next/nova-cloud-controller
+    num_units: 1
+    options:
+      debug: True
+      network-manager: Neutron
+  nova-compute:
+    constraints: mem=7168M
+    charm: cs:~openstack-charmers-next/nova-compute
+    num_units: 1
+    options:
+      debug: True
+  octavia:
+    series: disco
+    charm: ../../../octavia
+    num_units: 3
+    options:
+      debug: True
+  rabbitmq-server:
+    charm: cs:~openstack-charmers-next/rabbitmq-server
+    num_units: 1

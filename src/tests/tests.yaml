@@ -2,15 +2,18 @@ charm_name: octavia
 gate_bundles:
 - bionic-rocky
 - bionic-rocky-ha
+- bionic-stein
 - cosmic-rocky
 smoke_bundles:
 - bionic-rocky
 comment: |
+  Holding the ``disco-stein`` bundle pending LP: #1824112
   The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
     https://github.com/lxc/lxd/issues/4947
-  Holding the `cosmic-rocky-lxd` bundle awaiting required changes to CI.
-  Holding the `cosmic-rocky-ha` bundle due to it consitently timing out atm.
+  Holding the ``cosmic-rocky-lxd`` bundle awaiting required changes to CI.
+  Holding the ``cosmic-rocky-ha`` bundle due to it consitently timing out atm.
 dev_bundles:
+- disco-stein
 - bionic-rocky-lxd
 - cosmic-rocky-ha
 - cosmic-rocky-lxd

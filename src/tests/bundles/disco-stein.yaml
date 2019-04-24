@@ -121,12 +121,14 @@ applications:
     charm: cs:~openstack-charmers-next/rabbitmq-server
     num_units: 1
   glance-simplestreams-sync:
+    series: bionic
     charm: cs:~openstack-charmers-next/glance-simplestreams-sync
     num_units: 1
     options:
       source: ppa:simplestreams-dev/trunk
       use_swift: False
   octavia-diskimage-retrofit:
+    series: bionic
     charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'

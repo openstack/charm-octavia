@@ -100,9 +100,9 @@ applications:
       debug: True
       network-manager: Neutron
   nova-compute:
-    constraints: mem=7168M
+    constraints: mem=10240M
     charm: cs:~openstack-charmers-next/nova-compute
-    num_units: 1
+    num_units: 2
     options:
       debug: True
   hacluster-octavia:
@@ -114,6 +114,8 @@ applications:
     num_units: 3
     options:
       debug: True
+      spare-pool-size: 2
+      loadbalancer-topology: 'ACTIVE_STANDBY'
       vip: 'ADD YOUR VIP HERE'
   rabbitmq-server:
     charm: cs:~openstack-charmers-next/rabbitmq-server

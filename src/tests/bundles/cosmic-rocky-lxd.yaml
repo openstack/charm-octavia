@@ -123,9 +123,9 @@ applications:
     to:
     - lxd:1
   nova-compute:
-    constraints: mem=7168M
+    constraints: mem=10240M
     charm: cs:~openstack-charmers-next/nova-compute
-    num_units: 1
+    num_units: 2
     options:
       debug: True
     to:
@@ -136,6 +136,8 @@ applications:
     num_units: 3
     options:
       debug: True
+      spare-pool-size: 2
+      loadbalancer-topology: 'ACTIVE_STANDBY'
     to:
     - lxd:0
     - lxd:1

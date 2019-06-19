@@ -50,6 +50,14 @@ relations:
   - nova-compute:neutron-plugin
 - - neutron-openvswitch:neutron-plugin
   - octavia:neutron-openvswitch
+- - glance-simplestreams-sync:juju-info
+  - octavia-diskimage-retrofit:juju-info
+- - keystone:identity-service
+  - glance-simplestreams-sync:identity-service
+- - rabbitmq-server:amqp
+  - glance-simplestreams-sync:amqp
+- - keystone:identity-credentials
+  - octavia-diskimage-retrofit:identity-credentials
 applications:
   glance:
     charm: cs:~openstack-charmers-next/glance
@@ -113,3 +121,13 @@ applications:
   rabbitmq-server:
     charm: cs:~openstack-charmers-next/rabbitmq-server
     num_units: 1
+  glance-simplestreams-sync:
+    charm: cs:~openstack-charmers-next/glance-simplestreams-sync
+    num_units: 1
+    options:
+      source: ppa:simplestreams-dev/trunk
+      use_swift: False
+  octavia-diskimage-retrofit:
+    charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
+    options:
+      retrofit-uca-pocket: stein

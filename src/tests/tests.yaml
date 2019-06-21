@@ -28,8 +28,12 @@ configure:
 - zaza.openstack.charm_tests.nova.setup.create_flavors
 - zaza.openstack.charm_tests.nova.setup.manage_ssh_key
 - zaza.openstack.charm_tests.neutron.setup.basic_overcloud_network
+- zaza.openstack.charm_tests.octavia.setup.prepare_payload_instance
+- zaza.openstack.charm_tests.octavia.setup.prepare_payload_instance
+comment: |
+  The repetition of ``prepare_payload_instance`` is intentional and gives the
+  test multiple backends to feed Octavia.
 tests:
 - zaza.openstack.charm_tests.neutron_openvswitch.tests.NeutronOpenvSwitchOverlayTest
-- zaza.openstack.charm_tests.nova.tests.LTSGuestCreateTest
 - zaza.openstack.charm_tests.octavia.tests.LBAASv2Test
 - zaza.openstack.charm_tests.octavia.tests.CharmOperationTest

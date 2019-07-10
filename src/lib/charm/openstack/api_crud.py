@@ -31,6 +31,8 @@ from keystoneauth1 import exceptions as keystone_exceptions
 from neutronclient.v2_0 import client as neutron_client
 from novaclient import client as nova_client
 
+import neutron_lib.constants
+
 import charm.openstack.octavia as octavia  # for constants
 
 import charmhelpers.core as ch_core
@@ -213,7 +215,21 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address):
                         # before it is created in the local units OVSDB
                         'admin_state_up': False,
                         'binding:host_id': socket.gethostname(),
-                        'device_owner': 'Octavia:health-mgr',
+                        # NOTE(fnordahl): device_owner has special meaning
+                        # for Neutron [0], and things may break if set to
+                        # an arbritary value.  Using a value known by Neutron
+                        # is_dvr_serviced() function [1] gets us the correct
+                        # rules appiled to the port to allow IPv6 Router
+                        # Advertisement packets through LP: #1813931
+                        # 0: https://github.com/openstack/neutron/blob/
+                        #      916347b996684c82b29570cd2962df3ea57d4b16/
+                        #      neutron/plugins/ml2/drivers/openvswitch/
+                        #      agent/ovs_dvr_neutron_agent.py#L592
+                        # 1: https://github.com/openstack/neutron/blob/
+                        #      50308c03c960bd6e566f328a790b8e05f5e92ead/
+                        #      neutron/common/utils.py#L200
+                        'device_owner': (
+                            neutron_lib.constants.DEVICE_OWNER_LOADBALANCERV2),
                         'security_groups': [
                             health_secgrp['id'],
                         ],

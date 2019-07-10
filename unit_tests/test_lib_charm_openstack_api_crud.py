@@ -143,6 +143,8 @@ class TestAPICrud(test_utils.PatchHelper):
         self.patch('subprocess.check_output', 'check_output')
         self.patch('charms.reactive.set_flag', 'set_flag')
         identity_service = mock.MagicMock()
+        self.patch_object(api_crud, 'neutron_lib')
+        self.neutron_lib.constants.DEVICE_OWNER_LOADBALANCERV2 = 'fakeowner'
         result = api_crud.get_hm_port(identity_service,
                                       'fake-unit-name',
                                       '192.0.2.42')
@@ -157,7 +159,7 @@ class TestAPICrud(test_utils.PatchHelper):
                 'port': {
                     'admin_state_up': False,
                     'binding:host_id': 'fakehostname',
-                    'device_owner': 'Octavia:health-mgr',
+                    'device_owner': 'fakeowner',
                     'security_groups': ['fake-secgrp-uuid'],
                     'name': 'octavia-health-manager-'
                             'fake-unit-name-listen-port',

@@ -2,3 +2,5 @@ keystoneauth1
 pbr
 python-novaclient
 python-neutronclient
+neutron_lib
+pytest-runner

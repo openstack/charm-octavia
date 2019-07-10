@@ -29,8 +29,6 @@ relations:
 - - rabbitmq-server:amqp
   - glance:amqp
 - - rabbitmq-server:amqp
-  - neutron-gateway:amqp
-- - rabbitmq-server:amqp
   - nova-cloud-controller:amqp
 - - rabbitmq-server:amqp
   - nova-compute:amqp
@@ -40,15 +38,17 @@ relations:
   - nova-cloud-controller:neutron-api
 - - neutron-api:neutron-load-balancer
   - octavia:neutron-api
-- - neutron-gateway:quantum-network-service
-  - nova-cloud-controller:quantum-network-service
 - - rabbitmq-server:amqp
   - neutron-openvswitch:amqp
 - - neutron-api:neutron-plugin-api
   - neutron-openvswitch:neutron-plugin-api
 - - neutron-openvswitch:neutron-plugin
   - nova-compute:neutron-plugin
-- - neutron-openvswitch:neutron-plugin
+- - rabbitmq-server:amqp
+  - neutron-openvswitch-octavia:amqp
+- - neutron-api:neutron-plugin-api
+  - neutron-openvswitch-octavia:neutron-plugin-api
+- - neutron-openvswitch-octavia:neutron-plugin
   - octavia:neutron-openvswitch
 - - glance-simplestreams-sync:juju-info
   - octavia-diskimage-retrofit:juju-info
@@ -76,13 +76,19 @@ applications:
       debug: True
       flat-network-providers: physnet1
       neutron-security-groups: True
-  neutron-gateway:
-    charm: cs:~openstack-charmers-next/neutron-gateway
-    num_units: 1
-    options:
-      bridge-mappings: physnet1:br-ex
-      debug: True
+      enable-dvr: True
   neutron-openvswitch:
+    series: disco
+    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    num_units: 0
+    options:
+      debug: True
+      enable-local-dhcp-and-metadata: True
+      use-dvr-snat: True
+      prevent-arp-spoofing: False
+      firewall-driver: openvswitch
+      bridge-mappings: physnet1:br-ex
+  neutron-openvswitch-octavia:
     series: disco
     charm: cs:~openstack-charmers-next/neutron-openvswitch
     num_units: 0

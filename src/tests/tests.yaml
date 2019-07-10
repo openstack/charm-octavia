@@ -1,6 +1,6 @@
 charm_name: octavia
 gate_bundles:
-- bionic-stein
+- bionic-stein-ha
 - bionic-rocky-ha
 smoke_bundles:
 - bionic-stein
@@ -8,8 +8,6 @@ comment: |
   Holding the ``disco-stein`` bundle pending LP: #1824112
   The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
     https://github.com/lxc/lxd/issues/4947
-  Holding the ``cosmic-rocky-lxd`` bundle awaiting required changes to CI.
-  Holding the ``cosmic-rocky-ha`` bundle due to it consitently timing out atm.
 dev_bundles:
 - disco-stein
 - bionic-rocky-lxd
@@ -27,6 +25,7 @@ configure:
 - zaza.openstack.charm_tests.nova.setup.create_flavors
 - zaza.openstack.charm_tests.nova.setup.manage_ssh_key
 - zaza.openstack.charm_tests.neutron.setup.basic_overcloud_network
+- zaza.openstack.charm_tests.octavia.setup.centralized_fip_network
 - zaza.openstack.charm_tests.octavia.setup.prepare_payload_instance
 - zaza.openstack.charm_tests.octavia.setup.prepare_payload_instance
 comment: |

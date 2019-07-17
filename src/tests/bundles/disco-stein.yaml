@@ -123,4 +123,5 @@ applications:
   octavia-diskimage-retrofit:
     charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
     options:
+      amp-image-tag: 'octavia-amphora'
       retrofit-uca-pocket: stein

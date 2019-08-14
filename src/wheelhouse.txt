@@ -4,3 +4,5 @@ python-novaclient
 python-neutronclient
 neutron_lib
 pytest-runner
+
+git+https://opendev.org/openstack/charms.openstack.git@stable/19.07#egg=charms.openstack

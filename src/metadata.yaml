@@ -19,7 +19,7 @@ tags:
   - openstack
 series:
   - bionic
-  - cosmic
+  - eoan
   - disco
 subordinate: false
 requires:

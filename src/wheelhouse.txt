@@ -4,6 +4,3 @@ python-novaclient
 python-neutronclient
 neutron_lib
 pytest-runner
-
-jinja2
-psutil

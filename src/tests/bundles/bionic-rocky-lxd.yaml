@@ -67,6 +67,20 @@ relations:
   - glance-simplestreams-sync:amqp
 - - keystone:identity-credentials
   - octavia-diskimage-retrofit:identity-credentials
+- - vault:shared-db
+  - mysql:shared-db
+- - vault:certificates
+  - glance:certificates
+- - vault:certificates
+  - keystone:certificates
+- - vault:certificates
+  - neutron-api:certificates
+- - vault:certificates
+  - nova-cloud-controller:certificates
+- - vault:certificates
+  - octavia:certificates
+- - vault:certificates
+  - octavia-diskimage-retrofit:certificates
 applications:
   glance:
     charm: cs:~openstack-charmers-next/glance
@@ -166,3 +180,6 @@ applications:
     charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
+  vault:
+    charm: cs:~openstack-charmers-next/vault
+    num_units: 1

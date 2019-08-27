@@ -1,4 +1,4 @@
-series: bionic
+series: disco
 relations:
 - - glance:image-service
   - nova-cloud-controller:image-service
@@ -50,6 +50,8 @@ relations:
   - neutron-openvswitch-octavia:neutron-plugin-api
 - - neutron-openvswitch-octavia:neutron-plugin
   - octavia:neutron-openvswitch
+- - hacluster-octavia:ha
+  - octavia:ha
 - - glance-simplestreams-sync:juju-info
   - octavia-diskimage-retrofit:juju-info
 - - keystone:identity-service
@@ -62,13 +64,9 @@ applications:
   glance:
     charm: cs:~openstack-charmers-next/glance
     num_units: 1
-    options:
-      openstack-origin: cloud:bionic-rocky
   keystone:
     charm: cs:~openstack-charmers-next/keystone
     num_units: 1
-    options:
-      openstack-origin: cloud:bionic-rocky
   mysql:
     constraints: mem=3072M
     charm: cs:~openstack-charmers-next/percona-cluster
@@ -77,13 +75,12 @@ applications:
     charm: cs:~openstack-charmers-next/neutron-api
     num_units: 1
     options:
-      openstack-origin: cloud:bionic-rocky
       debug: True
       flat-network-providers: physnet1
       neutron-security-groups: True
       enable-dvr: True
   neutron-openvswitch:
-    series: bionic
+    series: disco
     charm: cs:~openstack-charmers-next/neutron-openvswitch
     num_units: 0
     options:
@@ -94,7 +91,7 @@ applications:
       firewall-driver: openvswitch
       bridge-mappings: physnet1:br-ex
   neutron-openvswitch-octavia:
-    series: bionic
+    series: disco
     charm: cs:~openstack-charmers-next/neutron-openvswitch
     num_units: 0
     options:
@@ -106,7 +103,6 @@ applications:
     charm: cs:~openstack-charmers-next/nova-cloud-controller
     num_units: 1
     options:
-      openstack-origin: cloud:bionic-rocky
       debug: True
       network-manager: Neutron
   nova-compute:
@@ -114,14 +110,15 @@ applications:
     charm: cs:~openstack-charmers-next/nova-compute
     num_units: 2
     options:
-      openstack-origin: cloud:bionic-rocky
       debug: True
+  hacluster-octavia:
+    charm: cs:~openstack-charmers-next/hacluster
+    num_units: 0
   octavia:
-    series: bionic
+    series: disco
     charm: ../../../octavia
     num_units: 3
     options:
-      openstack-origin: cloud:bionic-rocky
       debug: True
       spare-pool-size: 2
       loadbalancer-topology: 'ACTIVE_STANDBY'
@@ -129,13 +126,15 @@ applications:
     charm: cs:~openstack-charmers-next/rabbitmq-server
     num_units: 1
   glance-simplestreams-sync:
+    series: bionic
     charm: cs:~openstack-charmers-next/glance-simplestreams-sync
     num_units: 1
     options:
       source: ppa:simplestreams-dev/trunk
       use_swift: False
   octavia-diskimage-retrofit:
+    series: bionic
     charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
-      retrofit-uca-pocket: rocky
+      retrofit-uca-pocket: stein

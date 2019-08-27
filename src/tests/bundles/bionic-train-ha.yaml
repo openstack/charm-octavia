@@ -63,6 +63,22 @@ relations:
 - [ placement, mysql ]
 - [ placement, keystone ]
 - [ placement, nova-cloud-controller ]
+- - vault:shared-db
+  - mysql:shared-db
+- - vault:certificates
+  - glance:certificates
+- - vault:certificates
+  - keystone:certificates
+- - vault:certificates
+  - neutron-api:certificates
+- - vault:certificates
+  - nova-cloud-controller:certificates
+- - vault:certificates
+  - octavia:certificates
+- - vault:certificates
+  - octavia-diskimage-retrofit:certificates
+- - vault:certificates
+  - placement:certificates
 applications:
   glance:
     charm: cs:~openstack-charmers-next/glance
@@ -155,3 +171,6 @@ applications:
     options:
       openstack-origin: cloud:bionic-train
       debug: true
+  vault:
+    charm: cs:~openstack-charmers-next/vault
+    num_units: 1

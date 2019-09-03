@@ -33,10 +33,12 @@ charm.use_defaults(
     'charm.installed',
     'amqp.connected',
     'shared-db.connected',
-    'identity-service.available',
+    'identity-service.connected',
     'config.changed',
     'update-status',
-    'upgrade-charm')
+    'upgrade-charm',
+    'certificates.available',
+)
 
 
 @reactive.when('identity-service.connected')

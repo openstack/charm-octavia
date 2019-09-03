@@ -31,10 +31,12 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
             'charm.installed',
             'amqp.connected',
             'shared-db.connected',
-            'identity-service.available',
+            'identity-service.connected',
             'config.changed',
             'update-status',
-            'upgrade-charm']
+            'upgrade-charm',
+            'certificates.available',
+        ]
         hook_set = {
             'when': {
                 'render': ('shared-db.available',

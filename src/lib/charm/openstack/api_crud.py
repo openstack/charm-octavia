@@ -472,6 +472,7 @@ def get_mgmt_network(identity_service, create=True):
                 {
                     'router': {
                         'name': octavia.OCTAVIA_MGMT_NAME_PREFIX,
+                        'distributed': False,
 
                     }
                 })

@@ -269,6 +269,8 @@ class TestAPICrud(test_utils.PatchHelper):
 
         nc.list_subnets.assert_called_once_with(tags=resource_tag)
         nc.list_routers.assert_called_once_with(tags=resource_tag)
+        nc.create_router.assert_called_once_with(
+            {'router': {'name': 'lb-mgmt', 'distributed': False}})
         nc.list_security_groups.assert_any_call(tags=resource_tag)
         nc.list_security_groups.assert_any_call(tags=resource_tag + '-health')
         nc.create_security_group_rule.assert_has_calls(

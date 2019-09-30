@@ -2,5 +2,7 @@ keystoneauth1
 pbr
 python-novaclient
 python-neutronclient
+# tactical fix for https://github.com/celery/kombu/issues/1105
+amqp==2.5.1
 neutron_lib
 pytest-runner

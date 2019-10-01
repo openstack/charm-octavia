@@ -122,8 +122,10 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
         self.patch('charms.reactive.set_flag', 'set_flag')
         self.patch_object(handlers.api_crud, 'setup_hm_port')
         handlers.setup_hm_port()
-        self.setup_hm_port.assert_called_with(self.endpoint_from_flag(),
-                                              self.octavia_charm)
+        self.setup_hm_port.assert_called_with(
+            self.endpoint_from_flag(),
+            self.octavia_charm,
+            ovs_hostname=self.endpoint_from_flag().host())
         self.set_flag.assert_called_once_with('config.changed')
 
     def test_update_controller_ip_port_list(self):

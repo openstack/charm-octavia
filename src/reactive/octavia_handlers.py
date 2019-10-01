@@ -100,13 +100,15 @@ def setup_hm_port():
     communication with the octavia managed load balancer instances running
     within the deployed cloud.
     """
+    ovs = reactive.endpoint_from_flag('neutron-openvswitch.connected')
     with charm.provide_charm_instance() as octavia_charm:
         identity_service = reactive.endpoint_from_flag(
             'identity-service.available')
         try:
             if api_crud.setup_hm_port(
                     identity_service,
-                    octavia_charm):
+                    octavia_charm,
+                    ovs_hostname=ovs.host()):
                 # trigger config render to make systemd-networkd bring up
                 # automatic IP configuration of the new port right now.
                 reactive.set_flag('config.changed')

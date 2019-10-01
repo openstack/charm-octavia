@@ -169,6 +169,25 @@ class TestAPICrud(test_utils.PatchHelper):
         nc.add_tag.assert_called_with('ports', port_uuid, 'charm-octavia')
         self.assertEqual(result, {'id': 'fake-port-uuid',
                                   'mac_address': 'fake-mac-address'})
+        nc.create_port.reset_mock()
+        result = api_crud.get_hm_port(identity_service,
+                                      'fake-unit-name',
+                                      '192.0.2.42',
+                                      ovs_hostname='fake-unit-name.fqdn')
+        nc.create_port.assert_called_once_with(
+            {
+                'port': {
+                    'admin_state_up': False,
+                    'binding:host_id': 'fake-unit-name.fqdn',
+                    'device_owner': 'fakeowner',
+                    'security_groups': ['fake-secgrp-uuid'],
+                    'name': 'octavia-health-manager-'
+                            'fake-unit-name-listen-port',
+                    'network_id': 'fake-network-uuid',
+                },
+            })
+        self.assertEqual(result, {'id': 'fake-port-uuid',
+                                  'mac_address': 'fake-mac-address'})
 
     def test_toggle_hm_port(self):
         self.patch_object(api_crud, 'neutron_client')
@@ -204,7 +223,8 @@ class TestAPICrud(test_utils.PatchHelper):
         self.get_hm_port.assert_called_with(
             identity_service,
             octavia_charm.local_unit_name,
-            octavia_charm.local_address)
+            octavia_charm.local_address,
+            ovs_hostname=None)
         self.check_output.assert_called_with(
             ['ip', 'link', 'show', api_crud.octavia.OCTAVIA_MGMT_INTF],
             stderr=-2, universal_newlines=True)

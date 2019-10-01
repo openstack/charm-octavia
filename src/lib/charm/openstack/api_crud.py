@@ -138,7 +138,8 @@ def get_nova_flavor(identity_service):
         raise APIUnavailable('nova', 'flavors', e)
 
 
-def get_hm_port(identity_service, local_unit_name, local_unit_address):
+def get_hm_port(identity_service, local_unit_name, local_unit_address,
+                ovs_hostname=None):
     """Get or create a per unit Neutron port for Octavia Health Manager.
 
     A side effect of calling this function is that a port is created if one
@@ -151,6 +152,8 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address):
     :param local_unit_address: DNS resolvable IP address of unit, used to
                                build Neutron port ``binding:host_id``
     :type local_unit_address: str
+    :param ovs_hostname: Hostname used by neutron-openvswitch
+    :type ovs_hostname: Option[None,str]
     :returns: Port details extracted from result of call to
               neutron_client.list_ports or neutron_client.create_port
     :rtype: dict
@@ -200,44 +203,63 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address):
     except NEUTRON_TEMP_EXCS as e:
         raise APIUnavailable('neutron', 'ports', e)
 
+    port_template = {
+        'port': {
+            # avoid race with OVS agent attempting to bind port
+            # before it is created in the local units OVSDB
+            'admin_state_up': False,
+            'binding:host_id': (ovs_hostname or
+                                socket.gethostname()),
+            # NOTE(fnordahl): device_owner has special meaning
+            # for Neutron [0], and things may break if set to
+            # an arbritary value.  Using a value known by Neutron
+            # is_dvr_serviced() function [1] gets us the correct
+            # rules appiled to the port to allow IPv6 Router
+            # Advertisement packets through LP: #1813931
+            # 0: https://github.com/openstack/neutron/blob/
+            #      916347b996684c82b29570cd2962df3ea57d4b16/
+            #      neutron/plugins/ml2/drivers/openvswitch/
+            #      agent/ovs_dvr_neutron_agent.py#L592
+            # 1: https://github.com/openstack/neutron/blob/
+            #      50308c03c960bd6e566f328a790b8e05f5e92ead/
+            #      neutron/common/utils.py#L200
+            'device_owner': (
+                neutron_lib.constants.DEVICE_OWNER_LOADBALANCERV2),
+            'security_groups': [
+                health_secgrp['id'],
+            ],
+            'name': 'octavia-health-manager-{}-listen-port'
+                    .format(local_unit_name),
+            'network_id': network['id'],
+        },
+    }
     n_resp = len(resp.get('ports', []))
     if n_resp == 1:
         hm_port = resp['ports'][0]
+        # Ensure binding:host_id is up to date on a existing port
+        #
+        # In the event of a need to update it, we bring the port down to make
+        # sure Neutron rebuilds the port correctly.
+        #
+        # Our caller, ``setup_hm_port``, will toggle the port admin status.
+        if hm_port and hm_port.get(
+                'binding:host_id') != port_template['port']['binding:host_id']:
+            try:
+                nc.update_port(hm_port['id'], {
+                    'port': {
+                        'admin_state_up': False,
+                        'binding:host_id': port_template['port'][
+                            'binding:host_id'],
+                    }
+                })
+            except NEUTRON_TEMP_EXCS as e:
+                raise APIUnavailable('neutron', 'ports', e)
     elif n_resp > 1:
         raise DuplicateResource('neutron', 'ports', data=resp)
     else:
         # create new port
         try:
-            resp = nc.create_port(
-                {
-                    'port': {
-                        # avoid race with OVS agent attempting to bind port
-                        # before it is created in the local units OVSDB
-                        'admin_state_up': False,
-                        'binding:host_id': socket.gethostname(),
-                        # NOTE(fnordahl): device_owner has special meaning
-                        # for Neutron [0], and things may break if set to
-                        # an arbritary value.  Using a value known by Neutron
-                        # is_dvr_serviced() function [1] gets us the correct
-                        # rules appiled to the port to allow IPv6 Router
-                        # Advertisement packets through LP: #1813931
-                        # 0: https://github.com/openstack/neutron/blob/
-                        #      916347b996684c82b29570cd2962df3ea57d4b16/
-                        #      neutron/plugins/ml2/drivers/openvswitch/
-                        #      agent/ovs_dvr_neutron_agent.py#L592
-                        # 1: https://github.com/openstack/neutron/blob/
-                        #      50308c03c960bd6e566f328a790b8e05f5e92ead/
-                        #      neutron/common/utils.py#L200
-                        'device_owner': (
-                            neutron_lib.constants.DEVICE_OWNER_LOADBALANCERV2),
-                        'security_groups': [
-                            health_secgrp['id'],
-                        ],
-                        'name': 'octavia-health-manager-{}-listen-port'
-                                .format(local_unit_name),
-                        'network_id': network['id'],
-                    },
-                })
+            resp = nc.create_port(port_template)
             hm_port = resp['port']
             ch_core.hookenv.log('Created port {}'.format(hm_port['id']),
                                 ch_core.hookenv.INFO)
@@ -275,7 +297,7 @@ def toggle_hm_port(identity_service, local_unit_name, enabled=True):
         nc.update_port(port['id'], {'port': {'admin_state_up': enabled}})
 
 
-def setup_hm_port(identity_service, octavia_charm):
+def setup_hm_port(identity_service, octavia_charm, ovs_hostname=None):
     """Create a per unit Neutron and OVS port for Octavia Health Manager.
 
     This is used to plug the unit into the overlay network for direct
@@ -286,6 +308,8 @@ def setup_hm_port(identity_service, octavia_charm):
     :type identity_service: RelationBase class
     :param ocataiva_charm: charm instance
     :type octavia_charm: OctaviaCharm class instance
+    :param ovs_hostname: Hostname used by neutron-openvswitch
+    :type ovs_hostname: Option[None,str]
     :retruns: True on change to local unit, False otherwise
     :rtype: bool
     :raises: api_crud.APIUnavailable, api_crud.DuplicateResource
@@ -294,7 +318,8 @@ def setup_hm_port(identity_service, octavia_charm):
     hm_port = get_hm_port(
         identity_service,
         octavia_charm.local_unit_name,
-        octavia_charm.local_address)
+        octavia_charm.local_address,
+        ovs_hostname=ovs_hostname)
     if not hm_port:
         ch_core.hookenv.log('No network tagged with `charm-octavia` '
                             'exists, deferring port setup awaiting '

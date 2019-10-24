@@ -1,11 +1,14 @@
 charm_name: octavia
 gate_bundles:
-- disco-stein
+- bionic-train-ha
 - bionic-stein-ha
 - bionic-rocky-ha
+- bionic-train
+- bionic-stein
+- bionic-rocky
 - disco-stein
 smoke_bundles:
-- bionic-stein
+- bionic-train
 comment: |
   The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
     https://github.com/lxc/lxd/issues/4947

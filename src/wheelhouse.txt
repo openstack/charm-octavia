@@ -6,3 +6,5 @@ python-neutronclient
 amqp==2.5.1
 neutron_lib
 pytest-runner
+
+git+https://opendev.org/openstack/charms.openstack.git@stable/19.10#egg=charms.openstack

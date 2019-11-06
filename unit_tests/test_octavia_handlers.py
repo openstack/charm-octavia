@@ -150,6 +150,8 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
         handlers.render('arg1', 'arg2')
         self.octavia_charm.render_with_interfaces.assert_called_once_with(
             ('arg1', 'arg2'))
+        self.octavia_charm.configure_ssl.assert_called_once_with()
+        self.octavia_charm.enable_webserver_site.assert_called_once_with()
         self.octavia_charm.assess_status.assert_called_once_with()
         self.set_state.assert_called_once_with('config.rendered')
 

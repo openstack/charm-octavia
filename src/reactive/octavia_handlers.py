@@ -153,6 +153,7 @@ def render(*args):
     """
     with charm.provide_charm_instance() as octavia_charm:
         octavia_charm.render_with_interfaces(args)
+        octavia_charm.configure_ssl()
         octavia_charm.enable_webserver_site()
         octavia_charm.assess_status()
     reactive.set_state('config.rendered')

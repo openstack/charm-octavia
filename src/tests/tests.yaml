@@ -38,3 +38,7 @@ tests:
 - zaza.openstack.charm_tests.neutron_openvswitch.tests.NeutronOpenvSwitchOverlayTest
 - zaza.openstack.charm_tests.octavia.tests.LBAASv2Test
 - zaza.openstack.charm_tests.octavia.tests.CharmOperationTest
+- zaza.openstack.charm_tests.policyd.tests.OctaviaTests
+tests_options:
+  policyd:
+    service: octavia

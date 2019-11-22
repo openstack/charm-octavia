@@ -28,3 +28,8 @@ requires:
   neutron-openvswitch:
     interface: neutron-plugin
     scope: container
+resources:
+  policyd-override:
+    type: file
+    filename: policyd-override.zip
+    description: The policy.d overrides file

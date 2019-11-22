@@ -21,6 +21,7 @@ import subprocess
 import charms_openstack.charm
 import charms_openstack.adapters
 import charms_openstack.ip as os_ip
+import charms_openstack.plugins as ch_plugins
 
 import charms.leadership as leadership
 import charms.reactive as reactive
@@ -53,7 +54,10 @@ OCTAVIA_ROLES = [
     'load-balancer_admin',
 ]
 
-charms_openstack.charm.use_defaults('charm.default-select-release')
+# config.changed is needed to get the policyd override clean-up to work when
+# setting use-policyd-override=false
+charms_openstack.charm.use_defaults('charm.default-select-release',
+                                    'config.changed')
 
 
 @charms_openstack.adapters.config_property
@@ -300,7 +304,9 @@ def spare_amphora_pool_size(cls):
     return ch_core.hookenv.config('spare-pool-size')
 
 
-class OctaviaCharm(charms_openstack.charm.HAOpenStackCharm):
+# note plugin comes first to override the config_changed method as a mixin
+class OctaviaCharm(ch_plugins.PolicydOverridePlugin,
+                   charms_openstack.charm.HAOpenStackCharm):
     """Charm class for the Octavia charm."""
     # layer-openstack-api uses service_type as service name in endpoint catalog
     name = service_type = 'octavia'
@@ -335,6 +341,10 @@ class OctaviaCharm(charms_openstack.charm.HAOpenStackCharm):
         ]),
     }
     group = 'octavia'
+
+    # policyd override constants
+    policyd_service_name = 'octavia'
+    policyd_restart_on_change = True
 
     def install(self):
         """Custom install function.

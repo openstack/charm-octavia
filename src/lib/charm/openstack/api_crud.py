@@ -109,6 +109,19 @@ def session_from_identity_service(identity_service):
     return keystone_session.Session(auth=auth, verify=SYSTEM_CA_BUNDLE)
 
 
+def init_neutron_client(keystone_session):
+    """Instantiate neutron client
+
+    :param keytone_session: Keystone client auth session
+    :type keystone_session.Session
+    :returns: Neutron client
+    :rtype: neutron_client.Client
+    """
+    return neutron_client.Client(session=keystone_session,
+                                 region_name=ch_core.hookenv.config('region'),
+                                 )
+
+
 def get_nova_flavor(identity_service):
     """Get or create private Nova flavor for use with Octavia.
 
@@ -122,7 +135,9 @@ def get_nova_flavor(identity_service):
     """
     try:
         session = session_from_identity_service(identity_service)
-        nova = nova_client.Client('2', session=session)
+        nova = nova_client.Client('2',
+                                  session=session,
+                                  region_name=ch_core.hookenv.config('region'))
         flavors = nova.flavors.list(is_public=False)
         for flavor in flavors:
             if flavor.name == 'charm-octavia':
@@ -161,7 +176,7 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address,
     """
     session = session_from_identity_service(identity_service)
     try:
-        nc = neutron_client.Client(session=session)
+        nc = init_neutron_client(session)
         resp = nc.list_networks(tags='charm-octavia')
     except NEUTRON_TEMP_EXCS as e:
         raise APIUnavailable('neutron', 'networks', e)
@@ -288,7 +303,7 @@ def toggle_hm_port(identity_service, local_unit_name, enabled=True):
     """
     session = session_from_identity_service(identity_service)
     try:
-        nc = neutron_client.Client(session=session)
+        nc = init_neutron_client(session)
         resp = nc.list_ports(tags='charm-octavia-{}'
                                   .format(local_unit_name))
     except NEUTRON_TEMP_EXCS as e:
@@ -392,7 +407,7 @@ def get_port_ips(identity_service):
     """
     session = session_from_identity_service(identity_service)
     try:
-        nc = neutron_client.Client(session=session)
+        nc = init_neutron_client(session)
         resp = nc.list_ports(tags='charm-octavia')
     except NEUTRON_TEMP_EXCS as e:
         raise APIUnavailable('neutron', 'ports', e)
@@ -421,7 +436,7 @@ def get_mgmt_network(identity_service, create=True):
     """
     session = session_from_identity_service(identity_service)
     try:
-        nc = neutron_client.Client(session=session)
+        nc = init_neutron_client(session)
         resp = nc.list_networks(tags='charm-octavia')
     except NEUTRON_TEMP_EXCS as e:
         raise APIUnavailable('neutron', 'networks', e)

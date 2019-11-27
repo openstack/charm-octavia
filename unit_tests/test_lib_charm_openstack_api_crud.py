@@ -91,17 +91,26 @@ class TestAPICrud(test_utils.PatchHelper):
             verify='/etc/ssl/certs/ca-certificates.crt')
         self.assertEqual(result, self.keystone_session.Session())
 
+    def test_init_neutron_client(self):
+        self.patch_object(api_crud, 'neutron_client')
+        self.patch_object(api_crud.ch_core.hookenv, 'config')
+        api_crud.init_neutron_client('somesession')
+        self.config.assert_called_once_with('region')
+        self.neutron_client.Client.assert_called_once_with(
+            session='somesession', region_name=self.config())
+
     def test_get_nova_flavor(self):
         self.patch_object(api_crud, 'nova_client')
-        self.patch_object(api_crud, 'keystone_session')
-        self.patch_object(api_crud, 'keystone_identity')
+        self.patch_object(api_crud, 'session_from_identity_service')
         self.patch_object(api_crud, 'keystone_exceptions')
+        self.patch_object(api_crud.ch_core.hookenv, 'config')
         nova = mock.MagicMock()
         flavor = mock.MagicMock()
         flavor.id = 'fake-id'
         flavor.name = 'charm-octavia'
         nova.flavors.list.return_value = [flavor]
         self.nova_client.Client.return_value = nova
+        self.config.return_value = 'someregion'
 
         self.keystone_exceptions.catalog.EndpointNotFound = Exception
         self.keystone_exceptions.connection.ConnectFailure = Exception
@@ -114,9 +123,11 @@ class TestAPICrud(test_utils.PatchHelper):
 
         nova.flavors.list.side_effect = None
         api_crud.get_nova_flavor(identity_service)
+        self.config.assert_called_with('region')
         self.nova_client.Client.assert_called_with(
             '2',
-            session=self.keystone_session.Session(auth=self.keystone_identity))
+            session=self.session_from_identity_service(),
+            region_name='someregion')
         nova.flavors.list.assert_called_with(is_public=False)
         self.assertFalse(nova.flavors.create.called)
         nova.flavors.list.return_value = []
@@ -126,9 +137,10 @@ class TestAPICrud(test_utils.PatchHelper):
                                                is_public=False)
 
     def test_get_hm_port(self):
-        self.patch_object(api_crud, 'neutron_client')
+        self.patch_object(api_crud, 'session_from_identity_service')
+        self.patch_object(api_crud, 'init_neutron_client')
         nc = mock.MagicMock()
-        self.neutron_client.Client.return_value = nc
+        self.init_neutron_client.return_value = nc
         network_uuid = 'fake-network-uuid'
         nc.list_networks.return_value = {'networks': [{'id': network_uuid}]}
         health_secgrp_uuid = 'fake-secgrp-uuid'
@@ -148,7 +160,8 @@ class TestAPICrud(test_utils.PatchHelper):
         result = api_crud.get_hm_port(identity_service,
                                       'fake-unit-name',
                                       '192.0.2.42')
-        self.neutron_client.Client.assert_called()
+        self.init_neutron_client.assert_called_once_with(
+            self.session_from_identity_service())
         nc.list_networks.assert_called_with(tags='charm-octavia')
         nc.list_security_groups.assert_called_with(
             tags='charm-octavia-health')
@@ -190,12 +203,15 @@ class TestAPICrud(test_utils.PatchHelper):
                                   'mac_address': 'fake-mac-address'})
 
     def test_toggle_hm_port(self):
-        self.patch_object(api_crud, 'neutron_client')
+        self.patch_object(api_crud, 'session_from_identity_service')
+        self.patch_object(api_crud, 'init_neutron_client')
         identity_service = mock.MagicMock()
         nc = mock.MagicMock()
-        self.neutron_client.Client.return_value = nc
+        self.init_neutron_client.return_value = nc
         nc.list_ports.return_value = {'ports': [{'id': 'fake-port-uuid'}]}
         api_crud.toggle_hm_port(identity_service, 'fake-unit-name')
+        self.init_neutron_client.assert_called_once_with(
+            self.session_from_identity_service())
         nc.list_ports.asssert_called_with(tags='charm-octavia-fake-unit-name')
         nc.update_port.assert_called_with('fake-port-uuid',
                                           {'port': {'admin_state_up': True}})
@@ -252,9 +268,10 @@ class TestAPICrud(test_utils.PatchHelper):
         self.toggle_hm_port.assert_called
 
     def test_get_port_ips(self):
-        self.patch_object(api_crud, 'neutron_client')
+        self.patch_object(api_crud, 'session_from_identity_service')
+        self.patch_object(api_crud, 'init_neutron_client')
         nc = mock.MagicMock()
-        self.neutron_client.Client.return_value = nc
+        self.init_neutron_client.return_value = nc
         nc.list_ports.return_value = {
             'ports': [
                 {'fixed_ips': [{'ip_address': '2001:db8:42::42'}]},
@@ -265,6 +282,8 @@ class TestAPICrud(test_utils.PatchHelper):
         self.assertEquals(api_crud.get_port_ips(identity_service),
                           ['2001:db8:42::42',
                            '2001:db8:42::51'])
+        self.init_neutron_client.assert_called_once_with(
+            self.session_from_identity_service())
 
     def test_get_mgmt_network_create(self):
         resource_tag = 'charm-octavia'
@@ -302,10 +321,11 @@ class TestAPICrud(test_utils.PatchHelper):
 
     def test_get_mgmt_network_exists(self):
         resource_tag = 'charm-octavia'
-        self.patch_object(api_crud, 'neutron_client')
+        self.patch_object(api_crud, 'session_from_identity_service')
+        self.patch_object(api_crud, 'init_neutron_client')
         identity_service = mock.MagicMock()
         nc = mock.MagicMock()
-        self.neutron_client.Client.return_value = nc
+        self.init_neutron_client.return_value = nc
         network_uuid = '83f1a860-9aed-4c0b-8b72-47195580a0c1'
         nc.list_networks.return_value = {'networks': [{'id': network_uuid}]}
         nc.list_subnets.return_value = {
@@ -323,6 +343,8 @@ class TestAPICrud(test_utils.PatchHelper):
         nc.create_security_group_rule.side_effect = \
             FakeNeutronConflictException
         result = api_crud.get_mgmt_network(identity_service)
+        self.init_neutron_client.assert_called_once_with(
+            self.session_from_identity_service())
         nc.list_networks.assert_called_once_with(tags=resource_tag)
         nc.list_subnets.assert_called_once_with(tags=resource_tag)
         nc.list_routers.assert_called_once_with(tags=resource_tag)

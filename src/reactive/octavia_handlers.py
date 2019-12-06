@@ -151,6 +151,12 @@ def update_controller_ip_port_list():
 def render(*args):
     """Render the configuration for Octavia when all interfaces are available.
     """
+    amp_key_name = ch_core.hookenv.config('amp-ssh-key-name')
+    if amp_key_name:
+        identity_service = reactive.endpoint_from_flag(
+            'identity-service.available')
+        api_crud.create_nova_keypair(identity_service, amp_key_name)
+
     with charm.provide_charm_instance() as octavia_charm:
         octavia_charm.render_with_interfaces(args)
         octavia_charm.configure_ssl()

@@ -2,8 +2,6 @@ keystoneauth1
 pbr
 python-novaclient
 python-neutronclient
-# tactical fix for https://github.com/celery/kombu/issues/1105
-amqp==2.5.1
 # REMOVEME -- fix for https://github.com/pyparsing/pyparsing/issues/164
 pyparsing==2.4.2
 neutron_lib

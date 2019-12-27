@@ -112,7 +112,7 @@ def session_from_identity_service(identity_service):
 def init_neutron_client(keystone_session):
     """Instantiate neutron client
 
-    :param keytone_session: Keystone client auth session
+    :param keystone_session: Keystone client auth session
     :type keystone_session.Session
     :returns: Neutron client
     :rtype: neutron_client.Client

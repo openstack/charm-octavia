@@ -21,6 +21,7 @@
 # and YAML for the ``fixed_ips`` field when providing details for a Neutron
 # port.
 
+import base64
 import neutronclient
 import socket
 import subprocess
@@ -151,6 +152,43 @@ def get_nova_flavor(identity_service):
             nova_client.exceptions.ConnectionRefused,
             nova_client.exceptions.ClientException) as e:
         raise APIUnavailable('nova', 'flavors', e)
+
+
+def create_nova_keypair(identity_service, amp_key_name):
+    """Create a nova keypair to use with Amphora images to allow ssh access
+    e.g. for debug purposes.
+    """
+    pubkey = ch_core.hookenv.config('amp-ssh-pub-key')
+    if not pubkey:
+        ch_core.hookenv.log('No pub key provided - cannot create amp-ssh-key '
+                            'keypair', level=ch_core.hookenv.WARNING)
+        return
+
+    pubkey_decoded = base64.b64decode(pubkey).strip().decode()
+    try:
+        session = session_from_identity_service(identity_service)
+        nova = nova_client.Client('2',
+                                  session=session,
+                                  region_name=ch_core.hookenv.config('region'))
+        keys = nova.keypairs.list()
+        for key in keys:
+            if key.name == amp_key_name:
+                ch_core.hookenv.log("Nova keypair with name '{}' already "
+                                    "exists - skipping create"
+                                    .format(amp_key_name),
+                                    level=ch_core.hookenv.INFO)
+                return
+
+        # create keypair
+        ch_core.hookenv.log("Creating nova keypair '{}'".format(amp_key_name),
+                            level=ch_core.hookenv.DEBUG)
+        return nova.keypairs.create(name=amp_key_name,
+                                    public_key=pubkey_decoded)
+    except (keystone_exceptions.catalog.EndpointNotFound,
+            keystone_exceptions.connection.ConnectFailure,
+            nova_client.exceptions.ConnectionRefused,
+            nova_client.exceptions.ClientException) as e:
+        raise APIUnavailable('nova', 'keypairs', e)
 
 
 def get_hm_port(identity_service, local_unit_name, local_unit_address,

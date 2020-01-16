@@ -147,6 +147,7 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
 
     def test_render(self):
         self.patch('charms.reactive.set_state', 'set_state')
+        self.patch_object(handlers.api_crud, 'create_nova_keypair')
         handlers.render('arg1', 'arg2')
         self.octavia_charm.render_with_interfaces.assert_called_once_with(
             ('arg1', 'arg2'))

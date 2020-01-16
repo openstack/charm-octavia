@@ -128,3 +128,17 @@ options:
       override YAML files in the service's policy.d directory.  The resource
       file should be a ZIP file containing at least one yaml file with a .yaml
       or .yml extension.  If False then remove the overrides.
+  amp-ssh-key-name:
+    type: string
+    default:
+    description: |
+      Name of nova key to use to provide ssh access to Amphora VMs. Note that
+      this key must be visible to the project used by Octavia.
+  amp-ssh-pub-key:
+    type: string
+    default:
+    description: |
+      Base64 encoded public ssh key. This will be used when creating the key
+      named by amp-ssh-key-name. Note that once the key is created it cannot be
+      modified and the only way to do so is to delete it and have the charm
+      create a new one.

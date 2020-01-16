@@ -43,7 +43,9 @@ NEUTRON_TEMP_EXCS = (keystone_exceptions.catalog.EndpointNotFound,
                      keystone_exceptions.connection.ConnectFailure,
                      keystone_exceptions.discovery.DiscoveryFailure,
                      keystone_exceptions.http.ServiceUnavailable,
-                     neutronclient.common.exceptions.ServiceUnavailable)
+                     neutronclient.common.exceptions.ServiceUnavailable,
+                     neutronclient.common.exceptions.BadRequest,
+                     neutronclient.common.exceptions.NeutronClientException)
 SYSTEM_CA_BUNDLE = '/etc/ssl/certs/ca-certificates.crt'
 
 

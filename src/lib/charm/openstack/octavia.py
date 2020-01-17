@@ -326,7 +326,7 @@ class OctaviaCharm(ch_plugins.PolicydOverridePlugin,
     services = ['apache2', 'octavia-health-manager', 'octavia-housekeeping',
                 'octavia-worker']
     required_relations = ['shared-db', 'amqp', 'identity-service',
-                          'neutron-openvswitch']
+                          'sdn-subordinate']
     restart_map = {
         OCTAVIA_MGMT_INTF_CONF: services + ['systemd-networkd'],
         OCTAVIA_CONF: services,
@@ -371,12 +371,6 @@ class OctaviaCharm(ch_plugins.PolicydOverridePlugin,
         workload status.
         """
         states_to_check = super().states_to_check(required_relations)
-        override_relation = 'neutron-openvswitch'
-        if override_relation in states_to_check:
-            states_to_check[override_relation] = [
-                ("{}.connected".format(override_relation),
-                 "blocked",
-                 "'{}' missing".format(override_relation))]
         if not leadership.leader_get('amp-boot-network-list'):
             if not reactive.is_flag_set('config.default.create-mgmt-network'):
                 # we are configured to not create required resources and they

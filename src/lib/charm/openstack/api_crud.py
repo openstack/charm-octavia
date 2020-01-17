@@ -125,6 +125,20 @@ def init_neutron_client(keystone_session):
                                  )
 
 
+def is_extension_enabled(neutron_client, ext_alias):
+    """Check for presence of Neutron extension
+
+    :param neutron_client:
+    :type neutron_client:
+    :returns: True if Neutron lists extension, False otherwise
+    :rtype: bool
+    """
+    for extension in neutron_client.list_extensions().get('extensions', []):
+        if extension.get('alias') == ext_alias:
+            return True
+    return False
+
+
 def get_nova_flavor(identity_service):
     """Get or create private Nova flavor for use with Octavia.
 
@@ -192,7 +206,7 @@ def create_nova_keypair(identity_service, amp_key_name):
 
 
 def get_hm_port(identity_service, local_unit_name, local_unit_address,
-                ovs_hostname=None):
+                host_id=None):
     """Get or create a per unit Neutron port for Octavia Health Manager.
 
     A side effect of calling this function is that a port is created if one
@@ -205,8 +219,8 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address,
     :param local_unit_address: DNS resolvable IP address of unit, used to
                                build Neutron port ``binding:host_id``
     :type local_unit_address: str
-    :param ovs_hostname: Hostname used by neutron-openvswitch
-    :type ovs_hostname: Option[None,str]
+    :param host_id: Identifier used by SDN for binding the port
+    :type host_id: Option[None,str]
     :returns: Port details extracted from result of call to
               neutron_client.list_ports or neutron_client.create_port
     :rtype: dict
@@ -261,8 +275,7 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address,
             # avoid race with OVS agent attempting to bind port
             # before it is created in the local units OVSDB
             'admin_state_up': False,
-            'binding:host_id': (ovs_hostname or
-                                socket.gethostname()),
+            'binding:host_id': host_id or socket.gethostname(),
             # NOTE(fnordahl): device_owner has special meaning
             # for Neutron [0], and things may break if set to
             # an arbritary value.  Using a value known by Neutron
@@ -350,7 +363,7 @@ def toggle_hm_port(identity_service, local_unit_name, enabled=True):
         nc.update_port(port['id'], {'port': {'admin_state_up': enabled}})
 
 
-def setup_hm_port(identity_service, octavia_charm, ovs_hostname=None):
+def setup_hm_port(identity_service, octavia_charm, host_id=None):
     """Create a per unit Neutron and OVS port for Octavia Health Manager.
 
     This is used to plug the unit into the overlay network for direct
@@ -361,8 +374,8 @@ def setup_hm_port(identity_service, octavia_charm, ovs_hostname=None):
     :type identity_service: RelationBase class
     :param ocataiva_charm: charm instance
     :type octavia_charm: OctaviaCharm class instance
-    :param ovs_hostname: Hostname used by neutron-openvswitch
-    :type ovs_hostname: Option[None,str]
+    :param host_id: Identifier used by SDN for binding the port
+    :type host_id: Option[None,str]
     :retruns: True on change to local unit, False otherwise
     :rtype: bool
     :raises: api_crud.APIUnavailable, api_crud.DuplicateResource
@@ -372,7 +385,7 @@ def setup_hm_port(identity_service, octavia_charm, ovs_hostname=None):
         identity_service,
         octavia_charm.local_unit_name,
         octavia_charm.local_address,
-        ovs_hostname=ovs_hostname)
+        host_id=host_id)
     if not hm_port:
         ch_core.hookenv.log('No network tagged with `charm-octavia` '
                             'exists, deferring port setup awaiting '
@@ -546,14 +559,19 @@ def get_mgmt_network(identity_service, create=True):
     router = None
     if n_resp < 1 and create:
         try:
-            resp = nc.create_router(
-                {
-                    'router': {
-                        'name': octavia.OCTAVIA_MGMT_NAME_PREFIX,
-                        'distributed': False,
-
-                    }
-                })
+            body = {
+                'router': {
+                    'name': octavia.OCTAVIA_MGMT_NAME_PREFIX,
+                },
+            }
+            # NOTE(fnordahl): Using the ``distributed`` key in a request to
+            # Neutron is an error when the DVR extension is not enabled.
+            if is_extension_enabled(nc, 'dvr'):
+                # NOTE(fnordahl): When DVR is enabled we want to use a
+                # centralized router to support assigning addresses with IPv6
+                # RA. LP: #1843557
+                body['router'].update({'distributed': False})
+            resp = nc.create_router(body)
             router = resp['router']
             nc.add_tag('routers', router['id'], 'charm-octavia')
             ch_core.hookenv.log('Created router {}'.format(router['id']),

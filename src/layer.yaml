@@ -6,6 +6,7 @@ includes:
   - interface:keystone
   - interface:neutron-load-balancer
   - interface:neutron-plugin
+  - interface:ovsdb-subordinate
 options:
   basic:
     use_venv: True

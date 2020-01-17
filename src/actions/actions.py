@@ -44,7 +44,7 @@ def configure_resources(*args):
                                            'unit.')
     if not reactive.all_flags_set('identity-service.available',
                                   'neutron-api.available',
-                                  'neutron-openvswitch.connected',
+                                  'sdn-subordinate.available',
                                   'amqp.available'):
         return ch_core.hookenv.action_fail('all required relations not '
                                            'available, please defer action'

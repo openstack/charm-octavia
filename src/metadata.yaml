@@ -28,6 +28,9 @@ requires:
   neutron-openvswitch:
     interface: neutron-plugin
     scope: container
+  ovsdb-subordinate:
+    interface: ovsdb-subordinate
+    scope: container
 resources:
   policyd-override:
     type: file

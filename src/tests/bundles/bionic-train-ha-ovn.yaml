@@ -63,6 +63,8 @@ relations:
   - nova-compute:neutron-plugin
 - - ovn-chassis:ovsdb-subordinate
   - octavia:ovsdb-subordinate
+- - ovn-central:ovsdb-cms
+  - octavia:ovsdb-cms
 - - ovn-chassis:certificates
   - vault:certificates
 - - ovn-chassis:ovsdb

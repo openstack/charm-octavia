@@ -1,0 +1,22 @@
+[Unit]
+Description=OpenStack Octavia Driver agent (octavia-driver-agent)
+After=postgresql.service mysql.service keystone.service rabbitmq-server.service ntp.service
+
+
+
+[Service]
+User=octavia
+Group=octavia
+Type=simple
+WorkingDirectory=~
+RuntimeDirectory=octavia lock/octavia
+CacheDirectory=octavia
+ExecStart=/etc/init.d/octavia-driver-agent systemd-start
+Restart=on-failure
+LimitNOFILE=65535
+TimeoutStopSec=15
+
+
+[Install]
+WantedBy=multi-user.target
+

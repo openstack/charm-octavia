@@ -7,6 +7,7 @@ includes:
   - interface:neutron-load-balancer
   - interface:neutron-plugin
   - interface:ovsdb-subordinate
+  - interface:ovsdb-cms
 options:
   basic:
     use_venv: True

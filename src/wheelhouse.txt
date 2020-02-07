@@ -6,6 +6,8 @@ python-neutronclient
 pyparsing==2.4.2
 neutron_lib
 pytest-runner
+# python-zipp 2.x introduces a requirement for setuptools 42.x which is not available.
 # resolve conflict:
 # layer-basic requires setuptools<42, zipp>=2.0.0 requires setuptools>42
-zipp<2.0.0
+# LP: #1862186
+zipp < 2.0.0

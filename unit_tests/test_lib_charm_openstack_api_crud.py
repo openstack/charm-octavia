@@ -114,7 +114,6 @@ class TestAPICrud(test_utils.PatchHelper):
 
         self.keystone_exceptions.catalog.EndpointNotFound = Exception
         self.keystone_exceptions.connection.ConnectFailure = Exception
-        self.nova_client.exceptions.ConnectionRefused = Exception
         self.nova_client.exceptions.ClientException = Exception
         nova.flavors.list.side_effect = Exception
         identity_service = mock.MagicMock()

@@ -151,7 +151,6 @@ def get_nova_flavor(identity_service):
                                    is_public=False)
     except (keystone_exceptions.catalog.EndpointNotFound,
             keystone_exceptions.connection.ConnectFailure,
-            nova_client.exceptions.ConnectionRefused,
             nova_client.exceptions.ClientException) as e:
         raise APIUnavailable('nova', 'flavors', e)
 
@@ -188,7 +187,6 @@ def create_nova_keypair(identity_service, amp_key_name):
                                     public_key=pubkey_decoded)
     except (keystone_exceptions.catalog.EndpointNotFound,
             keystone_exceptions.connection.ConnectFailure,
-            nova_client.exceptions.ConnectionRefused,
             nova_client.exceptions.ClientException) as e:
         raise APIUnavailable('nova', 'keypairs', e)
 

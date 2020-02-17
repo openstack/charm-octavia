@@ -9,3 +9,5 @@ pytest-runner
 # resolve conflict:
 # layer-basic requires setuptools<42, zipp>=2.0.0 requires setuptools>42
 zipp<2.0.0
+
+git+https://opendev.org/openstack/charms.openstack.git@stable/20.02#egg=charms.openstack

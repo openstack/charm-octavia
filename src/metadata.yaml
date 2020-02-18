@@ -20,7 +20,6 @@ tags:
 series:
   - bionic
   - eoan
-  - disco
 subordinate: false
 requires:
   neutron-api:

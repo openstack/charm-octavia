@@ -6,11 +6,9 @@ gate_bundles:
 smoke_bundles:
 - bionic-train-ha
 comment: |
-  Move `disco-stein` backup to dev pending LP: #1841599
   The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
     https://github.com/lxc/lxd/issues/4947
 dev_bundles:
-- disco-stein
 - bionic-rocky-lxd
 target_deploy_status:
   octavia:

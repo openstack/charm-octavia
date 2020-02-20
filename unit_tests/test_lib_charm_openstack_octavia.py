@@ -121,13 +121,30 @@ class TestOctaviaCharmConfigProperties(Helper):
 
 class TestOctaviaCharm(Helper):
 
+    def setUp(self):
+        super().setUp()
+        self.patch_object(octavia.reactive, 'is_flag_set', return_value=False)
+        self.target = octavia.OctaviaCharm()
+        # remove the 'is_flag_set' patch so the tests can use it
+        self._patches['is_flag_set'].stop()
+        setattr(self, 'is_flag_set', None)
+        del(self._patches['is_flag_set'])
+        del(self._patches_start['is_flag_set'])
+
+    def test_optional_ovn_provider_driver(self):
+        self.assertFalse('python3-networking-ovn' in self.target.packages)
+        self.assertFalse('octavia-driver-agent' in self.target.services)
+        self.patch_object(octavia.reactive, 'is_flag_set', return_value=True)
+        c = octavia.OctaviaCharm()
+        self.assertTrue('python3-networking-ovn' in c.packages)
+        self.assertTrue('octavia-driver-agent' in c.services)
+
     def test_install(self):
         # we do not care about the internals of the function we are overriding
         # and expanding so mock out the call to super()
         self.patch('builtins.super', 'super')
         self.patch_object(octavia.ch_core, 'host')
-        c = octavia.OctaviaCharm()
-        c.install()
+        self.target.install()
         self.super.assert_called()
         self.host.add_user_to_group.assert_called_once_with('systemd-network',
                                                             'octavia')
@@ -146,8 +163,7 @@ class TestOctaviaCharm(Helper):
             override_relation: 'something-we-are-replacing',
         }
         self.super().states_to_check.return_value = states_to_check
-        c = octavia.OctaviaCharm()
-        c.states_to_check()
+        self.target.states_to_check()
         self.super().states_to_check.assert_called_once_with(None)
         self.leader_get.assert_called_once_with(
             'amp-boot-network-list')
@@ -156,13 +172,11 @@ class TestOctaviaCharm(Helper):
         self.super.assert_called()
 
     def test_get_amqp_credentials(self):
-        c = octavia.OctaviaCharm()
-        result = c.get_amqp_credentials()
+        result = self.target.get_amqp_credentials()
         self.assertEqual(result, ('octavia', 'openstack'))
 
     def test_get_database_setup(self):
-        c = octavia.OctaviaCharm()
-        result = c.get_database_setup()
+        result = self.target.get_database_setup()
         self.assertEqual(result, [{'database': 'octavia',
                                    'username': 'octavia'}])
 
@@ -173,8 +187,7 @@ class TestOctaviaCharm(Helper):
         self.patch('charmhelpers.core.host.service_reload', 'service_reload')
         self.exists.return_value = True
         self.sp_call.return_value = True
-        c = octavia.OctaviaCharm()
-        c.enable_webserver_site()
+        self.target.enable_webserver_site()
         self.exists.assert_called_with(
             '/etc/apache2/sites-available/octavia-api.conf')
         self.sp_call.assert_called_with(['a2query', '-s', 'octavia-api'])
@@ -183,14 +196,13 @@ class TestOctaviaCharm(Helper):
             'apache2', restart_on_failure=True)
 
     def test_local_address(self):
-        c = octavia.OctaviaCharm()
         configuration_class = mock.MagicMock()
-        c.configuration_class = configuration_class
-        self.assertEqual(c.local_address, configuration_class().local_address)
+        self.target.configuration_class = configuration_class
+        self.assertEqual(self.target.local_address,
+                         configuration_class().local_address)
 
     def test_local_unit_name(self):
-        c = octavia.OctaviaCharm()
         configuration_class = mock.MagicMock()
-        c.configuration_class = configuration_class
-        self.assertEqual(c.local_unit_name,
+        self.target.configuration_class = configuration_class
+        self.assertEqual(self.target.local_unit_name,
                          configuration_class().local_unit_name)

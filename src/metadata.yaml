@@ -30,6 +30,8 @@ requires:
   ovsdb-subordinate:
     interface: ovsdb-subordinate
     scope: container
+  ovsdb-cms:
+    interface: ovsdb-cms
 resources:
   policyd-override:
     type: file

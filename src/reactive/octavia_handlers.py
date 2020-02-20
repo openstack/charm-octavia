@@ -55,6 +55,21 @@ def sdn_broken():
     reactive.clear_flag('sdn-subordinate.connected')
 
 
+@reactive.when_not('ovsdb-subordinate.available')
+def disable_ovn_driver():
+    reactive.clear_flag('charm.octavia.enable-ovn-driver')
+
+
+@reactive.when('ovsdb-subordinate.available')
+def maybe_enable_ovn_driver():
+    ovsdb = reactive.endpoint_from_flag('ovsdb-subordinate.available')
+    if ovsdb.ovn_configured:
+        reactive.set_flag('charm.octavia.enable-ovn-driver')
+        with charm.provide_charm_instance() as charm_instance:
+            charm_instance.install()
+            charm_instance.assess_status()
+
+
 @reactive.when('identity-service.connected')
 def setup_endpoint_connection(keystone):
     """Custom register endpoint function for Octavia.
@@ -174,7 +189,12 @@ def render(*args):
         api_crud.create_nova_keypair(identity_service, amp_key_name)
 
     with charm.provide_charm_instance() as octavia_charm:
-        octavia_charm.render_with_interfaces(args)
+        octavia_charm.render_with_interfaces(
+            charm.optional_interfaces(
+                args,
+                'ovsdb-subordinate.available',
+                'ovsdb-cms.available',
+            ))
         octavia_charm.configure_ssl()
         octavia_charm.enable_webserver_site()
         octavia_charm.assess_status()

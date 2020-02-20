@@ -346,6 +346,25 @@ class OctaviaCharm(ch_plugins.PolicydOverridePlugin,
     policyd_service_name = 'octavia'
     policyd_restart_on_change = True
 
+    def __init__(self, **kwargs):
+        if reactive.is_flag_set('charm.octavia.enable-ovn-driver'):
+            self.services.extend(['octavia-driver-agent'])
+            # NOTE(fnordahl): This is a tactical workaround for missing init
+            # script and systemd service in the package, this must be removed
+            # before release. LP: #1861671
+            self.restart_map.update({
+                '/etc/init.d/octavia-driver-agent': [],
+                '/lib/systemd/system/octavia-driver-agent.service': [
+                    'octavia-driver-agent']
+            })
+            self.permission_override_map = {
+                '/etc/init.d/octavia-driver-agent': 0o755,
+            }
+            # NOTE(fnordahl): For Ussuri and onwards this will be provided by
+            # a new ``ovn-octavia-provider`` package.
+            self.packages.extend(['python3-networking-ovn'])
+        super().__init__(**kwargs)
+
     def install(self):
         """Custom install function.
 

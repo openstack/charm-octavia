@@ -60,6 +60,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                     'amqp.available',),
                 'setup_endpoint_connection': (
                     'identity-service.connected',),
+                'maybe_enable_ovn_driver': (
+                    'ovsdb-subordinate.available',),
             },
             'when_any': {
                 'sdn_joined': ('neutron-openvswitch.connected',
@@ -73,6 +75,7 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'init_db': ('db.synced',),
                 'cluster_connected': ('ha.available',),
                 'generate_heartbeat_key': ('leadership.set.heartbeat-key',),
+                'disable_ovn_driver': ('ovsdb-subordinate.available',),
             },
         }
         # test that the hooks were registered via the
@@ -187,4 +190,24 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
         handlers.cluster_connected(hacluster)
         self.octavia_charm.configure_ha_resources.assert_called_once_with(
             hacluster)
+        self.octavia_charm.assess_status.assert_called_once_with()
+
+    def test_disable_ovn_driver(self):
+        self.patch_object(octavia.reactive, 'clear_flag')
+        handlers.disable_ovn_driver()
+        self.clear_flag.assert_called_once_with(
+            'charm.octavia.enable-ovn-driver')
+
+    def test_maybe_enable_ovn_driver(self):
+        ovsdb = mock.MagicMock()
+        ovsdb.ovn_configured = True
+        self.patch_object(octavia.reactive, 'endpoint_from_flag')
+        self.endpoint_from_flag.return_value = ovsdb
+        self.patch_object(octavia.reactive, 'set_flag')
+        handlers.maybe_enable_ovn_driver()
+        self.endpoint_from_flag.assert_called_once_with(
+            'ovsdb-subordinate.available')
+        self.set_flag.assert_called_once_with(
+            'charm.octavia.enable-ovn-driver')
+        self.octavia_charm.install.assert_called_once_with()
         self.octavia_charm.assess_status.assert_called_once_with()

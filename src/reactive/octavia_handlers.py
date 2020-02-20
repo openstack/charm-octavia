@@ -41,6 +41,20 @@ charm.use_defaults(
 )
 
 
+@reactive.when_any('neutron-openvswitch.connected',
+                   'ovsdb-subordinate.available')
+def sdn_joined():
+    reactive.set_flag('sdn-subordinate.connected')
+    reactive.set_flag('sdn-subordinate.available')
+
+
+@reactive.when_none('neutron-openvswitch.connected',
+                    'ovsdb-subordinate.available')
+def sdn_broken():
+    reactive.clear_flag('sdn-subordinate.available')
+    reactive.clear_flag('sdn-subordinate.connected')
+
+
 @reactive.when('identity-service.connected')
 def setup_endpoint_connection(keystone):
     """Custom register endpoint function for Octavia.
@@ -90,7 +104,7 @@ def setup_neutron_lbaas_proxy():
 
 @reactive.when('identity-service.available')
 @reactive.when('neutron-api.available')
-@reactive.when('neutron-openvswitch.connected')
+@reactive.when('sdn-subordinate.available')
 # Neutron API calls will consistently fail as long as AMQP is unavailable
 @reactive.when('amqp.available')
 def setup_hm_port():
@@ -100,7 +114,9 @@ def setup_hm_port():
     communication with the octavia managed load balancer instances running
     within the deployed cloud.
     """
-    ovs = reactive.endpoint_from_flag('neutron-openvswitch.connected')
+    neutron_ovs = reactive.endpoint_from_flag('neutron-openvswitch.connected')
+    ovsdb = reactive.endpoint_from_flag('ovsdb-subordinate.available')
+    host_id = neutron_ovs.host() if neutron_ovs else ovsdb.chassis_name
     with charm.provide_charm_instance() as octavia_charm:
         identity_service = reactive.endpoint_from_flag(
             'identity-service.available')
@@ -108,7 +124,7 @@ def setup_hm_port():
             if api_crud.setup_hm_port(
                     identity_service,
                     octavia_charm,
-                    ovs_hostname=ovs.host()):
+                    host_id=host_id):
                 # trigger config render to make systemd-networkd bring up
                 # automatic IP configuration of the new port right now.
                 reactive.set_flag('config.changed')

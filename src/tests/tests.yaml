@@ -1,9 +1,11 @@
 charm_name: octavia
 gate_bundles:
+- bionic-train-ha-ovn
 - bionic-train-ha
 - bionic-stein-ha
 - bionic-rocky-ha
 smoke_bundles:
+- bionic-train-ha-ovn
 - bionic-train-ha
 comment: |
   The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
@@ -20,6 +22,15 @@ target_deploy_status:
   vault:
     workload-status: blocked
     workload-status-message: Vault needs to be initialized
+  neutron-api-plugin-ovn:
+    workload-status: waiting
+    workload-status-message: "'ovsdb-cms' incomplete"
+  ovn-central:
+    workload-status: blocked
+    workload-status-message: "'certificates' missing"
+  ovn-chassis:
+    workload-status: blocked
+    workload-status-message: "'certificates' missing"
 configure:
 - zaza.openstack.charm_tests.vault.setup.auto_initialize
 - zaza.openstack.charm_tests.glance.setup.add_lts_image
@@ -35,7 +46,6 @@ comment: |
   The repetition of ``prepare_payload_instance`` is intentional and gives the
   test multiple backends to feed Octavia.
 tests:
-- zaza.openstack.charm_tests.neutron_openvswitch.tests.NeutronOpenvSwitchOverlayTest
 - zaza.openstack.charm_tests.octavia.tests.LBAASv2Test
 - zaza.openstack.charm_tests.octavia.tests.CharmOperationTest
 - zaza.openstack.charm_tests.policyd.tests.OctaviaTests

@@ -185,7 +185,7 @@ class TestAPICrud(test_utils.PatchHelper):
         result = api_crud.get_hm_port(identity_service,
                                       'fake-unit-name',
                                       '192.0.2.42',
-                                      ovs_hostname='fake-unit-name.fqdn')
+                                      host_id='fake-unit-name.fqdn')
         nc.create_port.assert_called_once_with(
             {
                 'port': {
@@ -239,7 +239,7 @@ class TestAPICrud(test_utils.PatchHelper):
             identity_service,
             octavia_charm.local_unit_name,
             octavia_charm.local_address,
-            ovs_hostname=None)
+            host_id=None)
         self.check_output.assert_called_with(
             ['ip', 'link', 'show', api_crud.octavia.OCTAVIA_MGMT_INTF],
             stderr=-2, universal_newlines=True)
@@ -300,6 +300,8 @@ class TestAPICrud(test_utils.PatchHelper):
             {'security_group': {'id': self.secgrp_uuid}},
             {'security_group': {'id': self.health_secgrp_uuid}},
         ]
+        self.patch_object(api_crud, 'is_extension_enabled')
+        self.is_extension_enabled.return_value = True
         result = api_crud.get_mgmt_network(identity_service)
         nc.list_networks.assert_called_once_with(tags=resource_tag)
         nc.create_network.assert_called_once_with({

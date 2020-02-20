@@ -51,7 +51,7 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'setup_hm_port': (
                     'identity-service.available',
                     'neutron-api.available',
-                    'neutron-openvswitch.connected',
+                    'sdn-subordinate.available',
                     'amqp.available',),
                 'update_controller_ip_port_list': (
                     'leadership.is_leader',
@@ -60,6 +60,14 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                     'amqp.available',),
                 'setup_endpoint_connection': (
                     'identity-service.connected',),
+            },
+            'when_any': {
+                'sdn_joined': ('neutron-openvswitch.connected',
+                               'ovsdb-subordinate.available'),
+            },
+            'when_none': {
+                'sdn_broken': ('neutron-openvswitch.connected',
+                               'ovsdb-subordinate.available'),
             },
             'when_not': {
                 'init_db': ('db.synced',),
@@ -125,8 +133,18 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
         self.setup_hm_port.assert_called_with(
             self.endpoint_from_flag(),
             self.octavia_charm,
-            ovs_hostname=self.endpoint_from_flag().host())
+            host_id=self.endpoint_from_flag().host())
         self.set_flag.assert_called_once_with('config.changed')
+        self.setup_hm_port.reset_mock()
+        ovsdb_subordinate = mock.MagicMock()
+        identity_service = mock.MagicMock()
+        self.endpoint_from_flag.side_effect = [
+            None, ovsdb_subordinate, identity_service]
+        handlers.setup_hm_port()
+        self.setup_hm_port.assert_called_with(
+            identity_service,
+            self.octavia_charm,
+            host_id=ovsdb_subordinate.chassis_name)
 
     def test_update_controller_ip_port_list(self):
         self.patch('charms.reactive.endpoint_from_flag', 'endpoint_from_flag')

@@ -305,12 +305,13 @@ def spare_amphora_pool_size(cls):
 
 
 # note plugin comes first to override the config_changed method as a mixin
-class OctaviaCharm(ch_plugins.PolicydOverridePlugin,
-                   charms_openstack.charm.HAOpenStackCharm):
-    """Charm class for the Octavia charm."""
+class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
+                       charms_openstack.charm.HAOpenStackCharm):
+    """Base charm class for the Octavia charm."""
+    abstract_class = True
+
     # layer-openstack-api uses service_type as service name in endpoint catalog
     name = service_type = 'octavia'
-    release = 'rocky'
     packages = ['octavia-api', 'octavia-health-manager',
                 'octavia-housekeeping', 'octavia-worker',
                 'apache2', 'libapache2-mod-wsgi-py3']
@@ -345,25 +346,6 @@ class OctaviaCharm(ch_plugins.PolicydOverridePlugin,
     # policyd override constants
     policyd_service_name = 'octavia'
     policyd_restart_on_change = True
-
-    def __init__(self, **kwargs):
-        if reactive.is_flag_set('charm.octavia.enable-ovn-driver'):
-            self.services.extend(['octavia-driver-agent'])
-            # NOTE(fnordahl): This is a tactical workaround for missing init
-            # script and systemd service in the package, this must be removed
-            # before release. LP: #1861671
-            self.restart_map.update({
-                '/etc/init.d/octavia-driver-agent': [],
-                '/lib/systemd/system/octavia-driver-agent.service': [
-                    'octavia-driver-agent']
-            })
-            self.permission_override_map = {
-                '/etc/init.d/octavia-driver-agent': 0o755,
-            }
-            # NOTE(fnordahl): For Ussuri and onwards this will be provided by
-            # a new ``ovn-octavia-provider`` package.
-            self.packages.extend(['python3-networking-ovn'])
-        super().__init__(**kwargs)
 
     def install(self):
         """Custom install function.
@@ -477,3 +459,25 @@ class OctaviaCharm(ch_plugins.PolicydOverridePlugin,
     def local_unit_name(self):
         """Return local unit name as provided by our ConfigurationClass."""
         return self.configuration_class().local_unit_name
+
+
+class RockyOctaviaCharm(BaseOctaviaCharm):
+    """Charm class for the Octavia charm on Rocky and newer releases."""
+    release = 'rocky'
+
+
+class UssuriOctaviaCharm(BaseOctaviaCharm):
+    """Charm class for the Octavia charm on Ussuri and newer releases."""
+    release = 'ussuri'
+
+    def __init__(self, **kwargs):
+        # NOTE(fnordahl): We probably should have a more generic harness for
+        # these kinds of extensions, there might be more SDNs that want support
+        # in the charm.
+        if reactive.is_flag_set('charm.octavia.enable-ovn-driver'):
+            self.packages.extend([
+                'octavia-driver-agent',
+                'python3-ovn-octavia-provider'
+            ])
+            self.services.extend(['octavia-driver-agent'])
+        super().__init__(**kwargs)

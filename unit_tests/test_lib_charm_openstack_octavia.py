@@ -26,7 +26,7 @@ class Helper(test_utils.PatchHelper):
 
     def setUp(self):
         super().setUp()
-        self.patch_release(octavia.OctaviaCharm.release)
+        self.patch_release(octavia.RockyOctaviaCharm.release)
 
 
 class TestOctaviaCharmConfigProperties(Helper):
@@ -124,7 +124,7 @@ class TestOctaviaCharm(Helper):
     def setUp(self):
         super().setUp()
         self.patch_object(octavia.reactive, 'is_flag_set', return_value=False)
-        self.target = octavia.OctaviaCharm()
+        self.target = octavia.RockyOctaviaCharm()
         # remove the 'is_flag_set' patch so the tests can use it
         self._patches['is_flag_set'].stop()
         setattr(self, 'is_flag_set', None)
@@ -132,11 +132,13 @@ class TestOctaviaCharm(Helper):
         del(self._patches_start['is_flag_set'])
 
     def test_optional_ovn_provider_driver(self):
-        self.assertFalse('python3-networking-ovn' in self.target.packages)
-        self.assertFalse('octavia-driver-agent' in self.target.services)
+        self.assertFalse('octavia-driver-agent' in self.target.packages)
+        self.assertFalse(
+            'python3-ovn-octavia-provider' in self.target.packages)
         self.patch_object(octavia.reactive, 'is_flag_set', return_value=True)
-        c = octavia.OctaviaCharm()
-        self.assertTrue('python3-networking-ovn' in c.packages)
+        c = octavia.UssuriOctaviaCharm()
+        self.assertTrue('octavia-driver-agent' in c.packages)
+        self.assertTrue('python3-ovn-octavia-provider' in c.packages)
         self.assertTrue('octavia-driver-agent' in c.services)
 
     def test_install(self):

@@ -87,7 +87,7 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
 
     def setUp(self):
         super().setUp()
-        self.patch_release(octavia.OctaviaCharm.release)
+        self.patch_release(octavia.RockyOctaviaCharm.release)
         self.octavia_charm = mock.MagicMock()
         self.patch_object(handlers.charm, 'provide_charm_instance',
                           new=mock.MagicMock())
@@ -169,9 +169,14 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
     def test_render(self):
         self.patch('charms.reactive.set_state', 'set_state')
         self.patch_object(handlers.api_crud, 'create_nova_keypair')
+        self.patch_object(handlers.charm, 'optional_interfaces')
+        self.optional_interfaces.return_value = ('fake', 'interface', 'list')
         handlers.render('arg1', 'arg2')
         self.octavia_charm.render_with_interfaces.assert_called_once_with(
-            ('arg1', 'arg2'))
+            ('fake', 'interface', 'list'))
+        self.optional_interfaces.assert_called_once_with(
+            ('arg1', 'arg2'), 'ovsdb-subordinate.available',
+            'ovsdb-cms.available')
         self.octavia_charm.configure_ssl.assert_called_once_with()
         self.octavia_charm.enable_webserver_site.assert_called_once_with()
         self.octavia_charm.assess_status.assert_called_once_with()

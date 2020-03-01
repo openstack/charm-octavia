@@ -211,7 +211,7 @@ class TestAPICrud(test_utils.PatchHelper):
         api_crud.toggle_hm_port(identity_service, 'fake-unit-name')
         self.init_neutron_client.assert_called_once_with(
             self.session_from_identity_service())
-        nc.list_ports.asssert_called_with(tags='charm-octavia-fake-unit-name')
+        nc.list_ports.assert_called_with(tags='charm-octavia-fake-unit-name')
         nc.update_port.assert_called_with('fake-port-uuid',
                                           {'port': {'admin_state_up': True}})
 

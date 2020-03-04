@@ -77,6 +77,13 @@ def configure_resources(*args):
             return
         else:
             leadership.leader_set({'amp-flavor-id': flavor.id})
+
+    amp_key_name = ch_core.hookenv.config('amp-ssh-key-name')
+    if amp_key_name:
+        identity_service = reactive.endpoint_from_flag(
+            'identity-service.available')
+        api_crud.create_nova_keypair(identity_service, amp_key_name)
+
     # execute port setup for leader, the followers will execute theirs on
     # `leader-settings-changed` hook
     with charm.provide_charm_instance() as octavia_charm:

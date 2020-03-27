@@ -38,6 +38,7 @@ charm.use_defaults(
     'update-status',
     'upgrade-charm',
     'certificates.available',
+    'cluster.available',
 )
 
 

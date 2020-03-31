@@ -87,6 +87,17 @@ class DuplicateResource(Exception):
         self.data = data
 
 
+def endpoint_type():
+    """Determine endpoint type to use.
+
+    :returns: endpoint type
+    :rtype: str
+    """
+    if ch_core.hookenv.config('use-internal-endpoints'):
+        return 'internalURL'
+    return 'publicURL'
+
+
 def session_from_identity_service(identity_service):
     """Get Keystone Session from `identity-service` relation.
 
@@ -122,7 +133,37 @@ def init_neutron_client(keystone_session):
     """
     return neutron_client.Client(session=keystone_session,
                                  region_name=ch_core.hookenv.config('region'),
+                                 endpoint_type=endpoint_type(),
                                  )
+
+
+def get_nova_client(keystone_session):
+    """Get Nova client
+
+    :param keystone_session: Keystone client auth session
+    :type keystone_session.Session
+    :returns: Nova client
+    :rtype: nova_client.Client
+    """
+    return nova_client.Client('2',
+                              session=keystone_session,
+                              region_name=ch_core.hookenv.config('region'),
+                              endpoint_type=endpoint_type(),
+                              )
+
+
+def is_extension_enabled(neutron_client, ext_alias):
+    """Check for presence of Neutron extension
+
+    :param neutron_client:
+    :type neutron_client:
+    :returns: True if Neutron lists extension, False otherwise
+    :rtype: bool
+    """
+    for extension in neutron_client.list_extensions().get('extensions', []):
+        if extension.get('alias') == ext_alias:
+            return True
+    return False
 
 
 def get_nova_flavor(identity_service):
@@ -138,9 +179,7 @@ def get_nova_flavor(identity_service):
     """
     try:
         session = session_from_identity_service(identity_service)
-        nova = nova_client.Client('2',
-                                  session=session,
-                                  region_name=ch_core.hookenv.config('region'))
+        nova = get_nova_client(session)
         flavors = nova.flavors.list(is_public=False)
         for flavor in flavors:
             if flavor.name == 'charm-octavia':
@@ -168,9 +207,7 @@ def create_nova_keypair(identity_service, amp_key_name):
     pubkey_decoded = base64.b64decode(pubkey).strip().decode()
     try:
         session = session_from_identity_service(identity_service)
-        nova = nova_client.Client('2',
-                                  session=session,
-                                  region_name=ch_core.hookenv.config('region'))
+        nova = get_nova_client(session)
         keys = nova.keypairs.list()
         for key in keys:
             if key.name == amp_key_name:

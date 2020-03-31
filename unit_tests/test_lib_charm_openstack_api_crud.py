@@ -70,6 +70,13 @@ class TestAPICrud(test_utils.PatchHelper):
                     'security_group_id': self.health_secgrp_uuid}}),
         ]
 
+    def test_endpoint_type(self):
+        self.patch_object(api_crud.ch_core.hookenv, 'config')
+        self.config.return_value = False
+        self.assertEquals(api_crud.endpoint_type(), 'publicURL')
+        self.config.return_value = True
+        self.assertEquals(api_crud.endpoint_type(), 'internalURL')
+
     def test_session_from_identity_service(self):
         self.patch_object(api_crud, 'keystone_identity')
         self.patch_object(api_crud, 'keystone_session')
@@ -94,23 +101,37 @@ class TestAPICrud(test_utils.PatchHelper):
     def test_init_neutron_client(self):
         self.patch_object(api_crud, 'neutron_client')
         self.patch_object(api_crud.ch_core.hookenv, 'config')
+        self.patch_object(api_crud, 'endpoint_type')
+        self.endpoint_type.return_value = 'someeptype'
         api_crud.init_neutron_client('somesession')
         self.config.assert_called_once_with('region')
         self.neutron_client.Client.assert_called_once_with(
-            session='somesession', region_name=self.config())
+            session='somesession', region_name=self.config(),
+            endpoint_type='someeptype')
+
+    def test_get_nova_client(self):
+        self.patch_object(api_crud, 'nova_client')
+        self.patch_object(api_crud.ch_core.hookenv, 'config')
+        self.config.return_value = 'someregion'
+        self.patch_object(api_crud, 'endpoint_type')
+        self.endpoint_type.return_value = 'someeptype'
+        api_crud.get_nova_client('somesession')
+        self.config.assert_called_once_with('region')
+        self.nova_client.Client.assert_called_once_with(
+            '2', session='somesession', region_name='someregion',
+            endpoint_type='someeptype')
 
     def test_get_nova_flavor(self):
+        self.patch_object(api_crud, 'get_nova_client')
         self.patch_object(api_crud, 'nova_client')
         self.patch_object(api_crud, 'session_from_identity_service')
         self.patch_object(api_crud, 'keystone_exceptions')
-        self.patch_object(api_crud.ch_core.hookenv, 'config')
         nova = mock.MagicMock()
+        self.get_nova_client.return_value = nova
         flavor = mock.MagicMock()
         flavor.id = 'fake-id'
         flavor.name = 'charm-octavia'
         nova.flavors.list.return_value = [flavor]
-        self.nova_client.Client.return_value = nova
-        self.config.return_value = 'someregion'
 
         self.keystone_exceptions.catalog.EndpointNotFound = Exception
         self.keystone_exceptions.connection.ConnectFailure = Exception
@@ -122,11 +143,6 @@ class TestAPICrud(test_utils.PatchHelper):
 
         nova.flavors.list.side_effect = None
         api_crud.get_nova_flavor(identity_service)
-        self.config.assert_called_with('region')
-        self.nova_client.Client.assert_called_with(
-            '2',
-            session=self.session_from_identity_service(),
-            region_name='someregion')
         nova.flavors.list.assert_called_with(is_public=False)
         self.assertFalse(nova.flavors.create.called)
         nova.flavors.list.return_value = []

@@ -1,0 +1,216 @@
+series: focal
+relations:
+- - glance:image-service
+  - nova-cloud-controller:image-service
+- - glance:image-service
+  - nova-compute:image-service
+- - glance-mysql-router:shared-db
+  - glance:shared-db
+- - keystone-mysql-router:shared-db
+  - keystone:shared-db
+- - neutron-mysql-router:shared-db
+  - neutron-api:shared-db
+- - nova-mysql-router:shared-db
+  - nova-cloud-controller:shared-db
+- - octavia-mysql-router:shared-db
+  - octavia:shared-db
+- - keystone:identity-service
+  - glance:identity-service
+- - keystone:identity-service
+  - nova-cloud-controller:identity-service
+- - keystone:identity-service
+  - neutron-api:identity-service
+- - keystone:identity-service
+  - octavia:identity-service
+- - nova-compute:cloud-compute
+  - nova-cloud-controller:cloud-compute
+- - rabbitmq-server:amqp
+  - neutron-api:amqp
+- - rabbitmq-server:amqp
+  - glance:amqp
+- - rabbitmq-server:amqp
+  - nova-cloud-controller:amqp
+- - rabbitmq-server:amqp
+  - nova-compute:amqp
+- - rabbitmq-server:amqp
+  - octavia:amqp
+- - neutron-api:neutron-api
+  - nova-cloud-controller:neutron-api
+- - neutron-api:neutron-load-balancer
+  - octavia:neutron-api
+- - glance-simplestreams-sync:juju-info
+  - octavia-diskimage-retrofit:juju-info
+- - keystone:identity-service
+  - glance-simplestreams-sync:identity-service
+- - rabbitmq-server:amqp
+  - glance-simplestreams-sync:amqp
+- - keystone:identity-credentials
+  - octavia-diskimage-retrofit:identity-credentials
+- [ placement, placement-mysql-router ]
+- [ placement, keystone ]
+- [ placement, nova-cloud-controller ]
+- - neutron-api-plugin-ovn:neutron-plugin
+  - neutron-api:neutron-plugin-api-subordinate
+- - vault:shared-db
+  - vault-mysql-router:shared-db
+- - ovn-central:certificates
+  - vault:certificates
+- - ovn-central:ovsdb-cms
+  - neutron-api-plugin-ovn:ovsdb-cms
+- - neutron-api:certificates
+  - vault:certificates
+- - ovn-chassis:nova-compute
+  - nova-compute:neutron-plugin
+- - ovn-chassis:ovsdb-subordinate
+  - octavia:ovsdb-subordinate
+- - ovn-central:ovsdb-cms
+  - octavia:ovsdb-cms
+- - ovn-chassis:certificates
+  - vault:certificates
+- - ovn-chassis:ovsdb
+  - ovn-central:ovsdb
+- - vault:certificates
+  - neutron-api-plugin-ovn:certificates
+- - vault:certificates
+  - glance:certificates
+- - vault:certificates
+  - keystone:certificates
+- - vault:certificates
+  - nova-cloud-controller:certificates
+- - vault:certificates
+  - placement:certificates
+- - vault:certificates
+  - octavia:certificates
+- - vault:certificates
+  - glance-simplestreams-sync:certificates
+- - hacluster-octavia:ha
+  - octavia:ha
+- ["octavia-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["keystone-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["nova-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["glance-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["neutron-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["placement-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["vault-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+applications:
+  glance:
+    charm: cs:~openstack-charmers-next/glance
+    num_units: 1
+    options:
+      openstack-origin: distro
+  keystone:
+    charm: cs:~openstack-charmers-next/keystone
+    num_units: 1
+    options:
+      openstack-origin: distro
+  octavia-mysql-router:
+    charm: cs:~openstack-charmers-next/mysql-router
+  keystone-mysql-router:
+    charm: cs:~openstack-charmers-next/mysql-router
+  nova-mysql-router:
+    charm: cs:~openstack-charmers-next/mysql-router
+  glance-mysql-router:
+    charm: cs:~openstack-charmers-next/mysql-router
+  neutron-mysql-router:
+    charm: cs:~openstack-charmers-next/mysql-router
+  placement-mysql-router:
+    charm: cs:~openstack-charmers-next/mysql-router
+  vault-mysql-router:
+    charm: cs:~openstack-charmers-next/mysql-router
+  mysql-innodb-cluster:
+    constraints: mem=3072M
+    charm: cs:~openstack-charmers-next/mysql-innodb-cluster
+    num_units: 3
+  neutron-api:
+    constraints: cores=4
+    charm: cs:~openstack-charmers-next/neutron-api
+    num_units: 1
+    options:
+      # NOTE(fnordahl): At current state of upstream Neutron development this
+      # is a requirement.  Remove once fixed upstream.
+      enable-ml2-port-security: true
+      openstack-origin: distro
+      debug: True
+      flat-network-providers: physnet1
+      neutron-security-groups: True
+  nova-cloud-controller:
+    constraints: mem=3072M
+    charm: cs:~openstack-charmers-next/nova-cloud-controller
+    num_units: 1
+    options:
+      openstack-origin: distro
+      debug: True
+      network-manager: Neutron
+  nova-compute:
+    constraints: mem=10240M
+    charm: cs:~openstack-charmers-next/nova-compute
+    num_units: 2
+    options:
+      openstack-origin: distro
+      debug: True
+  hacluster-octavia:
+    series: focal
+    charm: cs:~openstack-charmers-next/hacluster
+  octavia:
+    series: focal
+    charm: ../../../octavia
+    num_units: 3
+    options:
+      openstack-origin: distro
+      debug: True
+      spare-pool-size: 2
+      loadbalancer-topology: 'ACTIVE_STANDBY'
+  rabbitmq-server:
+    charm: cs:~openstack-charmers-next/rabbitmq-server
+    num_units: 1
+  glance-simplestreams-sync:
+    charm: cs:~openstack-charmers-next/glance-simplestreams-sync
+    num_units: 1
+    options:
+      source: ppa:simplestreams-dev/trunk
+      use_swift: False
+      mirror_list: "[{url: 'http://cloud-images.ubuntu.com/daily/',
+           name_prefix: 'ubuntu:released',
+           path: 'streams/v1/index.sjson',
+           max: 1,
+           item_filters: [
+               'release~(xenial|bionic|focal)',
+               'arch~(x86_64|amd64)',
+               'ftype~(disk1.img|disk.img)'
+               ]
+          },
+          {url: 'http://cloud-images.ubuntu.com/minimal/daily/',
+           name_prefix: 'ubuntu:released',
+           path: 'streams/v1/index.sjson',
+           max: 1,
+           item_filters: [
+               'release~(xenial|bionic|focal)',
+               'arch~(x86_64|amd64)',
+               'ftype~(disk1.img|disk.img)'
+               ]
+          }]"
+  octavia-diskimage-retrofit:
+    charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
+    options:
+      amp-image-tag: 'octavia-amphora'
+      retrofit-series: focal
+  placement:
+    charm: cs:~openstack-charmers-next/placement
+    num_units: 1
+    constraints: mem=1G
+    options:
+      openstack-origin: distro
+      debug: true
+  neutron-api-plugin-ovn:
+    charm: cs:~openstack-charmers-next/neutron-api-plugin-ovn
+  ovn-central:
+    constraints: mem=3072M
+    charm: cs:~openstack-charmers-next/ovn-central
+    num_units: 3
+    options:
+      source: distro
+  ovn-chassis:
+    charm: cs:~openstack-charmers-next/ovn-chassis
+  vault:
+    charm: cs:~openstack-charmers-next/vault
+    num_units: 1

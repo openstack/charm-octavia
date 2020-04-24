@@ -14,3 +14,4 @@ DHCP=yes
 UseMTU=true
 UseRoutes=false
 RouteMetric=100
+UseDomains=route

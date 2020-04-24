@@ -151,6 +151,7 @@ applications:
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-uca-pocket: train
+      retrofit-series: bionic
   placement:
     charm: cs:~openstack-charmers-next/placement
     num_units: 1

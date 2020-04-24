@@ -180,6 +180,7 @@ applications:
     charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
+      retrofit-series: bionic
   vault:
     charm: cs:~openstack-charmers-next/vault
     num_units: 1

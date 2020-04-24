@@ -159,6 +159,7 @@ applications:
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-uca-pocket: rocky
+      retrofit-series: bionic
   vault:
     charm: cs:~openstack-charmers-next/vault
     num_units: 1

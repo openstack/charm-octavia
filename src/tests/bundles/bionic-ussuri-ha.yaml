@@ -81,21 +81,21 @@ relations:
   - placement:certificates
 applications:
   glance:
-    charm: cs:~openstack-charmers-next/glance
+    charm: cs:~openstack-charmers/glance
     num_units: 1
     options:
       openstack-origin: cloud:bionic-ussuri/proposed
   keystone:
-    charm: cs:~openstack-charmers-next/keystone
+    charm: cs:~openstack-charmers/keystone
     num_units: 1
     options:
       openstack-origin: cloud:bionic-ussuri/proposed
   mysql:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers-next/percona-cluster
+    charm: cs:~openstack-charmers/percona-cluster
     num_units: 1
   neutron-api:
-    charm: cs:~openstack-charmers-next/neutron-api
+    charm: cs:~openstack-charmers/neutron-api
     num_units: 1
     options:
       openstack-origin: cloud:bionic-ussuri/proposed
@@ -106,7 +106,7 @@ applications:
       manage-neutron-plugin-legacy-mode: True
   neutron-openvswitch:
     series: bionic
-    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    charm: cs:~openstack-charmers/neutron-openvswitch
     num_units: 0
     options:
       debug: True
@@ -117,7 +117,7 @@ applications:
       bridge-mappings: physnet1:br-ex
   neutron-openvswitch-octavia:
     series: bionic
-    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    charm: cs:~openstack-charmers/neutron-openvswitch
     num_units: 0
     options:
       debug: True
@@ -125,7 +125,7 @@ applications:
       firewall-driver: openvswitch
   nova-cloud-controller:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers-next/nova-cloud-controller
+    charm: cs:~openstack-charmers/nova-cloud-controller
     num_units: 1
     options:
       openstack-origin: cloud:bionic-ussuri/proposed
@@ -133,13 +133,13 @@ applications:
       network-manager: Neutron
   nova-compute:
     constraints: mem=10240M
-    charm: cs:~openstack-charmers-next/nova-compute
+    charm: cs:~openstack-charmers/nova-compute
     num_units: 2
     options:
       openstack-origin: cloud:bionic-ussuri/proposed
       debug: True
   hacluster-octavia:
-    charm: cs:~openstack-charmers-next/hacluster
+    charm: cs:~openstack-charmers/hacluster
     num_units: 0
   octavia:
     series: bionic
@@ -152,27 +152,27 @@ applications:
       loadbalancer-topology: 'ACTIVE_STANDBY'
       vip: 'ADD YOUR VIP HERE'
   rabbitmq-server:
-    charm: cs:~openstack-charmers-next/rabbitmq-server
+    charm: cs:~openstack-charmers/rabbitmq-server
     num_units: 1
   glance-simplestreams-sync:
-    charm: cs:~openstack-charmers-next/glance-simplestreams-sync
+    charm: cs:~openstack-charmers/glance-simplestreams-sync
     num_units: 1
     options:
       source: ppa:simplestreams-dev/trunk
       use_swift: False
   octavia-diskimage-retrofit:
-    charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
+    charm: cs:~openstack-charmers/octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-uca-pocket: ussuri
       retrofit-series: bionic
   placement:
-    charm: cs:~openstack-charmers-next/placement
+    charm: cs:~openstack-charmers/placement
     num_units: 1
     constraints: mem=1G
     options:
       openstack-origin: cloud:bionic-ussuri/proposed
       debug: true
   vault:
-    charm: cs:~openstack-charmers-next/vault
+    charm: cs:~openstack-charmers/vault
     num_units: 1

@@ -16,11 +16,12 @@ description: |
 
   OpenStack Rocky or later is required.
 tags:
-  - openstack
+- openstack
 series:
-  - bionic
-  - eoan
-  - focal
+- bionic
+- eoan
+- focal
+- groovy
 subordinate: false
 provides:
   nrpe-external-master:

@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import json
-import mock
+from unittest import mock
 
 import charm.openstack.octavia as octavia
 import reactive.octavia_handlers as handlers

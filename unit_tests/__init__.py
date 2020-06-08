@@ -21,7 +21,7 @@ sys.path.append('src/lib')
 import charms_openstack.test_mocks  # noqa
 charms_openstack.test_mocks.mock_charmhelpers()
 
-import mock
+from unittest import mock
 
 
 class _fake_decorator(object):

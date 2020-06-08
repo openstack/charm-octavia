@@ -13,7 +13,7 @@
 # limitations under the License.
 
 import contextlib
-import mock
+from unittest import mock
 import subprocess
 
 import charms_openstack.test_utils as test_utils

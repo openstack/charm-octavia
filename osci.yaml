@@ -1,6 +1,6 @@
 - project:
     templates:
-      - charm-unit-jobs
+      - charm-yoga-unit-jobs
     check:
       jobs:
       - charm-build
@@ -54,10 +54,9 @@
     parent: func-target
     dependencies: &lint-jobs
         - osci-lint
-        - tox-py35
         - tox-py36
-        - tox-py37
         - tox-py38
+        - tox-py39
         - charm-build
     vars:
       tox_extra_args: bionic-train-ha-ovn

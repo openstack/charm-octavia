@@ -24,6 +24,8 @@ import charms_openstack.ip as os_ip
 
 import charmhelpers.core as ch_core
 
+from charmhelpers.contrib.charmsupport import nrpe
+
 import charm.openstack.api_crud as api_crud
 import charm.openstack.octavia as octavia
 
@@ -214,3 +216,29 @@ def cluster_connected(hacluster):
     with charm.provide_charm_instance() as octavia_charm:
         octavia_charm.configure_ha_resources(hacluster)
         octavia_charm.assess_status()
+
+
+@reactive.when('charm.installed')
+@reactive.when('nrpe-external-master.available')
+@reactive.when_not('octavia.nrpe.configured')
+def update_nagios():
+    ch_core.hookenv.status_set('maintenance', 'configuring Nagios checks')
+    current_unit = nrpe.get_nagios_unit_name()
+    with charm.provide_charm_instance() as charm_instance:
+        services = charm_instance.full_service_list
+    nrpe_instance = nrpe.NRPE()
+    nrpe.add_init_service_checks(nrpe_instance, services, current_unit)
+    nrpe_instance.write()
+    reactive.set_state('octavia.nrpe.configured')
+    ch_core.hookenv.status_set('active', 'Nagios checks configured')
+
+
+@reactive.when_any('config.changed.nagios_context',
+                   'config.changed.nagios_servicegroups')
+def nagios_config_changed():
+    reactive.remove_state('octavia.nrpe.configured')
+
+
+@reactive.hook('upgrade-charm')
+def upgrade_charm():
+    reactive.remove_state('octavia.nrpe.configured')

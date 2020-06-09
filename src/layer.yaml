@@ -8,6 +8,7 @@ includes:
   - interface:neutron-plugin
   - interface:ovsdb-subordinate
   - interface:ovsdb-cms
+  - interface:nrpe-external-master
 options:
   basic:
     use_venv: True

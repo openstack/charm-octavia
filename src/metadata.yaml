@@ -22,6 +22,10 @@ series:
   - eoan
   - focal
 subordinate: false
+provides:
+  nrpe-external-master:
+    interface: nrpe-external-master
+    scope: container
 requires:
   neutron-api:
     interface: neutron-load-balancer

@@ -244,4 +244,8 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
     def test_nagios_config_changed(self):
         self.patch('charms.reactive.remove_state')
         handlers.nagios_config_changed()
-        self.remove_state.assert_called_once_with('octavia.nrpe.configured')
+        self.remove_state.assert_any_call('octavia.nrpe.configured')
+        self.remove_state.assert_any_call('config.changed.nagios_context')
+        self.remove_state.assert_any_call(
+            'config.changed.nagios_servicegroups')
+        self.assertEqual(self.remove_state.call_count, 3)

@@ -237,6 +237,11 @@ def update_nagios():
                    'config.changed.nagios_servicegroups')
 def nagios_config_changed():
     reactive.remove_state('octavia.nrpe.configured')
+    # It's the charm's responsibility to clear flags set by the framework.
+    # Clear them so future config changes trigger a config update.
+    # See https://charmsreactive.readthedocs.io/en/latest/managed-flags.html
+    reactive.remove_state('config.changed.nagios_context')
+    reactive.remove_state('config.changed.nagios_servicegroups')
 
 
 @reactive.hook('upgrade-charm')

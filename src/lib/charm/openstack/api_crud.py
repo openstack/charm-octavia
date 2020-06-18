@@ -734,3 +734,35 @@ def get_mgmt_network(identity_service, create=True):
                 raise APIUnavailable('neutron', 'security_groups', e)
     resp = nc.list_security_group_rules(security_group_id=health_secgrp['id'])
     return (network, secgrp)
+
+
+def set_service_quotas_unlimited(identity_service):
+    """Set services project quotas to unlimited.
+
+    :param identity_service: reactive Endpoint of type ``identity-service``
+    :type identity_service: RelationBase class
+    :returns: None
+    :rtype: None
+    :raises: api_crud.APIUnavailable
+    """
+    try:
+        _ul = -1
+        session = session_from_identity_service(identity_service)
+        nova = get_nova_client(session)
+        nova.quotas.update(
+            identity_service.service_tenant_id(),
+            cores=_ul, ram=_ul, instances=_ul)
+        nc = init_neutron_client(session)
+        nc.update_quota(
+            identity_service.service_tenant_id(),
+            body={
+                "quota": {
+                    "port": _ul, "security_group": _ul,
+                    "security_group_rule": _ul, "network": _ul, "subnet": _ul,
+                    "floatingip": _ul, "router": _ul, "rbac_policy": _ul}})
+    except (keystone_exceptions.catalog.EndpointNotFound,
+            keystone_exceptions.connection.ConnectFailure,
+            nova_client.exceptions.ClientException) as e:
+        raise APIUnavailable('nova', 'quotas', e)
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'quotas', e)

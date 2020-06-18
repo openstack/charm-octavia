@@ -84,6 +84,13 @@ def configure_resources(*args):
             'identity-service.available')
         api_crud.create_nova_keypair(identity_service, amp_key_name)
 
+    # Set qutotas to unlimited
+    try:
+        api_crud.set_service_quotas_unlimited(identity_service)
+    except api_crud.APIUnavailable as e:
+        ch_core.hookenv.action_fail('Unbable to set quotas to unlimited: {}'
+                                    .format(e))
+
     # execute port setup for leader, the followers will execute theirs on
     # `leader-settings-changed` hook
     with charm.provide_charm_instance() as octavia_charm:

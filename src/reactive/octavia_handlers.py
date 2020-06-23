@@ -13,6 +13,7 @@
 # limitations under the License.
 
 import json
+import os
 import uuid
 
 import charms.reactive as reactive
@@ -301,8 +302,12 @@ def update_nagios():
     with charm.provide_charm_instance() as charm_instance:
         services = charm_instance.full_service_list
     nrpe_instance = nrpe.NRPE()
+    files_dir = os.path.join(os.getenv('CHARM_DIR', '.'), "files", "nrpe")
+    nrpe.copy_nrpe_checks(nrpe_files_dir=files_dir)
     nrpe.add_init_service_checks(nrpe_instance, services, current_unit)
     nrpe_instance.write()
+    if ch_core.host.group_exists("octavia"):
+        ch_core.host.add_user_to_group("nagios", "octavia")
     reactive.set_state('octavia.nrpe.configured')
     ch_core.hookenv.status_set('active', 'Nagios checks configured')
 

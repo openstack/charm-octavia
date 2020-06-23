@@ -33,6 +33,11 @@ class _fake_decorator(object):
         return f
 
 
+import charmhelpers.contrib
+sys.modules['charmhelpers.contrib.charmsupport'] = \
+    charmhelpers.contrib.charmsupport
+sys.modules['charmhelpers.contrib.charmsupport.nrpe'] = \
+    charmhelpers.contrib.charmsupport.nrpe
 charms = mock.MagicMock()
 sys.modules['charms'] = charms
 charms.leadership = mock.MagicMock()

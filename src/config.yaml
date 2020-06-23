@@ -182,3 +182,17 @@ options:
       Octavia supports multiple provider drivers. The reference Amphora
       provider driver is distributed as part of the Octavia software, and is
       enabled by default, unless you set this configuration option to 'False'.
+  tls_warn_days:
+    default: 30
+    type: int
+    description: |
+      Number of days left for the Octavia certificates, used for secure
+      communication between the controller and the amphora instances,
+      to expire before raising a Warning alert.
+  tls_crit_days:
+    default: 14
+    type: int
+    description: |
+      Number of days left for the Octavia certificates, used for secure
+      communication between the controller and the amphora instances,
+      to expire before raising a Critical alert.

@@ -27,6 +27,7 @@ import charms.leadership as leadership
 import charms.reactive as reactive
 
 import charmhelpers.core as ch_core
+import charmhelpers.contrib.charmsupport.nrpe as ch_nrpe
 import charmhelpers.contrib.network.ip as ch_net_ip
 
 OCTAVIA_DIR = '/etc/octavia'
@@ -53,6 +54,8 @@ OCTAVIA_ROLES = [
     'load-balancer_quota_admin',
     'load-balancer_admin',
 ]
+
+NAGIOS_PLUGINS = '/usr/local/lib/nagios/plugins'
 
 # config.changed is needed to get the policyd override clean-up to work when
 # setting use-policyd-override=false
@@ -218,7 +221,9 @@ def issuing_ca_private_key(cls):
     if config:
         return cls.charm_instance.decode_and_write_cert(
             'issuing_ca_key.pem',
-            config)
+            config,
+            check=False
+        )
 
 
 @charms_openstack.adapters.config_property
@@ -451,15 +456,19 @@ class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
                 ch_core.host.service_reload('apache2',
                                             restart_on_failure=True)
 
-    def decode_and_write_cert(self, filename, encoded_data):
+    def decode_and_write_cert(self, filename, encoded_data, check=True):
         """Write certificate data to disk.
+
+        Side effect of writing a certificate is that an nrpe check is added
+        to check validity and expiration of the certificate if `check=True` is
+        passed.
 
         :param filename: Name of file
         :type filename: str
-        :param group: Group ownership
-        :type group: str
         :param encoded_data: Base64 encoded data
         :type encoded_data: str
+        :param check: Install the nrpe check
+        :type check: bool
         :returns: Full path to file
         :rtype: str
         """
@@ -468,6 +477,22 @@ class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
                            perms=0o750)
         ch_core.host.write_file(filename, base64.b64decode(encoded_data),
                                 group=self.group, perms=0o440)
+        if check:
+            check_cmd = '{} -C {},{} {}'.format(
+                os.path.join(NAGIOS_PLUGINS, 'check_cert.py'),
+                ch_core.hookenv.config('tls_crit_days'),
+                ch_core.hookenv.config('tls_warn_days'),
+                filename
+            )
+            description = 'Check Certificate %s' % os.path.basename(filename)
+
+            nrpe = ch_nrpe.NRPE()
+            nrpe.add_check(
+                shortname='cert_%s' % os.path.basename(filename).split(".")[0],
+                description=description,
+                check_cmd=check_cmd
+            )
+            nrpe.write()
         return filename
 
     @property

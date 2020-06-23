@@ -251,11 +251,14 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
         nrpe_instance = mock.MagicMock()
         self.patch_object(handlers.nrpe, 'NRPE', return_value=nrpe_instance)
         self.patch_object(handlers.nrpe, 'add_init_service_checks')
+        self.patch_object(handlers.nrpe, 'copy_nrpe_checks')
         self.patch('charms.reactive.set_state')
         handlers.update_nagios()
         self.add_init_service_checks.assert_called_once_with(
             nrpe_instance, self.octavia_charm.full_service_list,
             mock.sentinel.unit_name)
+        self.copy_nrpe_checks.assert_called_once_with(
+            nrpe_files_dir="./files/nrpe")
         nrpe_instance.write.assert_called_once()
         self.set_state.assert_called_once_with('octavia.nrpe.configured')
 

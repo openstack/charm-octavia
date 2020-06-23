@@ -63,8 +63,6 @@ relations:
   - octavia-diskimage-retrofit:juju-info
 - - keystone:identity-service
   - glance-simplestreams-sync:identity-service
-- - rabbitmq-server:amqp
-  - glance-simplestreams-sync:amqp
 - - keystone:identity-credentials
   - octavia-diskimage-retrofit:identity-credentials
 - - vault:shared-db
@@ -79,6 +77,8 @@ relations:
   - nova-cloud-controller:certificates
 - - vault:certificates
   - octavia:certificates
+- - vault:certificates
+  - glance-simplestreams-sync:certificates
 - - vault:certificates
   - octavia-diskimage-retrofit:certificates
 applications:

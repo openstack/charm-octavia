@@ -43,6 +43,7 @@ NEUTRON_TEMP_EXCS = (keystone_exceptions.catalog.EndpointNotFound,
                      keystone_exceptions.connection.ConnectFailure,
                      keystone_exceptions.discovery.DiscoveryFailure,
                      keystone_exceptions.http.ServiceUnavailable,
+                     keystone_exceptions.http.InternalServerError,
                      neutronclient.common.exceptions.ServiceUnavailable,
                      neutronclient.common.exceptions.BadRequest,
                      neutronclient.common.exceptions.NeutronClientException)

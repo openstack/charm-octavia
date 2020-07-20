@@ -18,3 +18,5 @@ repo: https://github.com/openstack/charm-octavia
 config:
   deletes:
     - verbose
+    - use-syslog
+    - worker-multiplier

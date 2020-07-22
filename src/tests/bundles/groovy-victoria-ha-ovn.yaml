@@ -59,8 +59,12 @@ relations:
   - vault:certificates
 - - ovn-chassis:nova-compute
   - nova-compute:neutron-plugin
-- - ovn-chassis:ovsdb-subordinate
+- - ovn-chassis-octavia:ovsdb-subordinate
   - octavia:ovsdb-subordinate
+- - ovn-chassis-octavia:certificates
+  - vault:certificates
+- - ovn-chassis-octavia:ovsdb
+  - ovn-central:ovsdb
 - - ovn-central:ovsdb-cms
   - octavia:ovsdb-cms
 - - ovn-chassis:certificates
@@ -147,6 +151,8 @@ applications:
   hacluster-octavia:
     series: groovy
     charm: cs:~openstack-charmers-next/hacluster
+  ovn-chassis-octavia:
+    charm: cs:~openstack-charmers-next/ovn-chassis
   octavia:
     constraints: cores=8
     series: groovy

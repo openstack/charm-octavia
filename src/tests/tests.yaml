@@ -41,6 +41,9 @@ target_deploy_status:
   ovn-chassis:
     workload-status: waiting
     workload-status-message: "'certificates' awaiting server certificate data"
+  ovn-chassis-octavia:
+    workload-status: waiting
+    workload-status-message: "'certificates' awaiting server certificate data"
 configure:
 - zaza.openstack.charm_tests.vault.setup.auto_initialize
 - zaza.openstack.charm_tests.glance_simplestreams_sync.setup.sync_images

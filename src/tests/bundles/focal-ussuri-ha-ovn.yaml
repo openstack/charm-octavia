@@ -42,8 +42,6 @@ relations:
   - octavia-diskimage-retrofit:juju-info
 - - keystone:identity-service
   - glance-simplestreams-sync:identity-service
-- - rabbitmq-server:amqp
-  - glance-simplestreams-sync:amqp
 - - keystone:identity-credentials
   - octavia-diskimage-retrofit:identity-credentials
 - [ placement, placement-mysql-router ]
@@ -144,7 +142,7 @@ applications:
   nova-compute:
     constraints: mem=10240M
     charm: cs:~openstack-charmers-next/nova-compute
-    num_units: 2
+    num_units: 4
     options:
       openstack-origin: distro
       debug: True
@@ -167,28 +165,7 @@ applications:
     charm: cs:~openstack-charmers-next/glance-simplestreams-sync
     num_units: 1
     options:
-      source: ppa:simplestreams-dev/trunk
       use_swift: False
-      mirror_list: "[{url: 'http://cloud-images.ubuntu.com/daily/',
-           name_prefix: 'ubuntu:released',
-           path: 'streams/v1/index.sjson',
-           max: 1,
-           item_filters: [
-               'release~(xenial|bionic|focal)',
-               'arch~(x86_64|amd64)',
-               'ftype~(disk1.img|disk.img)'
-               ]
-          },
-          {url: 'http://cloud-images.ubuntu.com/minimal/daily/',
-           name_prefix: 'ubuntu:released',
-           path: 'streams/v1/index.sjson',
-           max: 1,
-           item_filters: [
-               'release~(xenial|bionic|focal)',
-               'arch~(x86_64|amd64)',
-               'ftype~(disk1.img|disk.img)'
-               ]
-          }]"
   octavia-diskimage-retrofit:
     charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
     options:

@@ -1,3 +1,6 @@
+# Several dependencies now require setuptools-scm>=3.0<=3.4.1 which requires toml
+setuptools-scm>=3.0<=3.4.1
+toml
 keystoneauth1
 pbr
 python-novaclient

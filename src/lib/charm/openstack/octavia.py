@@ -339,6 +339,10 @@ class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
     package_codenames = {
         'octavia-common': collections.OrderedDict([
             ('1', 'rocky'),
+            ('4', 'stein'),
+            ('5', 'train'),
+            ('6', 'ussuri'),
+            ('7', 'victoria'),
         ]),
     }
     group = 'octavia'

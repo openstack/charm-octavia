@@ -15,6 +15,7 @@
 
 import os
 import sys
+import traceback
 
 # Load modules from $CHARM_DIR/lib
 sys.path.append('lib')
@@ -114,6 +115,10 @@ def main(args):
         try:
             action(args)
         except Exception as e:
+            ch_core.hookenv.log('action "{}" failed: "{}" "{}"'
+                                .format(action_name, str(e),
+                                        traceback.format_exc()),
+                                level=ch_core.hookenv.ERROR)
             ch_core.hookenv.action_fail(str(e))
 
 

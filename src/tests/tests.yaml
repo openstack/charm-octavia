@@ -15,6 +15,10 @@ comment: |
   The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
     https://github.com/lxc/lxd/issues/4947
 dev_bundles:
+- groovy-victoria-ha-ovn
+- groovy-victoria-ha
+- focal-victoria-ha-ovn
+- focal-victoria-ha
 - bionic-rocky-lxd
 target_deploy_status:
   octavia:
@@ -53,5 +57,5 @@ tests_options:
   policyd:
     service: octavia
   force_deploy:
-    - focal-ussuri-ha-ovn
-    - focal-ussuri-ha
+    - groovy-victoria-ha-ovn
+    - groovy-victoria-ha

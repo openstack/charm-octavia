@@ -118,7 +118,7 @@ applications:
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
   nova-cloud-controller:
-    constraints: mem=3072M
+    constraints: mem=7168M
     charm: cs:~openstack-charmers-next/nova-cloud-controller
     num_units: 1
     options:

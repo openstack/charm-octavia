@@ -1,16 +1,14 @@
 charm_name: octavia
 gate_bundles:
-- focal-ussuri-ha-ovn
-- focal-ussuri-ha
+- bionic-rocky-ha
+- bionic-stein-ha
 - bionic-train-ha-ovn
 - bionic-train-ha
-- bionic-stein-ha
-- bionic-rocky-ha
-- bionic-ussuri-ha-ovn
-- bionic-ussuri-ha
+- focal-ussuri-ha-ovn
+- focal-ussuri-ha
 smoke_bundles:
-- bionic-ussuri-ha-ovn
-- bionic-ussuri-ha
+- focal-ussuri-ha-ovn
+- focal-ussuri-ha
 comment: |
   The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
     https://github.com/lxc/lxd/issues/4947
@@ -20,6 +18,9 @@ dev_bundles:
 - focal-victoria-ha-ovn
 - focal-victoria-ha
 - bionic-rocky-lxd
+# LP: #1896729
+- bionic-ussuri-ha-ovn
+- bionic-ussuri-ha
 target_deploy_status:
   octavia:
     workload-status: blocked

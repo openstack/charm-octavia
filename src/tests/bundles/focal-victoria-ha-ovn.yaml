@@ -124,9 +124,6 @@ applications:
     charm: cs:~openstack-charmers/neutron-api
     num_units: 1
     options:
-      # NOTE(fnordahl): At current state of upstream Neutron development this
-      # is a requirement.  Remove once fixed upstream.
-      enable-ml2-port-security: true
       openstack-origin: cloud:focal-victoria
       debug: True
       flat-network-providers: physnet1
@@ -150,6 +147,7 @@ applications:
     series: focal
     charm: cs:~openstack-charmers/hacluster
   octavia:
+    constraints: cores=8
     series: focal
     charm: ../../../octavia
     num_units: 3

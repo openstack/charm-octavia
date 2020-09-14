@@ -163,6 +163,7 @@ applications:
     charm: cs:~openstack-charmers/hacluster
     num_units: 0
   octavia:
+    constraints: cores=8
     series: focal
     charm: ../../../octavia
     num_units: 3

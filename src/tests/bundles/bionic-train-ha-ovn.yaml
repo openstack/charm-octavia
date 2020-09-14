@@ -127,6 +127,7 @@ applications:
     series: bionic
     charm: cs:~openstack-charmers/hacluster
   octavia:
+    constraints: cores=8
     series: bionic
     charm: ../../../octavia
     num_units: 3

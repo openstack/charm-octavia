@@ -63,6 +63,7 @@ def disable_ovn_driver():
     reactive.clear_flag('charm.octavia.enable-ovn-driver')
 
 
+@reactive.when_not('is-update-status-hook')
 @reactive.when('ovsdb-subordinate.available')
 def maybe_enable_ovn_driver():
     ovsdb = reactive.endpoint_from_flag('ovsdb-subordinate.available')
@@ -73,6 +74,7 @@ def maybe_enable_ovn_driver():
             charm_instance.assess_status()
 
 
+@reactive.when_not('is-update-status-hook')
 @reactive.when('identity-service.connected')
 def setup_endpoint_connection(keystone):
     """Custom register endpoint function for Octavia.
@@ -94,11 +96,13 @@ def setup_endpoint_connection(keystone):
 
 @reactive.when('leadership.is_leader')
 @reactive.when_not('leadership.set.heartbeat-key')
+@reactive.when_not('is-update-status-hook')
 def generate_heartbeat_key():
     """Generate a unique key for ``heartbeat_key`` configuration option."""
     leadership.leader_set({'heartbeat-key': str(uuid.uuid4())})
 
 
+@reactive.when_not('is-update-status-hook')
 @reactive.when('neutron-api.available')
 def setup_neutron_lbaas_proxy():
     """Publish our URL to Neutron API units.
@@ -120,6 +124,7 @@ def setup_neutron_lbaas_proxy():
         neutron.publish_load_balancer_info('octavia', octavia_url)
 
 
+@reactive.when_not('is-update-status-hook')
 @reactive.when('identity-service.available')
 @reactive.when('neutron-api.available')
 @reactive.when('sdn-subordinate.available')
@@ -154,6 +159,7 @@ def setup_hm_port():
             return
 
 
+@reactive.when_not('is-update-status-hook')
 @reactive.when('leadership.is_leader')
 @reactive.when('identity-service.available')
 @reactive.when('neutron-api.available')
@@ -178,6 +184,7 @@ def update_controller_ip_port_list():
             {'controller-ip-port-list': json.dumps(neutron_ip_list)})
 
 
+@reactive.when_not('is-update-status-hook')
 @reactive.when('shared-db.available')
 @reactive.when('identity-service.available')
 @reactive.when('amqp.available')
@@ -198,6 +205,7 @@ def render(*args):
     reactive.set_state('config.rendered')
 
 
+@reactive.when_not('is-update-status-hook')
 @reactive.when_not('db.synced')
 @reactive.when('config.rendered')
 def init_db():
@@ -209,6 +217,7 @@ def init_db():
         octavia_charm.assess_status()
 
 
+@reactive.when_not('is-update-status-hook')
 @reactive.when('ha.connected')
 @reactive.when_not('ha.available')
 def cluster_connected(hacluster):
@@ -221,6 +230,7 @@ def cluster_connected(hacluster):
 @reactive.when('charm.installed')
 @reactive.when('nrpe-external-master.available')
 @reactive.when_not('octavia.nrpe.configured')
+@reactive.when_not('is-update-status-hook')
 def update_nagios():
     ch_core.hookenv.status_set('maintenance', 'configuring Nagios checks')
     current_unit = nrpe.get_nagios_unit_name()

@@ -127,9 +127,9 @@ applications:
       debug: True
       network-manager: Neutron
   nova-compute:
-    constraints: mem=10240M
+    constraints: mem=7168M
     charm: cs:~openstack-charmers-next/nova-compute
-    num_units: 4
+    num_units: 2
     options:
       openstack-origin: cloud:bionic-rocky
       debug: True
@@ -144,7 +144,6 @@ applications:
     options:
       openstack-origin: cloud:bionic-rocky
       debug: True
-      spare-pool-size: 2
       loadbalancer-topology: 'ACTIVE_STANDBY'
       vip: 'ADD YOUR VIP HERE'
   rabbitmq-server:

@@ -120,6 +120,10 @@ options:
       time for new load balancers.
       .
       The default behaviour is to not maintain any spare servers.
+      .
+      NOTE: As of OpenStack Victoria this configuration option is DEPRECATED
+      and support for the feature will be removed from Octavia in the
+      OpenStack X release.
   use-policyd-override:
     type: boolean
     default: False

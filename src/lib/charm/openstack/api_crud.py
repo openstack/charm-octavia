@@ -229,6 +229,28 @@ def create_nova_keypair(identity_service, amp_key_name):
         raise APIUnavailable('nova', 'keypairs', e)
 
 
+def lookup_hm_port(nc, local_unit_name):
+    """Retrieve port object for Neutron port for local unit.
+
+    :param nc: Neutron Client object
+    :type nc: neutron_client.Client
+    :param local_unit_name: Name of juju unit, used to build tag name for port
+    :type local_unit_name: str
+    :returns: Port data
+    :rtype: Optional[Dict[str,any]]
+    :raises: DuplicateResource or any exceptions raised by Keystone and Neutron
+             clients.
+    """
+    resp = nc.list_ports(tags='charm-octavia-{}'.format(local_unit_name))
+    n_resp = len(resp.get('ports', []))
+    if n_resp == 1:
+        return (resp['ports'][0])
+    elif n_resp > 1:
+        raise DuplicateResource('neutron', 'ports', data=resp)
+    else:
+        return
+
+
 def get_hm_port(identity_service, local_unit_name, local_unit_address,
                 host_id=None):
     """Get or create a per unit Neutron port for Octavia Health Manager.
@@ -289,8 +311,7 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address,
         return
 
     try:
-        resp = nc.list_ports(tags='charm-octavia-{}'
-                                  .format(local_unit_name))
+        hm_port = lookup_hm_port(nc, local_unit_name)
     except NEUTRON_TEMP_EXCS as e:
         raise APIUnavailable('neutron', 'ports', e)
 
@@ -323,30 +344,7 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address,
             'network_id': network['id'],
         },
     }
-    n_resp = len(resp.get('ports', []))
-    if n_resp == 1:
-        hm_port = resp['ports'][0]
-        # Ensure binding:host_id is up to date on a existing port
-        #
-        # In the event of a need to update it, we bring the port down to make
-        # sure Neutron rebuilds the port correctly.
-        #
-        # Our caller, ``setup_hm_port``, will toggle the port admin status.
-        if hm_port and hm_port.get(
-                'binding:host_id') != port_template['port']['binding:host_id']:
-            try:
-                nc.update_port(hm_port['id'], {
-                    'port': {
-                        'admin_state_up': False,
-                        'binding:host_id': port_template['port'][
-                            'binding:host_id'],
-                    }
-                })
-            except NEUTRON_TEMP_EXCS as e:
-                raise APIUnavailable('neutron', 'ports', e)
-    elif n_resp > 1:
-        raise DuplicateResource('neutron', 'ports', data=resp)
-    else:
+    if not hm_port:
         # create new port
         try:
             resp = nc.create_port(port_template)
@@ -360,6 +358,24 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address,
             # charm-wide tag is used by leader to load cluster state and build
             # ``controller_ip_port_list`` configuration property
             nc.add_tag('ports', hm_port['id'], 'charm-octavia')
+        except NEUTRON_TEMP_EXCS as e:
+            raise APIUnavailable('neutron', 'ports', e)
+    elif hm_port.get(
+            'binding:host_id') != port_template['port']['binding:host_id']:
+        # Ensure binding:host_id is up to date on a existing port
+        #
+        # In the event of a need to update it, we bring the port down to make
+        # sure Neutron rebuilds the port correctly.
+        #
+        # Our caller, ``setup_hm_port``, will toggle the port admin status.
+        try:
+            nc.update_port(hm_port['id'], {
+                'port': {
+                    'admin_state_up': False,
+                    'binding:host_id': port_template['port'][
+                        'binding:host_id'],
+                }
+            })
         except NEUTRON_TEMP_EXCS as e:
             raise APIUnavailable('neutron', 'ports', e)
     return hm_port
@@ -379,12 +395,16 @@ def toggle_hm_port(identity_service, local_unit_name, enabled=True):
     session = session_from_identity_service(identity_service)
     try:
         nc = init_neutron_client(session)
-        resp = nc.list_ports(tags='charm-octavia-{}'
-                                  .format(local_unit_name))
+        port = lookup_hm_port(nc, local_unit_name)
     except NEUTRON_TEMP_EXCS as e:
         raise APIUnavailable('neutron', 'ports', e)
-    for port in (resp['ports']):
-        nc.update_port(port['id'], {'port': {'admin_state_up': enabled}})
+    if not port:
+        ch_core.hookenv.log('When attempting to toggle admin status of port, '
+                            'we unexpectedly found that no port exists for '
+                            'unit.',
+                            level=ch_core.hookenv.WARNING)
+        return
+    nc.update_port(port['id'], {'port': {'admin_state_up': enabled}})
 
 
 def setup_hm_port(identity_service, octavia_charm, host_id=None):

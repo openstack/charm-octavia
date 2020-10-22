@@ -151,6 +151,20 @@ class TestAPICrud(test_utils.PatchHelper):
         nova.flavors.create.assert_called_with('charm-octavia', 1024, 1, 8,
                                                is_public=False)
 
+    def test_lookup_hm_port(self):
+        nc = mock.MagicMock()
+        nc.list_ports.return_value = {'ports': ['first', 'second']}
+        with self.assertRaises(api_crud.DuplicateResource):
+            api_crud.lookup_hm_port(nc, 'fake-unit-name')
+        nc.list_ports.return_value = {'ports': ['first']}
+        self.assertEquals(
+            api_crud.lookup_hm_port(nc, 'fake-unit-name'),
+            'first')
+        nc.list_ports.return_value = {}
+        self.assertEquals(
+            api_crud.lookup_hm_port(nc, 'fake-unit-name'),
+            None)
+
     def test_get_hm_port(self):
         self.patch_object(api_crud, 'session_from_identity_service')
         self.patch_object(api_crud, 'init_neutron_client')
@@ -172,6 +186,8 @@ class TestAPICrud(test_utils.PatchHelper):
         identity_service = mock.MagicMock()
         self.patch_object(api_crud, 'neutron_lib')
         self.neutron_lib.constants.DEVICE_OWNER_LOADBALANCERV2 = 'fakeowner'
+        self.patch_object(api_crud, 'lookup_hm_port')
+        self.lookup_hm_port.return_value = None
         result = api_crud.get_hm_port(identity_service,
                                       'fake-unit-name',
                                       '192.0.2.42')
@@ -180,8 +196,8 @@ class TestAPICrud(test_utils.PatchHelper):
         nc.list_networks.assert_called_with(tags='charm-octavia')
         nc.list_security_groups.assert_called_with(
             tags='charm-octavia-health')
-        nc.list_ports.assert_called_once_with(
-            tags='charm-octavia-fake-unit-name')
+        self.lookup_hm_port.assert_called_once_with(
+            nc, 'fake-unit-name')
         nc.create_port.assert_called_once_with(
             {
                 'port': {

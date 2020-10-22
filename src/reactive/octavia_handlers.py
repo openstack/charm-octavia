@@ -164,6 +164,12 @@ def setup_hm_port():
                                 .format(e),
                                 level=ch_core.hookenv.DEBUG)
             return
+        # Confirm port comes up from Neutron POV
+        if api_crud.wait_for_hm_port_bound(
+                identity_service, octavia_charm.local_unit_name):
+            reactive.set_flag('octavia.hm-port.available')
+        else:
+            reactive.clear_flag('octavia.hm-port.available')
 
 
 @reactive.when_not('is-update-status-hook')

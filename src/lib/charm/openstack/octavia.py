@@ -402,6 +402,11 @@ class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
                     ('crud.available',  # imaginate ``crud`` relation
                      'blocked',
                      'Awaiting {} to create required resources'.format(who))]
+        else:
+            states_to_check['octavia'] = [
+                ('octavia.hm-port.available',
+                 'blocked',
+                 'Virtual network for access to Amphorae is down')]
         # if these configuration options are at default value it means they are
         # not set by end-user, they are required for successfull creation of
         # load balancer instances.

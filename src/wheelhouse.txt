@@ -16,7 +16,7 @@ pytest-runner
 # layer-basic requires setuptools<42, zipp>=2.0.0 requires setuptools>42
 # LP: #1862186
 zipp < 2.0.0
-
+tenacity
 # cryptography 3.4 introduces a requirement for rust code in the module.  As it has to be compiled
 # on the machine during install, this breaks installs.  Instead pin to <3.4 until a solution can be
 # found that doesn't require compiling on the target machine.

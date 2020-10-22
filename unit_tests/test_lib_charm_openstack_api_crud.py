@@ -12,6 +12,7 @@
 # See the License for the specific language governing permissions and
 # limitations under the License.
 
+import contextlib
 import mock
 import subprocess
 
@@ -247,6 +248,39 @@ class TestAPICrud(test_utils.PatchHelper):
         nc.update_port.assert_called_with('fake-port-uuid',
                                           {'port': {'admin_state_up': True}})
 
+    def test_is_hm_port_bound(self):
+        self.patch_object(api_crud, 'session_from_identity_service')
+        self.patch_object(api_crud, 'init_neutron_client')
+        self.patch_object(api_crud, 'lookup_hm_port')
+        self.lookup_hm_port.return_value = None
+        self.assertEquals(
+            api_crud.is_hm_port_bound('ids', 'fake-unit-name'), None)
+        self.lookup_hm_port.assert_called_once_with(
+            mock.ANY, 'fake-unit-name')
+        self.lookup_hm_port.return_value = {'binding:vif_type': 'nonfailure'}
+        self.assertTrue(api_crud.is_hm_port_bound('ids', 'fake-unit-name'))
+        self.lookup_hm_port.return_value = {
+            'binding:vif_type': 'binding_failed'}
+        self.assertFalse(api_crud.is_hm_port_bound('ids', 'fake-unit-name'))
+
+    def test_wait_for_hm_port_bound(self):
+        self.patch_object(api_crud.tenacity, 'Retrying')
+
+        @contextlib.contextmanager
+        def fake_context_manager():
+            # TODO: Replace with `contextlib.nullcontext()` once we have
+            # deprecated support for Python 3.4, 3.5 and 3.6
+            yield None
+
+        self.Retrying.return_value = [fake_context_manager()]
+        self.patch_object(api_crud, 'is_hm_port_bound')
+        self.is_hm_port_bound.return_value = True
+        self.assertTrue(api_crud.wait_for_hm_port_bound(
+            'ids', 'fake-unit-name'))
+        self.Retrying.side_effect = api_crud.tenacity.RetryError(None)
+        self.assertFalse(api_crud.wait_for_hm_port_bound(
+            'ids', 'fake-unit-name'))
+
     def test_setup_hm_port(self):
         self.patch('subprocess.check_output', 'check_output')
         self.patch('subprocess.check_call', 'check_call')
@@ -260,6 +294,7 @@ class TestAPICrud(test_utils.PatchHelper):
             'id': port_uuid,
             'mac_address': port_mac_address,
             'admin_state_up': False,
+            'binding:vif_type': 'binding_failed',
             'status': 'DOWN',
         }
         e = subprocess.CalledProcessError(returncode=1, cmd=None)

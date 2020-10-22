@@ -149,12 +149,16 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
         self.patch('charms.reactive.endpoint_from_flag', 'endpoint_from_flag')
         self.patch('charms.reactive.set_flag', 'set_flag')
         self.patch_object(handlers.api_crud, 'setup_hm_port')
+        self.patch_object(handlers.api_crud, 'wait_for_hm_port_bound')
+        self.wait_for_hm_port_bound = True
         handlers.setup_hm_port()
         self.setup_hm_port.assert_called_with(
             self.endpoint_from_flag(),
             self.octavia_charm,
             host_id=self.endpoint_from_flag().host())
-        self.set_flag.assert_called_once_with('config.changed')
+        self.set_flag.assert_has_calls([
+            mock.call('config.changed'),
+            mock.call('octavia.hm-port.available')])
         self.setup_hm_port.reset_mock()
         ovsdb_subordinate = mock.MagicMock()
         identity_service = mock.MagicMock()

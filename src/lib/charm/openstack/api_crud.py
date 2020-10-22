@@ -25,6 +25,7 @@ import base64
 import neutronclient
 import socket
 import subprocess
+import tenacity
 
 from keystoneauth1 import identity as keystone_identity
 from keystoneauth1 import session as keystone_session
@@ -407,6 +408,53 @@ def toggle_hm_port(identity_service, local_unit_name, enabled=True):
     nc.update_port(port['id'], {'port': {'admin_state_up': enabled}})
 
 
+def is_hm_port_bound(identity_service, local_unit_name):
+    """Retrieve bound status of Neutron port for local unit.
+
+    :param identity_service: reactive Endpoint of type ``identity-service``
+    :type identity_service: RelationBase class
+    :param local_unit_name: Name of juju unit, used to build tag name for port
+    :type local_unit_name: str
+    :returns: True if up, False if down, None if no port found
+    :rtype: Optional[bool]
+    :raises: api_crud.APIUnavailable
+    """
+    session = session_from_identity_service(identity_service)
+    try:
+        nc = init_neutron_client(session)
+        port = lookup_hm_port(nc, local_unit_name)
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'ports', e)
+    if port:
+        # The operational status field for our port is unfortunately not
+        # accurate. But we can use the binding_vif_type field to detect if
+        # binding failed.
+        return port['binding:vif_type'] != 'binding_failed'
+
+
+def wait_for_hm_port_bound(identity_service, local_unit_name):
+    """Wait for port binding status of Neutron port for local unit.
+
+    :param identity_service: reactive Endpoint of type ``identity-service``
+    :type identity_service: RelationBase class
+    :param local_unit_name: Name of juju unit, used to build tag name for port
+    :type local_unit_name: str
+    :returns: True if state was reached, False otherwise
+    """
+    try:
+        for attempt in tenacity.Retrying(
+                stop=tenacity.stop_after_attempt(3),
+                wait=tenacity.wait_exponential(
+                    multiplier=1, min=2, max=10)):
+            with attempt:
+                port_up = is_hm_port_bound(
+                    identity_service, local_unit_name)
+                assert port_up is True
+                return port_up
+    except tenacity.RetryError:
+        return False
+
+
 def setup_hm_port(identity_service, octavia_charm, host_id=None):
     """Create a per unit Neutron and OVS port for Octavia Health Manager.
 
@@ -439,6 +487,12 @@ def setup_hm_port(identity_service, octavia_charm, host_id=None):
     HM_PORT_MAC = hm_port['mac_address']
     HM_PORT_ID = hm_port['id']
     try:
+        # TODO: We should add/update the OVS port and interface parameters on
+        # every call. Otherwise mac-address binding may get out of sync with
+        # what is in Neutron on port re-create etc. Remove the pre-flight ip
+        # link check and call ovs-vsctl with ``--may-exist`` instead. We would
+        # need to add some code to check if something changed or not.
+
         subprocess.check_output(
             ['ip', 'link', 'show', octavia.OCTAVIA_MGMT_INTF],
             stderr=subprocess.STDOUT, universal_newlines=True)
@@ -469,17 +523,21 @@ def setup_hm_port(identity_service, octavia_charm, host_id=None):
         else:
             # unknown error, raise
             raise e
-    if not hm_port['admin_state_up'] or hm_port['status'] == 'DOWN':
+    if (not hm_port['admin_state_up'] or
+            not is_hm_port_bound(identity_service,
+                                 octavia_charm.local_unit_name) or
+            hm_port['status'] == 'DOWN'):
         # NOTE(fnordahl) there appears to be a handful of race conditions
         # hitting us sometimes making the newly created ports unusable.
         # as a workaround we toggle the port belonging to us.
         # a disable/enable round trip makes Neutron reset the port
         # configuration which resolves these situations.
         ch_core.hookenv.log('toggling port {} (admin_state_up: {} '
-                            'status: {})'
+                            'status: {} binding:vif_type: {})'
                             .format(hm_port['id'],
                                     hm_port['admin_state_up'],
-                                    hm_port['status']),
+                                    hm_port['status'],
+                                    hm_port['binding:vif_type']),
                             level=ch_core.hookenv.INFO)
 
         toggle_hm_port(identity_service,

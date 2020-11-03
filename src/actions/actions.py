@@ -95,7 +95,8 @@ def configure_resources(*args):
     # execute port setup for leader, the followers will execute theirs on
     # `leader-settings-changed` hook
     with charm.provide_charm_instance() as octavia_charm:
-        api_crud.setup_hm_port(identity_service, octavia_charm)
+        # defer to main charm code to setup hm port
+        reactive.set_flag('charm.octavia.action_setup_hm_port')
         octavia_charm.render_all_configs()
         octavia_charm._assess_status()
 

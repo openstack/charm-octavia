@@ -124,6 +124,11 @@ def setup_neutron_lbaas_proxy():
         neutron.publish_load_balancer_info('octavia', octavia_url)
 
 
+@reactive.when('charm.octavia.action_setup_hm_port')
+def action_setup_hm_port():
+    setup_hm_port()
+
+
 @reactive.when_not('is-update-status-hook')
 @reactive.when('identity-service.available')
 @reactive.when('neutron-api.available')
@@ -151,6 +156,8 @@ def setup_hm_port():
                 # trigger config render to make systemd-networkd bring up
                 # automatic IP configuration of the new port right now.
                 reactive.set_flag('config.changed')
+                if reactive.is_flag_set('charm.octavia.action_setup_hm_port'):
+                    reactive.clear_flag('charm.octavia.action_setup_hm_port')
         except api_crud.APIUnavailable as e:
             ch_core.hookenv.log('Neutron API not available yet, deferring '
                                 'port discovery. ("{}")'

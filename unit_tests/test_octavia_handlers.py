@@ -62,6 +62,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'update_nagios': (
                     'charm.installed',
                     'nrpe-external-master.available',),
+                'action_setup_hm_port':
+                    ('charm.octavia.action_setup_hm_port',),
             },
             'when_any': {
                 'sdn_joined': ('neutron-openvswitch.connected',

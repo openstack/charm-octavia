@@ -19,7 +19,6 @@ tags:
 - openstack
 series:
 - bionic
-- eoan
 - focal
 - groovy
 subordinate: false

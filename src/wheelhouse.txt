@@ -15,6 +15,12 @@ pytest-runner
 # LP: #1862186
 zipp < 2.0.0
 
+# cryptography 3.4 introduces a requirement for rust code in the module.  As it has to be compiled
+# on the machine during install, this breaks installs.  Instead pin to <3.4 until a solution can be
+# found that doesn't require compiling on the target machine.
+# LP: #1915171
+cryptography<3.4
+
 git+https://opendev.org/openstack/charms.openstack.git#egg=charms.openstack
 
 git+https://github.com/juju/charm-helpers.git#egg=charmhelpers

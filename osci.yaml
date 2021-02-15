@@ -1,0 +1,59 @@
+- project:
+    templates:
+      - charm-unit-jobs
+    check:
+      jobs:
+      - charm-build
+      - bionic-stein-ha
+      - bionic-train-ha-ovn
+      - bionic-train-ha
+      - focal-ussuri-ha-ovn
+      - focal-ussuri-ha
+    vars:
+      needs_charm_build: true
+      charm_build_name: octavia
+
+- job:
+    name: bionic-rocky-ha
+    parent: func-target
+    dependencies: &smoke-jobs
+      - focal-ussuri-ha
+      - focal-ussuri-ha-ovn
+    vars:
+      tox_extra_args: bionic-rocky-ha
+- job:
+    name: bionic-stein-ha
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: bionic-stein-ha
+- job:
+    name: bionic-train-ha-ovn
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: bionic-train-ha-ovn
+- job:
+    name: bionic-train-ha
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: bionic-train-ha
+- job:
+    name: focal-ussuri-ha-ovn
+    parent: func-target
+    dependencies: &lint-jobs
+        - osci-lint
+        - tox-py35
+        - tox-py36
+        - tox-py37
+        - tox-py38
+        - charm-build
+    vars:
+      tox_extra_args: focal-ussuri-ha-ovn
+- job:
+    name: focal-ussuri-ha
+    parent: func-target
+    dependencies: *lint-jobs
+    vars:
+      tox_extra_args: focal-ussuri-ha

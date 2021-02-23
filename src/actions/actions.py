@@ -107,6 +107,9 @@ ACTIONS = {
 
 
 def main(args):
+    # Manually trigger any register atstart events to ensure all endpoints
+    # are correctly setup, Bug #1916008.
+    ch_core.hookenv._run_atstart()
     action_name = os.path.basename(args[0])
     try:
         action = ACTIONS[action_name]
@@ -121,6 +124,17 @@ def main(args):
                                         traceback.format_exc()),
                                 level=ch_core.hookenv.ERROR)
             ch_core.hookenv.action_fail(str(e))
+        else:
+            # we were successful, so commit changes from the action
+            ch_core.unitdata.kv().flush()
+            # try running handlers based on new state
+            try:
+                reactive.main()
+            except Exception:
+                exc = traceback.format_exc()
+                ch_core.hookenv.log(exc, ch_core.hookenv.ERROR)
+                ch_core.hookenv.action_fail(exc.splitlines()[-1])
+    ch_core.hookenv._run_atexit()
 
 
 if __name__ == '__main__':

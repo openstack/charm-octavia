@@ -134,9 +134,9 @@ class TestOctaviaCharm(Helper):
             'python3-ovn-octavia-provider' in self.target.packages)
         self.patch_object(octavia.reactive, 'is_flag_set', return_value=True)
         c = octavia.UssuriOctaviaCharm()
-        self.assertTrue('octavia-driver-agent' in c.packages)
-        self.assertTrue('python3-ovn-octavia-provider' in c.packages)
-        self.assertTrue('octavia-driver-agent' in c.services)
+        self.assertTrue('octavia-driver-agent' in c.all_packages)
+        self.assertTrue('python3-ovn-octavia-provider' in c.all_packages)
+        self.assertTrue('octavia-driver-agent' in c.full_service_list)
 
     def test_install(self):
         # we do not care about the internals of the function we are overriding

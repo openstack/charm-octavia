@@ -38,6 +38,12 @@ import charm.openstack.api_crud as api_crud
 charms_openstack.bus.discover()
 
 
+def log_and_action_fail(message):
+    """Log an ERROR level message to the debug log and call action_fail"""
+    ch_core.hookenv.log(message, level=ch_core.hookenv.ERROR)
+    ch_core.hookenv.action_fail(message)
+
+
 def configure_resources(*args):
     """Create/discover resources for management of load balancer instances."""
     if not reactive.is_flag_set('leadership.is_leader'):
@@ -58,9 +64,9 @@ def configure_resources(*args):
             create=reactive.is_flag_set('config.default.create-mgmt-network'),
         )
     except api_crud.APIUnavailable as e:
-        ch_core.hookenv.action_fail('Neutron API not available yet, deferring '
-                                    'network creation/discovery. ("{}")'
-                                    .format(e))
+        log_and_action_fail('Neutron API not available yet, deferring '
+                            'network creation/discovery. ("{}")'
+                            .format(e))
         return
     if network and secgrp:
         leadership.leader_set({'amp-boot-network-list': network['id'],
@@ -71,10 +77,10 @@ def configure_resources(*args):
         try:
             flavor = api_crud.get_nova_flavor(identity_service)
         except api_crud.APIUnavailable as e:
-            ch_core.hookenv.action_fail('Nova API not available yet, '
-                                        'deferring flavor '
-                                        'creation. ("{}")'
-                                        .format(e))
+            log_and_action_fail('Nova API not available yet, '
+                                'deferring flavor '
+                                'creation. ("{}")'
+                                .format(e))
             return
         else:
             leadership.leader_set({'amp-flavor-id': flavor.id})
@@ -89,8 +95,8 @@ def configure_resources(*args):
     try:
         api_crud.set_service_quotas_unlimited(identity_service)
     except api_crud.APIUnavailable as e:
-        ch_core.hookenv.action_fail('Unbable to set quotas to unlimited: {}'
-                                    .format(e))
+        log_and_action_fail('Unbable to set quotas to unlimited: {}'
+                            .format(e))
 
     # execute port setup for leader, the followers will execute theirs on
     # `leader-settings-changed` hook

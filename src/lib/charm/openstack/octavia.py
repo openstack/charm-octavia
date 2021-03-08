@@ -474,14 +474,22 @@ class UssuriOctaviaCharm(BaseOctaviaCharm):
     """Charm class for the Octavia charm on Ussuri and newer releases."""
     release = 'ussuri'
 
-    def __init__(self, **kwargs):
+    @property
+    def all_packages(self):
+        all_packages = super().all_packages
         # NOTE(fnordahl): We probably should have a more generic harness for
         # these kinds of extensions, there might be more SDNs that want support
         # in the charm.
         if reactive.is_flag_set('charm.octavia.enable-ovn-driver'):
-            self.packages.extend([
+            all_packages.extend([
                 'octavia-driver-agent',
                 'python3-ovn-octavia-provider'
             ])
-            self.services.extend(['octavia-driver-agent'])
-        super().__init__(**kwargs)
+        return all_packages
+
+    @property
+    def full_service_list(self):
+        services = super().full_service_list
+        if reactive.is_flag_set('charm.octavia.enable-ovn-driver'):
+            services.extend(['octavia-driver-agent'])
+        return services

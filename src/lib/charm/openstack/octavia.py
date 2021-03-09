@@ -414,6 +414,13 @@ class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
                  'examine documentation')]
         return states_to_check
 
+    def custom_assess_status_check(self):
+        """Check required configuration options are set"""
+        if (reactive.is_flag_set('charm.octavia.enable-ovn-driver') and not
+                reactive.is_flag_set('certificates.available')):
+            return "blocked", "Certificates missing"
+        return None, None
+
     def get_amqp_credentials(self):
         """Configure the AMQP credentials for Octavia."""
         return ('octavia', 'openstack')

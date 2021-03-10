@@ -156,3 +156,13 @@ options:
     type: string
     description: |
       Comma separated list of nagios servicegroups for the graphite check
+  anti-affinity-policy:
+    default: auto
+    type: string
+    description: |
+      Sets the anti-affinity policy for Nova. Possible values are
+      anti-affinity, soft-anti-affinity, auto or disable.
+
+      When set to auto, the charm will choose between disabling anti-affinity
+      entirely or using soft-anti-affinity depending if loadbalancer-topology
+      is set to SINGLE or ACTIVE_STANDBY respectively.

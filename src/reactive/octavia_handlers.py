@@ -131,6 +131,7 @@ def action_setup_hm_port():
 
 
 @reactive.when_not('is-update-status-hook')
+@reactive.when_not('unit.is.departing')
 @reactive.when('identity-service.available',
                'neutron-api.available',
                'sdn-subordinate.available',
@@ -153,6 +154,23 @@ def setup_hm_port():
         identity_service = reactive.endpoint_from_flag(
             'identity-service.available')
         try:
+            # The port got deleted by leader unit and then setup_hm_port is
+            # called from departing unit and new port is created since there
+            # is no hm_port. This is used to avoid this situation.
+            departing_unit = ch_core.hookenv.departing_unit()
+            ch_core.hookenv.log('entering setup_hm_port for {}'.format(
+                departing_unit), level=ch_core.hookenv.DEBUG)
+            if departing_unit:
+                departing_unit = departing_unit.replace('/', '-')
+                if departing_unit == octavia_charm.local_unit_name:
+                    ch_core.hookenv.log('skipping setup_hm_port for {}'.format(
+                        departing_unit), level=ch_core.hookenv.DEBUG)
+                    # If the unit is being deleted, setup_hm_port no longer
+                    # need to run again to recreate hm port for it.
+                    reactive.set_flag('unit.is.departing')
+                    return
+            ch_core.hookenv.log('running setup_hm_port on {}'.format(
+                host_id), level=ch_core.hookenv.DEBUG)
             if api_crud.setup_hm_port(
                     identity_service,
                     octavia_charm,
@@ -187,12 +205,17 @@ def setup_hm_port():
                )
 def update_controller_ip_port_list():
     """Load state from Neutron and update ``controller-ip-port-list``."""
+    departing_unit = ch_core.hookenv.departing_unit()
+    ch_core.hookenv.log('departing_unit:{}'.format(
+        departing_unit), level=ch_core.hookenv.DEBUG)
     identity_service = reactive.endpoint_from_flag(
         'identity-service.available')
     leader_ip_list = leadership.leader_get('controller-ip-port-list') or []
 
     try:
-        neutron_ip_list = sorted(api_crud.get_port_ips(identity_service))
+        neutron_ip_unit_map = api_crud.get_port_ip_unit_map(
+            identity_service)
+        neutron_ip_list = sorted(neutron_ip_unit_map.values())
     except api_crud.APIUnavailable as e:
         ch_core.hookenv.log('Neutron API not available yet, deferring '
                             'port discovery. ("{}")'
@@ -200,6 +223,26 @@ def update_controller_ip_port_list():
                             level=ch_core.hookenv.DEBUG)
         return
     if neutron_ip_list != sorted(leader_ip_list):
+        # NOTE: lp bug 1915512, delete hm port created by departed units
+        if departing_unit:
+            departing_unit = departing_unit.replace('/', '-')
+            removing_ip = neutron_ip_unit_map.get(departing_unit, None)
+            ch_core.hookenv.log('removing neutron_ip_list: {}'.format(
+                removing_ip), level=ch_core.hookenv.DEBUG)
+            if removing_ip is not None:
+                neutron_ip_list.remove(removing_ip)
+                try:
+                    ch_core.hookenv.log('deleting hm port for departed '
+                                        'unit {}'
+                                        .format(departing_unit),
+                                        level=ch_core.hookenv.DEBUG)
+                    api_crud.delete_hm_port(identity_service, departing_unit)
+                except api_crud.APIUnavailable as e:
+                    ch_core.hookenv.log('Neutron API not available yet,'
+                                        'deferring hm port deletion. ("{}")'
+                                        .format(e),
+                                        level=ch_core.hookenv.DEBUG)
+                    return
         leadership.leader_set(
             {'controller-ip-port-list': json.dumps(neutron_ip_list)})
 

@@ -281,6 +281,19 @@ class TestAPICrud(test_utils.PatchHelper):
         self.assertFalse(api_crud.wait_for_hm_port_bound(
             'ids', 'fake-unit-name'))
 
+    def test_delete_hm_port(self):
+        self.patch_object(api_crud, 'session_from_identity_service')
+        self.patch_object(api_crud, 'init_neutron_client')
+        identity_service = mock.MagicMock()
+        nc = mock.MagicMock()
+        self.init_neutron_client.return_value = nc
+        nc.list_ports.return_value = {'ports': [{'id': 'fake-port-uuid'}]}
+        api_crud.delete_hm_port(identity_service, 'fake-unit-name')
+        self.init_neutron_client.assert_called_once_with(
+            self.session_from_identity_service())
+        nc.list_ports.asssert_called_with(tags='charm-octavia-fake-unit-name')
+        nc.delete_port.assert_called_with('fake-port-uuid')
+
     def test_setup_hm_port(self):
         self.patch('subprocess.check_output', 'check_output')
         self.patch('subprocess.check_call', 'check_call')
@@ -333,21 +346,24 @@ class TestAPICrud(test_utils.PatchHelper):
              'up', 'address', port_mac_address])
         self.toggle_hm_port.assert_called
 
-    def test_get_port_ips(self):
+    def test_get_port_ip_unit_map(self):
         self.patch_object(api_crud, 'session_from_identity_service')
         self.patch_object(api_crud, 'init_neutron_client')
         nc = mock.MagicMock()
         self.init_neutron_client.return_value = nc
         nc.list_ports.return_value = {
             'ports': [
-                {'fixed_ips': [{'ip_address': '2001:db8:42::42'}]},
-                {'fixed_ips': [{'ip_address': '2001:db8:42::51'}]},
+                {'name': 'octavia-health-manager-lb-0-listen-port',
+                 'status': 'ACTIVE',
+                 'fixed_ips': [{'ip_address': '2001:db8:42::1'}]},
+                {'name': 'octavia-health-manager-lb-1-listen-port',
+                 'status': 'ACTIVE',
+                 'fixed_ips': [{'ip_address': '2001:db8:42::2'}]},
             ],
         }
         identity_service = mock.MagicMock()
-        self.assertEquals(api_crud.get_port_ips(identity_service),
-                          ['2001:db8:42::42',
-                           '2001:db8:42::51'])
+        self.assertEquals(api_crud.get_port_ip_unit_map(identity_service),
+                          {'lb-0': '2001:db8:42::1', 'lb-1': '2001:db8:42::2'})
         self.init_neutron_client.assert_called_once_with(
             self.session_from_identity_service())
 

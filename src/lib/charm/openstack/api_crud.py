@@ -252,6 +252,29 @@ def lookup_hm_port(nc, local_unit_name):
         return
 
 
+def delete_hm_port(identity_service, local_unit_name):
+    """Delete port object for Octavia hm port for local unit.
+
+    :param identity_service: reactive Endpoint of type ``identity-service``
+    :type identity_service: RelationBase class
+    :param local_unit_name: Name of juju unit, used to build tag name for port
+    :type local_unit_name: str
+    :returns: None
+    :raises: api_crud.APIUnavailable
+    """
+    session = session_from_identity_service(identity_service)
+    try:
+        nc = init_neutron_client(session)
+        port = lookup_hm_port(nc, local_unit_name)
+        if port:
+            ch_core.hookenv.log('delete hm port "{}" for unit "{}"'
+                                .format(port['id'], local_unit_name),
+                                level=ch_core.hookenv.DEBUG)
+            nc.delete_port(port['id'])
+    except NEUTRON_TEMP_EXCS as e:
+        raise APIUnavailable('neutron', 'ports', e)
+
+
 def get_hm_port(identity_service, local_unit_name, local_unit_address,
                 host_id=None):
     """Get or create a per unit Neutron port for Octavia Health Manager.
@@ -549,13 +572,14 @@ def setup_hm_port(identity_service, octavia_charm, host_id=None):
     return unit_changed
 
 
-def get_port_ips(identity_service):
-    """Extract IP information from Neutron ports tagged with ``charm-octavia``
+def get_port_ip_unit_map(identity_service):
+    """Extract map<unit, ip> from Neutron ports tagged with ``charm-octavia``
 
     :param identity_service: reactive Endpoint of type ``identity-service``
     :type identity_service: RelationBase class
-    :returns: List of IP addresses extracted from port details in search result
-    :rtype: list of str
+    :returns: Map of unit names and ip addresses extracted from port details
+              in search result
+    :rtype: dict(str, str)
     :raises: api_crud.APIUnavailable
     """
     session = session_from_identity_service(identity_service)
@@ -565,12 +589,14 @@ def get_port_ips(identity_service):
     except NEUTRON_TEMP_EXCS as e:
         raise APIUnavailable('neutron', 'ports', e)
 
-    neutron_ip_list = []
+    neutron_ip_unit_map = dict()
     for port in resp['ports']:
         for ip_info in port['fixed_ips']:
-            neutron_ip_list.append(ip_info['ip_address'])
+            unitname = port['name'].replace(
+                'octavia-health-manager-', '').replace('-listen-port', '')
+            neutron_ip_unit_map[unitname] = ip_info['ip_address']
 
-    return neutron_ip_list
+    return neutron_ip_unit_map
 
 
 def get_mgmt_network(identity_service, create=True):

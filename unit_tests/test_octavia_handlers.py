@@ -90,7 +90,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'maybe_enable_ovn_driver': ('is-update-status-hook',),
                 'setup_endpoint_connection': ('is-update-status-hook',),
                 'setup_neutron_lbaas_proxy': ('is-update-status-hook',),
-                'setup_hm_port': ('is-update-status-hook',),
+                'setup_hm_port': ('is-update-status-hook',
+                                  'unit.is.departing',),
                 'update_controller_ip_port_list': ('is-update-status-hook',),
                 'render': ('is-update-status-hook',),
                 'update_nagios': ('octavia.nrpe.configured',
@@ -179,17 +180,17 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
         self.patch('charms.reactive.endpoint_from_flag', 'endpoint_from_flag')
         self.patch('charms.leadership.leader_set', 'leader_set')
         self.patch('charms.leadership.leader_get', 'leader_get')
-        self.patch_object(handlers.api_crud, 'get_port_ips')
-        self.get_port_ips.return_value = [
-            '2001:db8:42::42',
-            '2001:db8:42::51',
-        ]
+        self.patch_object(handlers.api_crud, 'get_port_ip_unit_map')
+        fake_ip_unit_map = {'lb-0': '2001:db8:42::1', 'lb-1': '2001:db8:42::2'}
+        self.get_port_ip_unit_map.return_value = fake_ip_unit_map
+        self.patch_object(handlers.ch_core.hookenv, 'departing_unit')
+        self.departing_unit.return_value = 'lb/1'
+        self.patch_object(handlers.api_crud, 'delete_hm_port')
         handlers.update_controller_ip_port_list()
         self.leader_set.assert_called_once_with(
             {
                 'controller-ip-port-list': json.dumps([
-                    '2001:db8:42::42',
-                    '2001:db8:42::51',
+                    '2001:db8:42::1',
                 ])})
 
     def test_render(self):

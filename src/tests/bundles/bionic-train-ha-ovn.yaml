@@ -106,6 +106,7 @@ applications:
       openstack-origin: cloud:bionic-train
       debug: True
       flat-network-providers: physnet1
+      enable-ml2-port-security: True
       neutron-security-groups: True
       manage-neutron-plugin-legacy-mode: False
   nova-cloud-controller:

@@ -324,15 +324,8 @@ class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
         },
     }
     default_service = 'octavia-api'
-    services = ['apache2', 'octavia-health-manager', 'octavia-housekeeping',
-                'octavia-worker']
     required_relations = ['shared-db', 'amqp', 'identity-service',
                           'sdn-subordinate']
-    restart_map = {
-        OCTAVIA_MGMT_INTF_CONF: services + ['systemd-networkd'],
-        OCTAVIA_CONF: services,
-        OCTAVIA_WSGI_CONF: ['apache2'],
-    }
     sync_cmd = ['sudo', 'octavia-db-manage', 'upgrade', 'head']
     ha_resources = ['vips', 'haproxy', 'dnsha']
     release_pkg = 'octavia-common'
@@ -350,6 +343,21 @@ class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
     # policyd override constants
     policyd_service_name = 'octavia'
     policyd_restart_on_change = True
+
+    @property
+    def services(self):
+        """Allow descendents to modify the service list."""
+        return ['apache2', 'octavia-health-manager', 'octavia-housekeeping',
+                'octavia-worker']
+
+    @property
+    def restart_map(self):
+        """Allow descendents to modify the restart map."""
+        return {
+            OCTAVIA_MGMT_INTF_CONF: self.services + ['systemd-networkd'],
+            OCTAVIA_CONF: self.services,
+            OCTAVIA_WSGI_CONF: ['apache2'],
+        }
 
     def install(self):
         """Custom install function.
@@ -477,9 +485,9 @@ class RockyOctaviaCharm(BaseOctaviaCharm):
     release = 'rocky'
 
 
-class UssuriOctaviaCharm(BaseOctaviaCharm):
+class VictoriaOctaviaCharm(BaseOctaviaCharm):
     """Charm class for the Octavia charm on Ussuri and newer releases."""
-    release = 'ussuri'
+    release = 'victoria'
 
     @property
     def all_packages(self):
@@ -495,8 +503,8 @@ class UssuriOctaviaCharm(BaseOctaviaCharm):
         return all_packages
 
     @property
-    def full_service_list(self):
-        services = super().full_service_list
+    def services(self):
+        _services = super().services
         if reactive.is_flag_set('charm.octavia.enable-ovn-driver'):
-            services.extend(['octavia-driver-agent'])
-        return services
+            _services.extend(['octavia-driver-agent'])
+        return _services

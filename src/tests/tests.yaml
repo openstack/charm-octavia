@@ -3,21 +3,19 @@ gate_bundles:
 - bionic-stein-ha
 - bionic-train-ha-ovn
 - bionic-train-ha
-# focal-ussuri-ha-ovn disabled due to LP: #1893756
-# - focal-ussuri-ha-ovn
+# Awaiting SRU in LP: #1924981 to complete
+# - bionic-ussuri-ha-ovn
+- bionic-ussuri-ha
+- focal-ussuri-ha-ovn
 - focal-ussuri-ha
-smoke_bundles:
-# focal-ussuri-ha-ovn disabled due to LP: #1893756
-# - focal-ussuri-ha-ovn
-- focal-ussuri-ha
-dev_bundles:
-- groovy-victoria-ha-ovn
-- groovy-victoria-ha
 - focal-victoria-ha-ovn
 - focal-victoria-ha
-# LP: #1896729
-- bionic-ussuri-ha-ovn
-- bionic-ussuri-ha
+- groovy-victoria-ha-ovn
+- groovy-victoria-ha
+smoke_bundles:
+- focal-ussuri-ha-ovn
+- focal-ussuri-ha
+dev_bundles:
 - bionic-rocky-ha
 - bionic-rocky-lxd
 comment: |

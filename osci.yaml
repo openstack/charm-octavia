@@ -7,8 +7,15 @@
       - bionic-stein-ha
       - bionic-train-ha-ovn
       - bionic-train-ha
+      # Awaiting SRU in LP: #1924981 to complete
+      #- bionic-ussuri-ha-ovn
+      - bionic-ussuri-ha
       - focal-ussuri-ha-ovn
       - focal-ussuri-ha
+      - focal-victoria-ha-ovn
+      - focal-victoria-ha
+      - groovy-victoria-ha-ovn
+      - groovy-victoria-ha
     vars:
       needs_charm_build: true
       charm_build_name: octavia
@@ -19,6 +26,14 @@
     dependencies: &smoke-jobs
       - focal-ussuri-ha
       - focal-ussuri-ha-ovn
+    vars:
+      needs_charm_build: true
+      charm_build_name: octavia
+
+- job:
+    name: bionic-rocky-ha
+    parent: func-target
+    dependencies: *smoke-jobs
     vars:
       tox_extra_args: bionic-rocky-ha
 - job:
@@ -40,6 +55,18 @@
     vars:
       tox_extra_args: bionic-train-ha
 - job:
+    name: bionic-ussuri-ha-ovn
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: bionic-ussuri-ha-ovn
+- job:
+    name: bionic-ussuri-ha
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: bionic-ussuri-ha
+- job:
     name: focal-ussuri-ha-ovn
     parent: func-target
     dependencies: &lint-jobs
@@ -57,3 +84,27 @@
     dependencies: *lint-jobs
     vars:
       tox_extra_args: focal-ussuri-ha
+- job:
+    name: focal-victoria-ha-ovn
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: focal-victoria-ha-ovn
+- job:
+    name: focal-victoria-ha
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: focal-victoria-ha
+- job:
+    name: groovy-victoria-ha-ovn
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: groovy-victoria-ha-ovn
+- job:
+    name: groovy-victoria-ha
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: groovy-victoria-ha

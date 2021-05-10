@@ -133,7 +133,7 @@ class TestOctaviaCharm(Helper):
         self.assertFalse(
             'python3-ovn-octavia-provider' in self.target.packages)
         self.patch_object(octavia.reactive, 'is_flag_set', return_value=True)
-        c = octavia.UssuriOctaviaCharm()
+        c = octavia.VictoriaOctaviaCharm()
         self.assertTrue('octavia-driver-agent' in c.all_packages)
         self.assertTrue('python3-ovn-octavia-provider' in c.all_packages)
         self.assertTrue('octavia-driver-agent' in c.full_service_list)

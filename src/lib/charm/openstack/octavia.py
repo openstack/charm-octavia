@@ -422,13 +422,6 @@ class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
                  'examine documentation')]
         return states_to_check
 
-    def custom_assess_status_check(self):
-        """Check required configuration options are set"""
-        if (reactive.is_flag_set('charm.octavia.enable-ovn-driver') and not
-                reactive.is_flag_set('certificates.available')):
-            return "blocked", "Certificates missing"
-        return None, None
-
     def get_amqp_credentials(self):
         """Configure the AMQP credentials for Octavia."""
         return ('octavia', 'openstack')
@@ -508,3 +501,17 @@ class VictoriaOctaviaCharm(BaseOctaviaCharm):
         if reactive.is_flag_set('charm.octavia.enable-ovn-driver'):
             _services.extend(['octavia-driver-agent'])
         return _services
+
+    @property
+    def restart_map(self):
+        _restart_map = super().restart_map
+        if reactive.is_flag_set('charm.octavia.enable-ovn-driver'):
+            _restart_map.update({
+                os.path.join(OCTAVIA_DIR, 'ovn_ca_cert.pem'): [
+                    'octavia-driver-agent'],
+                os.path.join(OCTAVIA_DIR, 'ovn_certificate.pem'): [
+                    'octavia-driver-agent'],
+                os.path.join(OCTAVIA_DIR, 'ovn_private_key.pem'): [
+                    'octavia-driver-agent'],
+            })
+        return _restart_map

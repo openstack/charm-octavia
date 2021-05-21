@@ -90,8 +90,8 @@ To get you started we include an example of generating your own certificates:
 To apply the configuration execute:
 
     juju config octavia \
-        lb-mgmt-issuing-cacert="$(base64 controller_ca.pem)" \
-        lb-mgmt-issuing-ca-private-key="$(base64 controller_ca_key.pem)" \
+        lb-mgmt-issuing-cacert="$(base64 issuing_ca.pem)" \
+        lb-mgmt-issuing-ca-private-key="$(base64 issuing_ca_key.pem)" \
         lb-mgmt-issuing-ca-key-passphrase=foobar \
         lb-mgmt-controller-cacert="$(base64 controller_ca.pem)" \
         lb-mgmt-controller-cert="$(base64 controller_cert_bundle.pem)"

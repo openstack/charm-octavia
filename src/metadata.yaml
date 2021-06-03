@@ -22,6 +22,7 @@ series:
 - focal
 - groovy
 - hirsute
+- impish
 subordinate: false
 provides:
   nrpe-external-master:

@@ -124,17 +124,21 @@ def setup_neutron_lbaas_proxy():
         neutron.publish_load_balancer_info('octavia', octavia_url)
 
 
-@reactive.when('charm.octavia.action_setup_hm_port')
+@reactive.when('config.default.enable-amphora',
+               'charm.octavia.action_setup_hm_port')
 def action_setup_hm_port():
     setup_hm_port()
 
 
 @reactive.when_not('is-update-status-hook')
-@reactive.when('identity-service.available')
-@reactive.when('neutron-api.available')
-@reactive.when('sdn-subordinate.available')
-# Neutron API calls will consistently fail as long as AMQP is unavailable
-@reactive.when('amqp.available')
+@reactive.when('identity-service.available',
+               'neutron-api.available',
+               'sdn-subordinate.available',
+               # Neutron API calls will consistently fail as long as AMQP is
+               # unavailable
+               'amqp.available',
+               'config.default.enable-amphora',
+               )
 def setup_hm_port():
     """Create a per unit Neutron and OVS port for Octavia Health Manager.
 
@@ -173,11 +177,14 @@ def setup_hm_port():
 
 
 @reactive.when_not('is-update-status-hook')
-@reactive.when('leadership.is_leader')
-@reactive.when('identity-service.available')
-@reactive.when('neutron-api.available')
-# Neutron API calls will consistently fail as long as AMQP is unavailable
-@reactive.when('amqp.available')
+@reactive.when('leadership.is_leader',
+               'identity-service.available',
+               'neutron-api.available',
+               # Neutron API calls will consistently fail as long as AMQP is
+               # unavailable
+               'amqp.available',
+               'config.default.enable-amphora',
+               )
 def update_controller_ip_port_list():
     """Load state from Neutron and update ``controller-ip-port-list``."""
     identity_service = reactive.endpoint_from_flag(

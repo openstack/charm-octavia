@@ -384,6 +384,9 @@ class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
         workload status.
         """
         states_to_check = super().states_to_check(required_relations)
+        if not self.options.enable_amphora:
+            # Amphora provider driver not enabled, custom checks not necessary
+            return states_to_check
         if not leadership.leader_get('amp-boot-network-list'):
             if not reactive.is_flag_set('config.default.create-mgmt-network'):
                 # we are configured to not create required resources and they

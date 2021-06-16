@@ -13,6 +13,7 @@
       - focal-ussuri-ha
       - focal-victoria-ha-ovn
       - focal-victoria-ha
+      - focal-victoria-no-amphora
       - groovy-victoria-ha-ovn
       - groovy-victoria-ha
       # LP: #1913024 is fixed for bionic and focal, but not for hirsute/wallaby
@@ -92,6 +93,12 @@
     dependencies: *smoke-jobs
     vars:
       tox_extra_args: focal-victoria-ha
+- job:
+    name: focal-victoria-no-amphora
+    parent: func-target
+    dependencies: *lint-jobs
+    vars:
+      tox_extra_args: focal-victoria-no-amphora
 - job:
     name: groovy-victoria-ha-ovn
     parent: func-target

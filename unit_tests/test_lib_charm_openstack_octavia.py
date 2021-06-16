@@ -149,7 +149,11 @@ class TestOctaviaCharm(Helper):
                                                             'octavia')
         self.host.service_pause.assert_called_once_with('octavia-api')
 
-    def test_states_to_check(self):
+    # NOTE(fnordahl): for some reason our patch helper blows up on Python 3.6
+    # when patching this function, so let's resort to the good ol' decorator
+    # for this mock.
+    @mock.patch('charms_openstack.adapters.make_default_options')
+    def test_states_to_check(self, options):
         # we do not care about the internals of the function we are overriding
         # and expanding so mock out the call to super()
         self.patch('builtins.super', 'super')
@@ -162,8 +166,12 @@ class TestOctaviaCharm(Helper):
             override_relation: 'something-we-are-replacing',
         }
         self.super().states_to_check.return_value = states_to_check
+        options().enable_amphora = False
         self.target.states_to_check()
         self.super().states_to_check.assert_called_once_with(None)
+        self.assertFalse(self.leader_get.called)
+        options().enable_amphora = True
+        self.target.states_to_check()
         self.leader_get.assert_called_once_with(
             'amp-boot-network-list')
         self.is_flag_set.assert_has_calls([

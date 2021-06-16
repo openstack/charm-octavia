@@ -10,7 +10,8 @@ options:
     type: string
     default:
     description: |
-      Note that setting this configuration option is mandatory.
+      Note that setting this configuration option is mandatory, unless the
+      ``enable-amphora`` configuration option is set to 'False'.
       .
       Certificate Authority Certificate used to issue new certificates stored
       on the ``Amphora`` load balancer instances.  The ``Amphorae`` use them to
@@ -28,7 +29,8 @@ options:
     type: string
     default:
     description: |
-      Note that setting this configuration option is mandatory.
+      Note that setting this configuration option is mandatory, unless the
+      ``enable-amphora`` configuration option is set to 'False'.
       .
       Private key for the Certificate Authority set in ``lb-mgmt-issuing-ca``.
       .
@@ -38,7 +40,8 @@ options:
     type: string
     default:
     description: |
-      Note that setting this configuration option is mandatory.
+      Note that setting this configuration option is mandatory, unless the
+      ``enable-amphora`` configuration option is set to 'False'.
       .
       Passphrase for the key set in ``lb-mgmt-ca-private-key``.
       .
@@ -51,7 +54,8 @@ options:
     type: string
     default:
     description: |
-      Note that setting this configuration option is mandatory.
+      Note that setting this configuration option is mandatory, unless the
+      ``enable-amphora`` configuration option is set to 'False'.
       .
       Certificate Authority Certificate installed on ``Amphorae`` with the
       purpose of the ``Amphora`` agent using it to authenticate connections
@@ -69,7 +73,8 @@ options:
     type: string
     default:
     description: |
-      Note that setting this configuration option is mandatory.
+      Note that setting this configuration option is mandatory, unless the
+      ``enable-amphora`` configuration option is set to 'False'.
       .
       Certificate used by the ``Octavia`` controller to authenticate itself to
       its ``Amphorae``.
@@ -170,3 +175,10 @@ options:
       When set to auto, the charm will choose between disabling anti-affinity
       entirely or using soft-anti-affinity depending if loadbalancer-topology
       is set to SINGLE or ACTIVE_STANDBY respectively.
+  enable-amphora:
+    default: True
+    type: boolean
+    description: |
+      Octavia supports multiple provider drivers. The reference Amphora
+      provider driver is distributed as part of the Octavia software, and is
+      enabled by default, unless you set this configuration option to 'False'.

@@ -17,7 +17,21 @@ to be used in conjunction with the [OpenStack Base bundle](https://jujucharms.co
 Please refer to the [Octavia LBaaS](https://docs.openstack.org/project-deploy-guide/charm-deployment-guide/latest/app-octavia.html)
 section of the [OpenStack Charms Deployment Guide](https://docs.openstack.org/project-deploy-guide/charm-deployment-guide/latest/index.html).
 
-## Required configuration
+## Provider drivers
+
+Octavia supports multiple provider drivers. The end user of the LBAASv2 API
+may choose from the available provider drivers when creating a load balancer.
+
+### Amphora provider
+
+The reference Amphora provider driver is distributed as part of the Octavia
+software, and is enabled by default, unless the `enable-amphora` configuration
+option is set to 'False'.
+
+The Amphora driver provides advanced features such as TLS termination, L7
+loadbalancing and so on.
+
+#### Amphora provider - Required configuration
 
 After the deployment is complete and has settled, you must run the
 `configure-resources` action on the lead unit. This will prompt it to configure
@@ -96,7 +110,7 @@ To apply the configuration execute:
         lb-mgmt-controller-cacert="$(base64 controller_ca.pem)" \
         lb-mgmt-controller-cert="$(base64 controller_cert_bundle.pem)"
 
-## Optional resource configuration
+#### Amphora provider - Optional resource configuration
 
 By executing the `configure-resources` action the charm will create the
 resources required for operation of the Octavia service.  If you want to manage
@@ -120,6 +134,52 @@ The UUID of the Nova flavor you want to use must be set with the
 | Neutron Router            | charm-octavia        | (Optional) Router for IPv6 RA or north/south mgmt traffic |
 | Amphora Security Group    | charm-octavia        | Security group for Amphora ports                          |
 | Controller Security Group | charm-octavia-health | Security group for Controller ports                       |
+
+### OVN provider
+
+When Octavia is deployed with OVN as SDN, a optional OVN provider driver is
+enabled. If the `enable-amphora` configuration option is set to 'False' it
+will be the only provider driver available.
+
+> **Note**: The Amphora provider driver is still available and is the default
+            even if you deploy with OVN as SDN. You may optionally disable the
+            Amphora provider driver by setting the `enable-amphora`
+            configuration option to 'False'.
+
+#### OVN provider - Advantages
+
+The OVN Provider driver has a few advantages when used as a provider driver
+for Octavia over Amphora, like:
+
+* OVN can be deployed without VMs, so there is no additional overhead as is
+  required currently in Octavia when using the default Amphora driver.
+
+* OVN Load Balancers can be deployed faster than default Load Balancers in
+  Octavia (which use Amphora currently) because of no additional deployment requirement.
+
+#### OVN provider - Limitations
+
+OVN has its own set of limitations when considered as an Load Balancer driver. These include:
+
+* OVN currently supports TCP and UDP, so Layer-7 based load balancing is not
+  possible with the OVN provider driver.
+
+* While Health Checks are now available in OVN, they are not currently
+  implemented in OVN’s Provider Driver for Octavia.
+
+* Currently, the OVN Provider driver supports a 1:1 protocol mapping between
+  Listeners and associated Pools, i.e. a Listener which can handle TCP
+  protocols can only be used with pools associated to the TCP protocol. Pools
+  handling UDP protocols cannot be linked with TCP based Listeners.
+
+  This limitation will be handled in an upcoming core OVN release.
+
+* Mixed IPv4 and IPv6 members are not supported.
+
+* Only the 'SOURCE_IP_PORT' load balancing algorithm is supported, others like
+  'ROUND_ROBIN' and 'LEAST_CONNECTIONS' are not currently supported.
+
+* Octavia flavors are not supported.
 
 ## Policy Overrides
 

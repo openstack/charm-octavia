@@ -49,12 +49,16 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                     'identity-service.available',
                     'neutron-api.available',
                     'sdn-subordinate.available',
-                    'amqp.available',),
+                    'amqp.available',
+                    'config.default.enable-amphora',
+                ),
                 'update_controller_ip_port_list': (
                     'leadership.is_leader',
                     'identity-service.available',
                     'neutron-api.available',
-                    'amqp.available',),
+                    'amqp.available',
+                    'config.default.enable-amphora',
+                ),
                 'setup_endpoint_connection': (
                     'identity-service.connected',),
                 'maybe_enable_ovn_driver': (
@@ -62,8 +66,9 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
                 'update_nagios': (
                     'charm.installed',
                     'nrpe-external-master.available',),
-                'action_setup_hm_port':
-                    ('charm.octavia.action_setup_hm_port',),
+                'action_setup_hm_port': (
+                    'config.default.enable-amphora',
+                    'charm.octavia.action_setup_hm_port',),
             },
             'when_any': {
                 'sdn_joined': ('neutron-openvswitch.connected',

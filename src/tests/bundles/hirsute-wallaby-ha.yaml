@@ -1,7 +1,7 @@
 variables:
   openstack-origin: &openstack-origin distro
 
-series: &series groovy
+series: &series hirsute
 relations:
 - - glance:image-service
   - nova-cloud-controller:image-service
@@ -188,7 +188,7 @@ applications:
                       name_prefix: 'ubuntu:released',
                       path: 'streams/v1/index.sjson', max: 1,
                       item_filters: [
-                        'release~(bionic|focal|groovy)',
+                        'release~(bionic|focal|hirsute)',
                         'arch~(x86_64|amd64)',
                         'ftype~(disk1.img|disk.img)']}]"
   octavia-diskimage-retrofit:

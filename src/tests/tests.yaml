@@ -1,11 +1,11 @@
 charm_name: octavia
+
 gate_bundles:
 - bionic-rocky-ha
 - bionic-stein-ha
 - bionic-train-ha-ovn
 - bionic-train-ha
-# Awaiting SRU in LP: #1924981 to complete
-# - bionic-ussuri-ha-ovn
+- bionic-ussuri-ha-ovn
 - bionic-ussuri-ha
 - focal-ussuri-ha-ovn
 - focal-ussuri-ha
@@ -13,15 +13,22 @@ gate_bundles:
 - focal-victoria-ha
 - groovy-victoria-ha-ovn
 - groovy-victoria-ha
+- focal-wallaby-ha-ovn
+- focal-wallaby-ha
+- hirsute-wallaby-ha-ovn
+- hirsute-wallaby-ha
+
 smoke_bundles:
 - focal-ussuri-ha-ovn
 - focal-ussuri-ha
+
 comment: |
   The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
     https://github.com/lxc/lxd/issues/4947
 dev_bundles:
 - bionic-rocky-ha
 - bionic-rocky-lxd
+
 target_deploy_status:
   octavia:
     workload-status: blocked
@@ -44,6 +51,7 @@ target_deploy_status:
   ovn-chassis-octavia:
     workload-status: waiting
     workload-status-message: "'certificates' awaiting server certificate data"
+
 configure:
 - zaza.openstack.charm_tests.vault.setup.auto_initialize
 - zaza.openstack.charm_tests.glance_simplestreams_sync.setup.sync_images
@@ -54,13 +62,17 @@ configure:
 - zaza.openstack.charm_tests.nova.setup.manage_ssh_key
 - zaza.openstack.charm_tests.neutron.setup.basic_overcloud_network
 - zaza.openstack.charm_tests.octavia.setup.centralized_fip_network
+
 tests:
 - zaza.openstack.charm_tests.octavia.tests.LBAASv2Test
 - zaza.openstack.charm_tests.octavia.tests.CharmOperationTest
 - zaza.openstack.charm_tests.policyd.tests.OctaviaTests
+
 tests_options:
   policyd:
     service: octavia
   force_deploy:
     - groovy-victoria-ha-ovn
     - groovy-victoria-ha
+    - hirsute-wallaby-ha-ovn
+    - hirsute-wallaby-ha

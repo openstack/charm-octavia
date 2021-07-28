@@ -374,7 +374,8 @@ class TestAPICrud(test_utils.PatchHelper):
         nc.create_network.assert_called_once_with({
             'network': {'name': octavia.OCTAVIA_MGMT_NET}})
 
-        nc.list_subnets.assert_called_once_with(tags=resource_tag)
+        nc.list_subnets.assert_called_once_with(network_id=network_uuid,
+                                                tags=resource_tag)
         nc.list_routers.assert_called_once_with(tags=resource_tag)
         nc.create_router.assert_called_once_with(
             {'router': {'name': 'lb-mgmt', 'distributed': False}})
@@ -414,8 +415,57 @@ class TestAPICrud(test_utils.PatchHelper):
         self.init_neutron_client.assert_called_once_with(
             self.session_from_identity_service())
         nc.list_networks.assert_called_once_with(tags=resource_tag)
-        nc.list_subnets.assert_called_once_with(tags=resource_tag)
+        nc.list_subnets.assert_called_once_with(network_id=network_uuid,
+                                                tags=resource_tag)
         nc.list_routers.assert_called_once_with(tags=resource_tag)
+        nc.list_security_groups.assert_has_calls([
+            mock.call(tags=resource_tag),
+            mock.call(tags=resource_tag + '-health'),
+        ])
+        nc.create_security_group_rule.assert_has_calls(
+            self.security_group_rule_calls)
+        self.assertEqual(result, (
+            {'id': network_uuid},
+            {'id': self.secgrp_uuid},),
+        )
+
+    def test_get_mgmt_network_exists_create_router(self):
+        resource_tag = 'charm-octavia'
+        self.patch_object(api_crud, 'session_from_identity_service')
+        self.patch_object(api_crud, 'init_neutron_client')
+        identity_service = mock.MagicMock()
+        nc = mock.MagicMock()
+        self.init_neutron_client.return_value = nc
+        network_uuid = '83f1a860-9aed-4c0b-8b72-47195580a0c1'
+        nc.list_networks.return_value = {'networks': [{'id': network_uuid}]}
+        nc.list_subnets.return_value = {
+            'subnets': [{'id': 'fake-subnet-uuid'}]}
+        # network and subnet exists, but router doesn't
+        nc.list_routers.return_value = {'routers': []}
+        nc.create_router.return_value = {
+            'router': {'id': 'fake-router-uuid'}}
+        nc.list_security_groups.side_effect = [
+            {'security_groups': [{'id': self.secgrp_uuid}]},
+            {'security_groups': [{'id': self.health_secgrp_uuid}]},
+        ]
+
+        self.patch_object(api_crud.neutronclient.common, 'exceptions',
+                          name='neutron_exceptions')
+        self.neutron_exceptions.Conflict = FakeNeutronConflictException
+        nc.create_security_group_rule.side_effect = \
+            FakeNeutronConflictException
+        result = api_crud.get_mgmt_network(identity_service)
+        self.init_neutron_client.assert_called_once_with(
+            self.session_from_identity_service())
+        nc.list_networks.assert_called_once_with(tags=resource_tag)
+        self.assertFalse(nc.create_networks.called)
+        nc.list_subnets.assert_called_once_with(network_id=network_uuid,
+                                                tags=resource_tag)
+        self.assertFalse(nc.create_subnet.called)
+        nc.list_routers.assert_called_once_with(tags=resource_tag)
+        self.assertTrue(nc.create_router.called)
+        nc.add_interface_router.assert_called_once_with('fake-router-uuid', {
+            'subnet_id': 'fake-subnet-uuid'})
         nc.list_security_groups.assert_has_calls([
             mock.call(tags=resource_tag),
             mock.call(tags=resource_tag + '-health'),

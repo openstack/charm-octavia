@@ -617,12 +617,16 @@ def get_mgmt_network(identity_service, create=True):
             raise APIUnavailable('neutron', 'networks', e)
 
     try:
-        resp = nc.list_subnets(tags='charm-octavia')
+        # The service user can see other subnets that are tagged with
+        # 'charm-octavia' but are not part of this service's lb-mgmt-net. To
+        # avoid that, ensure that the subnets are filtered by the network the
+        # charm cares about.
+        resp = nc.list_subnets(network_id=network['id'], tags='charm-octavia')
     except NEUTRON_TEMP_EXCS as e:
         raise APIUnavailable('neutron', 'subnets', e)
 
-    n_resp = len(resp.get('subnets', []))
-    subnets = None
+    subnets = resp.get('subnets', [])
+    n_resp = len(subnets)
     if n_resp < 1 and create:
         # make rfc4193 Unique Local IPv6 Unicast Addresses from network UUID
         rfc4193_addr = 'fc00'

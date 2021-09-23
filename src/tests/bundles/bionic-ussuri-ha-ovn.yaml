@@ -1,6 +1,9 @@
 local_overlay_enabled: False
 
-series: bionic
+variables:
+  openstack-origin: &openstack-origin cloud:bionic-ussuri
+
+series: &series bionic
 relations:
 - - glance:image-service
   - nova-cloud-controller:image-service
@@ -89,30 +92,70 @@ relations:
   - glance-simplestreams-sync:certificates
 - - hacluster-octavia:ha
   - octavia:ha
+- - vault:certificates
+  - cinder:certificates
+- ["cinder-ceph:storage-backend", "cinder:storage-backend"]
+- ["nova-compute:ceph-access", "cinder-ceph:ceph-access"]
+- ["ceph-mon:client", "cinder-ceph:ceph"]
+- ["ceph-mon:osd", "ceph-osd:mon"]
+- ["cinder:shared-db", "mysql:shared-db"]
+- ["cinder:identity-service", "keystone:identity-service"]
+- ["cinder:amqp", "rabbitmq-server:amqp"]
+- ["cinder:image-service", "glance:image-service"]
 applications:
   glance:
     charm: ch:glance
     num_units: 1
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
     channel: ussuri/edge
   keystone:
     charm: ch:keystone
     num_units: 1
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
     channel: ussuri/edge
   mysql:
     constraints: mem=3072M
     charm: ch:percona-cluster
     num_units: 1
     channel: 5.7/edge
+  ceph-osd:
+    charm: ch:ceph-osd
+    num_units: 3
+    storage:
+      osd-devices: '40G'
+    options:
+      source: *openstack-origin
+    channel: octopus/candidate
+  ceph-mon:
+    charm: ch:ceph-mon
+    num_units: 1
+    options:
+      source: *openstack-origin
+      monitor-count: '1'
+    channel: octopus/candidate
+  cinder:
+    charm: ch:cinder
+    num_units: 1
+    storage:
+      block-devices: '40G'
+    options:
+      openstack-origin: *openstack-origin
+      glance-api-version: 2
+      block-device: None
+      overwrite: "true"
+      image-volume-cache-enabled: true
+    channel: ussuri/edge
+  cinder-ceph:
+    charm: ch:cinder-ceph
+    channel: ussuri/edge
   neutron-api:
     constraints: cores=4
     charm: ch:neutron-api
     num_units: 1
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
       debug: True
       flat-network-providers: physnet1
       enable-ml2-port-security: True
@@ -123,7 +166,7 @@ applications:
     charm: ch:nova-cloud-controller
     num_units: 1
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
       debug: True
       network-manager: Neutron
     channel: ussuri/edge
@@ -132,11 +175,11 @@ applications:
     charm: ch:nova-compute
     num_units: 2
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
       debug: True
     channel: ussuri/edge
   hacluster-octavia:
-    series: bionic
+    series: *series
     charm: ch:hacluster
     channel: 2.0.3/edge
   ovn-chassis-octavia:
@@ -144,11 +187,11 @@ applications:
     channel: 20.03/edge
   octavia:
     constraints: cores=8
-    series: bionic
+    series: *series
     charm: ../../../octavia.charm
     num_units: 3
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
       debug: True
       loadbalancer-topology: 'ACTIVE_STANDBY'
   rabbitmq-server:
@@ -167,14 +210,14 @@ applications:
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-uca-pocket: ussuri
-      retrofit-series: bionic
+      retrofit-series: *series
     channel: ussuri/edge
   placement:
     charm: ch:placement
     num_units: 1
     constraints: mem=1G
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
       debug: true
     channel: ussuri/edge
   neutron-api-plugin-ovn:
@@ -185,7 +228,7 @@ applications:
     charm: ch:ovn-central
     num_units: 3
     options:
-      source: cloud:bionic-ussuri
+      source: *openstack-origin
     channel: 20.03/edge
   ovn-chassis:
     charm: ch:ovn-chassis

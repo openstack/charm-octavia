@@ -182,3 +182,22 @@ options:
       Octavia supports multiple provider drivers. The reference Amphora
       provider driver is distributed as part of the Octavia software, and is
       enabled by default, unless you set this configuration option to 'False'.
+  enable-volume-based-amphora:
+    default: False
+    type: boolean
+    description: |
+      Enable the use of cinder volumes for the amphora. When this option is
+      enabled, Octavia will create a volume and attach it to the amphora.
+  volume-size:
+    default: 16
+    type: int
+    description: |
+      Size of the volume, in GB, for amphora instance. Applies only when
+      enable-volume-based-amphora is True.
+  volume-type:
+    default:
+    type: string
+    description: |
+      Type of volume for amphora volume root disk. Applies only when
+      enable-volume-based-amphora is True.If this isn't specified,
+      the default_volume_type from cinder.conf will be used.

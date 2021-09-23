@@ -49,22 +49,13 @@ configure:
 - zaza.openstack.charm_tests.nova.setup.manage_ssh_key
 - zaza.openstack.charm_tests.neutron.setup.basic_overcloud_network
 - zaza.openstack.charm_tests.octavia.setup.centralized_fip_network
-- no-amphora:
-  - zaza.openstack.charm_tests.vault.setup.auto_initialize
-  - zaza.openstack.charm_tests.octavia.setup.ensure_lts_images
-  - zaza.openstack.charm_tests.nova.setup.create_flavors
-  - zaza.openstack.charm_tests.nova.setup.manage_ssh_key
-  - zaza.openstack.charm_tests.neutron.setup.basic_overcloud_network
 
 
 tests:
 - zaza.openstack.charm_tests.octavia.tests.LBAASv2Test
+- zaza.openstack.charm_tests.octavia.tests.OctaviaVolumeBackedAmphoraTest
 - zaza.openstack.charm_tests.octavia.tests.CharmOperationTest
 - zaza.openstack.charm_tests.policyd.tests.OctaviaTests
-- no-amphora:
-  - zaza.openstack.charm_tests.octavia.tests.LBAASv2Test
-  - zaza.openstack.charm_tests.octavia.tests.CharmOperationTest
-  - zaza.openstack.charm_tests.policyd.tests.OctaviaTests
 
 tests_options:
   policyd:

@@ -90,6 +90,8 @@ relations:
   - octavia:certificates
 - - vault:certificates
   - glance-simplestreams-sync:certificates
+- - vault:certificates
+  - cinder:certificates
 - - hacluster-octavia:ha
   - octavia:ha
 - ["octavia-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
@@ -99,6 +101,15 @@ relations:
 - ["neutron-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 - ["placement-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 - ["vault-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["cinder-ceph:storage-backend", "cinder:storage-backend"]
+- ["nova-compute:ceph-access", "cinder-ceph:ceph-access"]
+- ["ceph-mon:client", "cinder-ceph:ceph"]
+- ["ceph-mon:osd", "ceph-osd:mon"]
+- ["cinder:shared-db", "cinder-mysql-router:shared-db"]
+- ["cinder-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["cinder:identity-service", "keystone:identity-service"]
+- ["cinder:amqp", "rabbitmq-server:amqp"]
+- ["cinder:image-service", "glance:image-service"]
 applications:
   glance:
     charm: ch:glance
@@ -112,6 +123,9 @@ applications:
     options:
       openstack-origin: *openstack-origin
     channel: wallaby/edge
+  cinder-mysql-router:
+    charm: ch:mysql-router
+    channel: 8.0/edge
   octavia-mysql-router:
     charm: ch:mysql-router
     channel: 8.0/edge
@@ -138,6 +152,36 @@ applications:
     charm: ch:mysql-innodb-cluster
     num_units: 3
     channel: 8.0/edge
+  ceph-osd:
+    charm: ch:ceph-osd
+    num_units: 3
+    storage:
+      osd-devices: '40G'
+    options:
+      source: *openstack-origin
+    channel: quincy/candidate
+  ceph-mon:
+    charm: ch:ceph-mon
+    num_units: 1
+    options:
+      source: *openstack-origin
+      monitor-count: '1'
+    channel: quincy/candidate
+  cinder:
+    charm: ch:cinder
+    num_units: 1
+    storage:
+      block-devices: '40G'
+    options:
+      openstack-origin: *openstack-origin
+      glance-api-version: 2
+      block-device: None
+      overwrite: "true"
+      image-volume-cache-enabled: true
+    channel: yoga/edge
+  cinder-ceph:
+    charm: ch:cinder-ceph
+    channel: yoga/edge
   neutron-api:
     constraints: cores=4
     charm: ch:neutron-api

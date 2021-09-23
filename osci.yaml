@@ -7,10 +7,6 @@
       - jammy-zed-ha-ovn
       - jammy-antelope-ha
       - jammy-antelope-ha-ovn
-      - lunar-antelope-ha:
-          voting: false
-      - lunar-antelope-ha-ovn:
-          voting: false
     vars:
       needs_charm_build: true
       charm_build_name: octavia
@@ -50,18 +46,4 @@
       - jammy-zed-ha
     vars:
       tox_extra_args: '-- jammy-antelope-ha-ovn'
-- job:
-    name: lunar-antelope-ha
-    parent: func-target
-    dependencies:
-      - jammy-zed-ha
-    vars:
-      tox_extra_args: '-- lunar-antelope-ha'
-- job:
-    name: lunar-antelope-ha-ovn
-    parent: func-target
-    timeout: 18000
-    dependencies:
-      - jammy-zed-ha
-    vars:
-      tox_extra_args: '-- lunar-antelope-ha-ovn'
+

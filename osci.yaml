@@ -7,10 +7,6 @@
       - jammy-yoga-ha-ovn
       - jammy-zed-ha
       - jammy-zed-ha-ovn
-      - kinetic-zed-ha:
-          voting: false
-      - kinetic-zed-ha-ovn:
-          voting: false
     vars:
       needs_charm_build: true
       charm_build_name: octavia
@@ -50,18 +46,3 @@
       - jammy-yoga-ha
     vars:
       tox_extra_args: jammy-zed-ha-ovn
-- job:
-    name: kinetic-zed-ha
-    parent: func-target
-    dependencies:
-      - jammy-zed-ha
-    vars:
-      tox_extra_args: kinetic-zed-ha
-- job:
-    name: kinetic-zed-ha-ovn
-    parent: func-target
-    timeout: 18000
-    dependencies:
-      - kinetic-zed-ha
-    vars:
-      tox_extra_args: kinetic-zed-ha-ovn

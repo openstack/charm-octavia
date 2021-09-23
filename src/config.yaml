@@ -221,3 +221,22 @@ options:
     type: int
     description: |
       Retry timeout between connection attempts in seconds for active amphora.
+  enable-volume-based-amphora:
+    default: False
+    type: boolean
+    description: |
+      Enable the use of cinder volumes for the amphora. When this option is
+      enabled, Octavia will create a volume and attach it to the amphora.
+  volume-size:
+    default: 16
+    type: int
+    description: |
+      Size of the volume, in GB, for amphora instance. Applies only when
+      enable-volume-based-amphora is True.
+  volume-type:
+    default:
+    type: string
+    description: |
+      Type of volume for amphora volume root disk. Applies only when
+      enable-volume-based-amphora is True.If this isn't specified,
+      the default_volume_type from cinder.conf will be used.

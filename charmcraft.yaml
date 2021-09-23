@@ -42,9 +42,6 @@ bases:
       - name: ubuntu
         channel: "22.04"
         architectures: [amd64]
-      - name: ubuntu
-        channel: "22.10"
-        architectures: [amd64]
   - build-on:
       - name: ubuntu
         channel: "22.04"
@@ -53,9 +50,6 @@ bases:
       - name: ubuntu
         channel: "22.04"
         architectures: [arm64]
-      - name: ubuntu
-        channel: "22.10"
-        architectures: [arm64]
   - build-on:
       - name: ubuntu
         channel: "22.04"
@@ -63,9 +57,6 @@ bases:
     run-on:
       - name: ubuntu
         channel: "22.04"
-        architectures: [ppc64el]
-      - name: ubuntu
-        channel: "22.10"
         architectures: [ppc64el]
   - build-on:
       - name: ubuntu
@@ -74,7 +65,4 @@ bases:
     run-on:
       - name: ubuntu
         channel: "22.04"
-        architectures: [s390x]
-      - name: ubuntu
-        channel: "22.10"
         architectures: [s390x]

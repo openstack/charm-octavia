@@ -9,10 +9,6 @@
           voting: false
       - jammy-bobcat-ha-ovn:
           voting: false
-      - mantic-bobcat-ha:
-          voting: false
-      - mantic-bobcat-ha-ovn:
-          voting: false
     vars:
       needs_charm_build: true
       charm_build_name: octavia
@@ -52,18 +48,3 @@
       - jammy-antelope-ha
     vars:
       tox_extra_args: '-- jammy-bobcat-ha-ovn'
-- job:
-    name: mantic-bobcat-ha
-    parent: func-target
-    dependencies:
-      - jammy-antelope-ha
-    vars:
-      tox_extra_args: '-- mantic-bobcat-ha'
-- job:
-    name: mantic-bobcat-ha-ovn
-    parent: func-target
-    timeout: 18000
-    dependencies:
-      - jammy-antelope-ha
-    vars:
-      tox_extra_args: '-- mantic-bobcat-ha-ovn'

@@ -58,6 +58,7 @@ configure:
 tests:
 - zaza.openstack.charm_tests.octavia.tests.LBAASv2Test
 - zaza.openstack.charm_tests.octavia.tests.CharmOperationTest
+- zaza.openstack.charm_tests.octavia.tests.VolumeBasedAmphoraTest
 - zaza.openstack.charm_tests.policyd.tests.OctaviaTests
 - no-amphora:
   - zaza.openstack.charm_tests.octavia.tests.LBAASv2Test

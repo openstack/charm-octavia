@@ -17,11 +17,21 @@
       - groovy-victoria-ha-ovn
       - groovy-victoria-ha
       # LP: #1913024 is fixed for bionic and focal, but not for hirsute/wallaby
-      # - focal-wallaby-ha-ovn
+      - focal-wallaby-ha-ovn:
+          voting: false
       - focal-wallaby-ha
+      - focal-xena-ha:
+          voting: false
+      - focal-xena-ha-ovn:
+          voting: false
       # LP: #1913024 is fixed for bionic and focal, but not for hirsute/wallaby
-      # - hirsute-wallaby-ha-ovn
+      - hirsute-wallaby-ha-ovn:
+         voting: false
       - hirsute-wallaby-ha
+      - impish-xena-ha:
+          voting: false
+      - impish-xena-ha-ovn:
+          voting: false
     vars:
       needs_charm_build: true
       charm_build_name: octavia
@@ -118,11 +128,23 @@
     vars:
       tox_extra_args: focal-wallaby-ha-ovn
 - job:
+    name: focal-xena-ha-ovn
+    parent: func-target
+    dependencies: *lint-jobs
+    vars:
+      tox_extra_args: focal-xena-ha-ovn
+- job:
     name: focal-wallaby-ha
     parent: func-target
     dependencies: *smoke-jobs
     vars:
       tox_extra_args: focal-wallaby-ha
+- job:
+    name: focal-xena-ha
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: focal-xena-ha
 - job:
     name: hirsute-wallaby-ha-ovn
     parent: func-target
@@ -135,3 +157,15 @@
     dependencies: *smoke-jobs
     vars:
       tox_extra_args: hirsute-wallaby-ha
+- job:
+    name: impish-xena-ha-ovn
+    parent: func-target
+    dependencies: *lint-jobs
+    vars:
+      tox_extra_args: impish-xena-ha-ovn
+- job:
+    name: impish-xena-ha
+    parent: func-target
+    dependencies: *smoke-jobs
+    vars:
+      tox_extra_args: impish-xena-ha

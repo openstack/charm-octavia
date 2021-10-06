@@ -12,10 +12,10 @@ gate_bundles:
 - focal-victoria-ha-ovn
 - focal-victoria-ha
 - no-amphora: focal-victoria-no-amphora
-- groovy-victoria-ha-ovn
-- groovy-victoria-ha
 - focal-wallaby-ha-ovn
 - focal-wallaby-ha
+- groovy-victoria-ha-ovn
+- groovy-victoria-ha
 - hirsute-wallaby-ha-ovn
 - hirsute-wallaby-ha
 
@@ -23,12 +23,17 @@ smoke_bundles:
 - focal-ussuri-ha-ovn
 - focal-ussuri-ha
 
-comment: |
-  The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
-    https://github.com/lxc/lxd/issues/4947
 dev_bundles:
 - bionic-rocky-ha
 - bionic-rocky-lxd
+- focal-xena-ha-ovn
+- focal-xena-ha
+- impish-xena-ha-ovn
+- impish-xena-ha
+
+comment: |
+  The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
+    https://github.com/lxc/lxd/issues/4947
 
 target_deploy_status:
   octavia:
@@ -86,5 +91,5 @@ tests_options:
   force_deploy:
     - groovy-victoria-ha-ovn
     - groovy-victoria-ha
-    - hirsute-wallaby-ha-ovn
-    - hirsute-wallaby-ha
+    - impish-xena-ha-ovn
+    - impish-xena-ha

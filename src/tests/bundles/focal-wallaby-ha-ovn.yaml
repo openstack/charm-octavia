@@ -99,36 +99,46 @@ relations:
 - ["vault-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 applications:
   glance:
-    charm: cs:~openstack-charmers-next/glance
+    charm: cs:~openstack-charmers/glance
     num_units: 1
     options:
       openstack-origin: *openstack-origin
+    channel: candidate
   keystone:
-    charm: cs:~openstack-charmers-next/keystone
+    charm: cs:~openstack-charmers/keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
+    channel: candidate
   octavia-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   keystone-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   nova-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   glance-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   neutron-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   placement-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   vault-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: cs:~openstack-charmers/mysql-router
+    channel: candidate
   mysql-innodb-cluster:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers-next/mysql-innodb-cluster
+    charm: cs:~openstack-charmers/mysql-innodb-cluster
     num_units: 3
+    channel: candidate
   neutron-api:
     constraints: cores=4
-    charm: cs:~openstack-charmers-next/neutron-api
+    charm: cs:~openstack-charmers/neutron-api
     num_units: 1
     options:
       openstack-origin: *openstack-origin
@@ -136,26 +146,31 @@ applications:
       flat-network-providers: physnet1
       enable-ml2-port-security: True
       neutron-security-groups: True
+    channel: candidate
   nova-cloud-controller:
     constraints: mem=7168M
-    charm: cs:~openstack-charmers-next/nova-cloud-controller
+    charm: cs:~openstack-charmers/nova-cloud-controller
     num_units: 1
     options:
       openstack-origin: *openstack-origin
       debug: True
       network-manager: Neutron
+    channel: candidate
   nova-compute:
     constraints: mem=7168M
-    charm: cs:~openstack-charmers-next/nova-compute
+    charm: cs:~openstack-charmers/nova-compute
     num_units: 2
     options:
       openstack-origin: *openstack-origin
       debug: True
+    channel: candidate
   hacluster-octavia:
     series: *series
-    charm: cs:~openstack-charmers-next/hacluster
+    charm: cs:~openstack-charmers/hacluster
+    channel: candidate
   ovn-chassis-octavia:
-    charm: cs:~openstack-charmers-next/ovn-chassis
+    charm: cs:~openstack-charmers/ovn-chassis
+    channel: candidate
   octavia:
     constraints: cores=8
     series: *series
@@ -166,36 +181,44 @@ applications:
       debug: True
       loadbalancer-topology: 'ACTIVE_STANDBY'
   rabbitmq-server:
-    charm: cs:~openstack-charmers-next/rabbitmq-server
+    charm: cs:~openstack-charmers/rabbitmq-server
     num_units: 1
+    channel: candidate
   glance-simplestreams-sync:
-    charm: cs:~openstack-charmers-next/glance-simplestreams-sync
+    charm: cs:~openstack-charmers/glance-simplestreams-sync
     num_units: 1
     options:
       use_swift: False
+    channel: candidate
   octavia-diskimage-retrofit:
-    charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
+    charm: cs:~openstack-charmers/octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: *series
       retrofit-uca-pocket: wallaby
+    channel: candidate
   placement:
-    charm: cs:~openstack-charmers-next/placement
+    charm: cs:~openstack-charmers/placement
     num_units: 1
     constraints: mem=1G
     options:
       openstack-origin: *openstack-origin
       debug: true
+    channel: candidate
   neutron-api-plugin-ovn:
-    charm: cs:~openstack-charmers-next/neutron-api-plugin-ovn
+    charm: cs:~openstack-charmers/neutron-api-plugin-ovn
+    channel: candidate
   ovn-central:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers-next/ovn-central
+    charm: cs:~openstack-charmers/ovn-central
     num_units: 3
     options:
       source: *openstack-origin
+    channel: candidate
   ovn-chassis:
-    charm: cs:~openstack-charmers-next/ovn-chassis
+    charm: cs:~openstack-charmers/ovn-chassis
+    channel: candidate
   vault:
-    charm: cs:~openstack-charmers-next/vault
+    charm: cs:~openstack-charmers/vault
     num_units: 1
+    channel: candidate

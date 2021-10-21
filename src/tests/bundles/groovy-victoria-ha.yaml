@@ -95,39 +95,29 @@ applications:
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: candidate
   keystone:
     charm: cs:~openstack-charmers/keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: candidate
   octavia-mysql-router:
     charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
   keystone-mysql-router:
     charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
   nova-mysql-router:
     charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
   glance-mysql-router:
     charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
   neutron-mysql-router:
     charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
   placement-mysql-router:
     charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
   vault-mysql-router:
     charm: cs:~openstack-charmers/mysql-router
-    channel: candidate
   mysql-innodb-cluster:
     constraints: mem=3072M
     charm: cs:~openstack-charmers/mysql-innodb-cluster
     num_units: 3
-    channel: candidate
   neutron-api:
     charm: cs:~openstack-charmers/neutron-api
     num_units: 1
@@ -139,7 +129,6 @@ applications:
       neutron-security-groups: True
       enable-dvr: True
       manage-neutron-plugin-legacy-mode: True
-    channel: candidate
   neutron-openvswitch:
     series: *series
     charm: cs:~openstack-charmers/neutron-openvswitch
@@ -151,7 +140,6 @@ applications:
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
       bridge-mappings: physnet1:br-ex
-    channel: candidate
   neutron-openvswitch-octavia:
     series: *series
     charm: cs:~openstack-charmers/neutron-openvswitch
@@ -160,7 +148,6 @@ applications:
       debug: True
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
-    channel: candidate
   nova-cloud-controller:
     constraints: mem=7168M
     charm: cs:~openstack-charmers/nova-cloud-controller
@@ -169,7 +156,6 @@ applications:
       openstack-origin: *openstack-origin
       debug: True
       network-manager: Neutron
-    channel: candidate
   nova-compute:
     constraints: mem=7168M
     charm: cs:~openstack-charmers/nova-compute
@@ -177,11 +163,9 @@ applications:
     options:
       openstack-origin: *openstack-origin
       debug: True
-    channel: candidate
   hacluster-octavia:
     charm: cs:~openstack-charmers/hacluster
     num_units: 0
-    channel: candidate
   octavia:
     constraints: cores=8
     series: *series
@@ -195,7 +179,6 @@ applications:
   rabbitmq-server:
     charm: cs:~openstack-charmers/rabbitmq-server
     num_units: 1
-    channel: candidate
   glance-simplestreams-sync:
     charm: cs:~openstack-charmers/glance-simplestreams-sync
     num_units: 1
@@ -208,13 +191,11 @@ applications:
                         'release~(bionic|focal|groovy)',
                         'arch~(x86_64|amd64)',
                         'ftype~(disk1.img|disk.img)']}]"
-    channel: candidate
   octavia-diskimage-retrofit:
     charm: cs:~openstack-charmers/octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: *series
-    channel: candidate
   placement:
     charm: cs:~openstack-charmers/placement
     num_units: 1
@@ -222,8 +203,6 @@ applications:
     options:
       openstack-origin: *openstack-origin
       debug: true
-    channel: candidate
   vault:
     charm: cs:~openstack-charmers/vault
     num_units: 1
-    channel: candidate

@@ -89,7 +89,6 @@ applications:
       openstack-origin: cloud:bionic-rocky
     to:
     - lxd:1
-    channel: candidate
   keystone:
     charm: cs:~openstack-charmers/keystone
     num_units: 1
@@ -97,14 +96,12 @@ applications:
       openstack-origin: cloud:bionic-rocky
     to:
     - lxd:0
-    channel: candidate
   mysql:
     constraints: mem=3072M
     charm: cs:~openstack-charmers/percona-cluster
     num_units: 1
     to:
     - lxd:0
-    channel: candidate
   neutron-api:
     charm: cs:~openstack-charmers/neutron-api
     num_units: 1
@@ -116,7 +113,6 @@ applications:
       neutron-security-groups: True
     to:
     - lxd:1
-    channel: candidate
   neutron-gateway:
     charm: cs:~openstack-charmers/neutron-gateway
     num_units: 1
@@ -128,7 +124,6 @@ applications:
       debug: True
     to:
     - 3
-    channel: candidate
   neutron-openvswitch:
     series: bionic
     charm: cs:~openstack-charmers/neutron-openvswitch
@@ -139,7 +134,6 @@ applications:
       instance-mtu: 1300
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
-    channel: candidate
   nova-cloud-controller:
     constraints: mem=7168M
     charm: cs:~openstack-charmers/nova-cloud-controller
@@ -150,7 +144,6 @@ applications:
       network-manager: Neutron
     to:
     - lxd:1
-    channel: candidate
   nova-compute:
     constraints: mem=10240M
     charm: cs:~openstack-charmers/nova-compute
@@ -160,7 +153,6 @@ applications:
       debug: True
     to:
     - 2
-    channel: candidate
   octavia:
     constraints: cores=8
     series: bionic
@@ -180,21 +172,17 @@ applications:
     num_units: 1
     to:
     - lxd:0
-    channel: candidate
   glance-simplestreams-sync:
     charm: cs:~openstack-charmers/glance-simplestreams-sync
     num_units: 1
     options:
       source: ppa:simplestreams-dev/trunk
       use_swift: False
-    channel: candidate
   octavia-diskimage-retrofit:
     charm: cs:~openstack-charmers/octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: bionic
-    channel: candidate
   vault:
     charm: cs:~openstack-charmers/vault
     num_units: 1
-    channel: candidate

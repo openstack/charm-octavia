@@ -80,18 +80,15 @@ applications:
     num_units: 1
     options:
       openstack-origin: cloud:bionic-stein
-    channel: candidate
   keystone:
     charm: cs:~openstack-charmers/keystone
     num_units: 1
     options:
       openstack-origin: cloud:bionic-stein
-    channel: candidate
   mysql:
     constraints: mem=3072M
     charm: cs:~openstack-charmers/percona-cluster
     num_units: 1
-    channel: candidate
   neutron-api:
     charm: cs:~openstack-charmers/neutron-api
     num_units: 1
@@ -102,7 +99,6 @@ applications:
       enable-ml2-port-security: True
       neutron-security-groups: True
       enable-dvr: True
-    channel: candidate
   neutron-openvswitch:
     series: bionic
     charm: cs:~openstack-charmers/neutron-openvswitch
@@ -114,7 +110,6 @@ applications:
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
       bridge-mappings: physnet1:br-ex
-    channel: candidate
   neutron-openvswitch-octavia:
     series: bionic
     charm: cs:~openstack-charmers/neutron-openvswitch
@@ -123,7 +118,6 @@ applications:
       debug: True
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
-    channel: candidate
   nova-cloud-controller:
     constraints: mem=7168M
     charm: cs:~openstack-charmers/nova-cloud-controller
@@ -132,7 +126,6 @@ applications:
       openstack-origin: cloud:bionic-stein
       debug: True
       network-manager: Neutron
-    channel: candidate
   nova-compute:
     constraints: mem=7168M
     charm: cs:~openstack-charmers/nova-compute
@@ -140,11 +133,9 @@ applications:
     options:
       openstack-origin: cloud:bionic-stein
       debug: True
-    channel: candidate
   hacluster-octavia:
     charm: cs:~openstack-charmers/hacluster
     num_units: 0
-    channel: candidate
   octavia:
     constraints: cores=8
     series: bionic
@@ -158,22 +149,18 @@ applications:
   rabbitmq-server:
     charm: cs:~openstack-charmers/rabbitmq-server
     num_units: 1
-    channel: candidate
   glance-simplestreams-sync:
     charm: cs:~openstack-charmers/glance-simplestreams-sync
     num_units: 1
     options:
       source: ppa:simplestreams-dev/trunk
       use_swift: False
-    channel: candidate
   octavia-diskimage-retrofit:
     charm: cs:~openstack-charmers/octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-uca-pocket: stein
       retrofit-series: bionic
-    channel: candidate
   vault:
     charm: cs:~openstack-charmers/vault
     num_units: 1
-    channel: candidate

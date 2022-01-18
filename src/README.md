@@ -77,14 +77,15 @@ To get you started we include an example of generating your own certificates:
     mkdir -p demoCA/newcerts
     touch demoCA/index.txt
     touch demoCA/index.txt.attr
-    openssl genrsa -passout pass:foobar -des3 -out issuing_ca_key.pem 2048
+
+    openssl genpkey -algorithm RSA -aes256 -pass pass:foobar -out issuing_ca_key.pem
     openssl req -x509 -passin pass:foobar -new -nodes -key issuing_ca_key.pem \
         -config /etc/ssl/openssl.cnf \
         -subj "/C=US/ST=Somestate/O=Org/CN=www.example.com" \
         -days 30 \
         -out issuing_ca.pem
 
-    openssl genrsa -passout pass:foobar -des3 -out controller_ca_key.pem 2048
+    openssl genpkey -algorithm RSA -aes256 -pass pass:foobar -out controller_ca_key.pem
     openssl req -x509 -passin pass:foobar -new -nodes \
             -key controller_ca_key.pem \
         -config /etc/ssl/openssl.cnf \

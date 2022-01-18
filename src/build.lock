@@ -137,12 +137,12 @@
       "commit": "55e82469e841aa2e9acac3a8940077ea8d42b150"
     },
     {
-      "item": "interface:nrpe-external-master",
-      "vcs": null,
-      "url": "https://github.com/cmars/nrpe-external-master-interface",
       "type": "layer",
-      "branch": "2e0e1fdea6d83b55078200aacb537d60013ec5bc",
-      "commit": "2e0e1fdea6d83b55078200aacb537d60013ec5bc"
+      "item": "interface:nrpe-external-master",
+      "url": "https://github.com/canonical/nrpe-external-master-interface",
+      "vcs": null,
+      "branch": "95d744d1dbc4d86fb0462283c9371619bf5bbc24",
+      "commit": "95d744d1dbc4d86fb0462283c9371619bf5bbc24"
     },
     {
       "vcs": null,

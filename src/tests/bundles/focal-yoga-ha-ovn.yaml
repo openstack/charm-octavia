@@ -1,18 +1,23 @@
-series: bionic
+variables:
+  openstack-origin: &openstack-origin cloud:focal-yoga
+
+local_overlay_enabled: False
+
+series: &series focal
 relations:
 - - glance:image-service
   - nova-cloud-controller:image-service
 - - glance:image-service
   - nova-compute:image-service
-- - mysql:shared-db
+- - glance-mysql-router:shared-db
   - glance:shared-db
-- - mysql:shared-db
+- - keystone-mysql-router:shared-db
   - keystone:shared-db
-- - mysql:shared-db
+- - neutron-mysql-router:shared-db
   - neutron-api:shared-db
-- - mysql:shared-db
+- - nova-mysql-router:shared-db
   - nova-cloud-controller:shared-db
-- - mysql:shared-db
+- - octavia-mysql-router:shared-db
   - octavia:shared-db
 - - keystone:identity-service
   - glance:identity-service
@@ -44,13 +49,13 @@ relations:
   - glance-simplestreams-sync:identity-service
 - - keystone:identity-credentials
   - octavia-diskimage-retrofit:identity-credentials
-- [ placement, mysql ]
+- [ placement, placement-mysql-router ]
 - [ placement, keystone ]
 - [ placement, nova-cloud-controller ]
 - - neutron-api-plugin-ovn:neutron-plugin
   - neutron-api:neutron-plugin-api-subordinate
 - - vault:shared-db
-  - mysql:shared-db
+  - vault-mysql-router:shared-db
 - - ovn-central:certificates
   - vault:certificates
 - - ovn-central:ovsdb-cms
@@ -87,92 +92,135 @@ relations:
   - glance-simplestreams-sync:certificates
 - - hacluster-octavia:ha
   - octavia:ha
+- ["octavia-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["keystone-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["nova-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["glance-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["neutron-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["placement-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["vault-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 applications:
   glance:
-    charm: cs:~openstack-charmers-next/glance
+    charm: ch:glance
     num_units: 1
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
+    channel: yoga/edge
   keystone:
-    charm: cs:~openstack-charmers-next/keystone
+    charm: ch:keystone
     num_units: 1
     options:
-      openstack-origin: cloud:bionic-ussuri
-  mysql:
+      openstack-origin: *openstack-origin
+    channel: yoga/edge
+  octavia-mysql-router:
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
+  keystone-mysql-router:
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
+  nova-mysql-router:
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
+  glance-mysql-router:
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
+  neutron-mysql-router:
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
+  placement-mysql-router:
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
+  vault-mysql-router:
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
+  mysql-innodb-cluster:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers-next/percona-cluster
-    num_units: 1
+    charm: ch:mysql-innodb-cluster
+    num_units: 3
+    channel: 8.0.19/edge
   neutron-api:
     constraints: cores=4
-    charm: cs:~openstack-charmers-next/neutron-api
+    charm: ch:neutron-api
     num_units: 1
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
       debug: True
       flat-network-providers: physnet1
       enable-ml2-port-security: True
       neutron-security-groups: True
+    channel: yoga/edge
   nova-cloud-controller:
     constraints: mem=7168M
-    charm: cs:~openstack-charmers-next/nova-cloud-controller
+    charm: ch:nova-cloud-controller
     num_units: 1
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
       debug: True
       network-manager: Neutron
+    channel: yoga/edge
   nova-compute:
     constraints: mem=7168M
-    charm: cs:~openstack-charmers-next/nova-compute
+    charm: ch:nova-compute
     num_units: 2
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
       debug: True
+    channel: yoga/edge
   hacluster-octavia:
-    series: bionic
-    charm: cs:~openstack-charmers-next/hacluster
+    series: *series
+    charm: ch:hacluster
+    channel: 2.0.3/edge
   ovn-chassis-octavia:
-    charm: cs:~openstack-charmers-next/ovn-chassis
+    charm: ch:ovn-chassis
+    channel: latest/edge
   octavia:
     constraints: cores=8
-    series: bionic
-    charm: ../../../octavia
+    series: *series
+    charm: ../../../octavia.charm
     num_units: 3
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
       debug: True
       loadbalancer-topology: 'ACTIVE_STANDBY'
   rabbitmq-server:
-    charm: cs:~openstack-charmers-next/rabbitmq-server
+    charm: ch:rabbitmq-server
     num_units: 1
+    channel: 3.8/edge
   glance-simplestreams-sync:
-    charm: cs:~openstack-charmers-next/glance-simplestreams-sync
+    charm: ch:glance-simplestreams-sync
     num_units: 1
     options:
-      source: ppa:simplestreams-dev/trunk
       use_swift: False
+    channel: yoga/edge
   octavia-diskimage-retrofit:
-    charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
+    charm: ch:octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
-      retrofit-uca-pocket: ussuri
-      retrofit-series: bionic
+      retrofit-series: *series
+      retrofit-uca-pocket: wallaby
+    channel: yoga/edge
   placement:
-    charm: cs:~openstack-charmers-next/placement
+    charm: ch:placement
     num_units: 1
     constraints: mem=1G
     options:
-      openstack-origin: cloud:bionic-ussuri
+      openstack-origin: *openstack-origin
       debug: true
+    channel: yoga/edge
   neutron-api-plugin-ovn:
-    charm: cs:~openstack-charmers-next/neutron-api-plugin-ovn
+    charm: ch:neutron-api-plugin-ovn
+    channel: yoga/edge
   ovn-central:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers-next/ovn-central
+    charm: ch:ovn-central
     num_units: 3
     options:
-      source: cloud:bionic-ussuri
+      source: *openstack-origin
+    channel: latest/edge
   ovn-chassis:
-    charm: cs:~openstack-charmers-next/ovn-chassis
+    charm: ch:ovn-chassis
+    channel: latest/edge
   vault:
-    charm: cs:~openstack-charmers-next/vault
+    charm: ch:vault
     num_units: 1
+    channel: 1.7/edge

@@ -127,7 +127,8 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
             self.octavia_charm.public_url,
             self.octavia_charm.internal_url,
             self.octavia_charm.admin_url,
-            requested_roles=octavia.OCTAVIA_ROLES)
+            requested_roles=octavia.OCTAVIA_ROLES,
+            add_role_to_admin=octavia.OCTAVIA_ROLES)
         self.octavia_charm.assess_status.assert_called_once_with()
 
     def test_generate_heartbeat_key(self):

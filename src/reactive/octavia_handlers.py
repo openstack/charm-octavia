@@ -90,7 +90,8 @@ def setup_endpoint_connection(keystone):
                                     instance.public_url,
                                     instance.internal_url,
                                     instance.admin_url,
-                                    requested_roles=octavia.OCTAVIA_ROLES)
+                                    requested_roles=octavia.OCTAVIA_ROLES,
+                                    add_role_to_admin=octavia.OCTAVIA_ROLES)
         instance.assess_status()
 
 

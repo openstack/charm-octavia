@@ -1,0 +1,47 @@
+type: charm
+
+parts:
+  charm:
+    build-packages:
+      - tox
+      - git
+      - python3-dev
+      - libffi-dev
+      - libssl-dev
+    override-build: |
+      apt-get install ca-certificates -y
+      tox -e build-reactive
+    override-stage: |
+      echo "Copying charm to staging area: $CHARMCRAFT_STAGE"
+      NAME=$(ls $CHARMCRAFT_PART_BUILD/build/builds)
+      cp -r $CHARMCRAFT_PART_BUILD/build/builds/$NAME/* $CHARMCRAFT_STAGE/
+    override-prime: |
+      # For some reason, the normal priming chokes on the fact that there's a
+      # hooks directory.
+      cp -r $CHARMCRAFT_STAGE/* .
+
+bases:
+  - name: ubuntu
+    channel: "20.04"
+    architectures: [amd64]
+  - name: ubuntu
+    channel: "20.04"
+    architectures: [arm64]
+  - name: ubuntu
+    channel: "20.04"
+    architectures: [ppc64el]
+  - name: ubuntu
+    channel: "20.04"
+    architectures: [s390x]
+  - name: ubuntu
+    channel: "22.04"
+    architectures: [amd64]
+  - name: ubuntu
+    channel: "22.04"
+    architectures: [arm64]
+  - name: ubuntu
+    channel: "22.04"
+    architectures: [ppc64el]
+  - name: ubuntu
+    channel: "22.04"
+    architectures: [s390x]

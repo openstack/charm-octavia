@@ -4,6 +4,10 @@
 #     https://github.com/openstack-charmers/release-tools
 #
 
+# Need tox to be available from tox... inception yes, but its a workaround for now
+tox
+
 # Functional Test Requirements (let Zaza's dependencies solve all dependencies here!)
-git+https://github.com/openstack-charmers/zaza.git#egg=zaza
-git+https://github.com/openstack-charmers/zaza-openstack-tests.git#egg=zaza.openstack
+# XXX Remove me before landing
+git+https://github.com/gnuoy/zaza.git@add-additional-machine-error-info#egg=zaza
+git+https://github.com/gnuoy/zaza-openstack-tests.git@change-zaza-dep#egg=zaza.openstack

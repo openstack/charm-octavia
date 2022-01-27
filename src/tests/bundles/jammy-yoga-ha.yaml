@@ -1,7 +1,9 @@
 variables:
   openstack-origin: &openstack-origin distro
 
-series: &series groovy
+local_overlay_enabled: False
+
+series: &series jammy
 relations:
 - - glance:image-service
   - nova-cloud-controller:image-service
@@ -91,35 +93,45 @@ relations:
 - ["vault-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 applications:
   glance:
-    charm: cs:~openstack-charmers-next/glance
+    charm: ch:glance
     num_units: 1
     options:
       openstack-origin: *openstack-origin
+    channel: yoga/edge
   keystone:
-    charm: cs:~openstack-charmers-next/keystone
+    charm: ch:keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
+    channel: yoga/edge
   octavia-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   keystone-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   nova-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   glance-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   neutron-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   placement-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   vault-mysql-router:
-    charm: cs:~openstack-charmers-next/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0.19/edge
   mysql-innodb-cluster:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers-next/mysql-innodb-cluster
+    charm: ch:mysql-innodb-cluster
     num_units: 3
+    channel: 8.0.19/edge
   neutron-api:
-    charm: cs:~openstack-charmers-next/neutron-api
+    charm: ch:neutron-api
     num_units: 1
     options:
       openstack-origin: *openstack-origin
@@ -129,9 +141,10 @@ applications:
       neutron-security-groups: True
       enable-dvr: True
       manage-neutron-plugin-legacy-mode: True
+    channel: yoga/edge
   neutron-openvswitch:
     series: *series
-    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    charm: ch:neutron-openvswitch
     num_units: 0
     options:
       debug: True
@@ -140,36 +153,41 @@ applications:
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
       bridge-mappings: physnet1:br-ex
+    channel: yoga/edge
   neutron-openvswitch-octavia:
     series: *series
-    charm: cs:~openstack-charmers-next/neutron-openvswitch
+    charm: ch:neutron-openvswitch
     num_units: 0
     options:
       debug: True
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
+    channel: yoga/edge
   nova-cloud-controller:
     constraints: mem=7168M
-    charm: cs:~openstack-charmers-next/nova-cloud-controller
+    charm: ch:nova-cloud-controller
     num_units: 1
     options:
       openstack-origin: *openstack-origin
       debug: True
       network-manager: Neutron
+    channel: yoga/edge
   nova-compute:
     constraints: mem=7168M
-    charm: cs:~openstack-charmers-next/nova-compute
+    charm: ch:nova-compute
     num_units: 2
     options:
       openstack-origin: *openstack-origin
       debug: True
+    channel: yoga/edge
   hacluster-octavia:
-    charm: cs:~openstack-charmers-next/hacluster
+    charm: ch:hacluster
     num_units: 0
+    channel: 2.0.3/edge
   octavia:
     constraints: cores=8
     series: *series
-    charm: ../../../octavia
+    charm: ../../../octavia.charm
     num_units: 3
     options:
       openstack-origin: *openstack-origin
@@ -177,10 +195,11 @@ applications:
       loadbalancer-topology: 'ACTIVE_STANDBY'
       vip: 'ADD YOUR VIP HERE'
   rabbitmq-server:
-    charm: cs:~openstack-charmers-next/rabbitmq-server
+    charm: ch:rabbitmq-server
     num_units: 1
+    channel: 3.8/edge
   glance-simplestreams-sync:
-    charm: cs:~openstack-charmers-next/glance-simplestreams-sync
+    charm: ch:glance-simplestreams-sync
     num_units: 1
     options:
       use_swift: False
@@ -188,21 +207,25 @@ applications:
                       name_prefix: 'ubuntu:released',
                       path: 'streams/v1/index.sjson', max: 1,
                       item_filters: [
-                        'release~(bionic|focal|groovy)',
+                        'release~(bionic|focal|hirsute)',
                         'arch~(x86_64|amd64)',
                         'ftype~(disk1.img|disk.img)']}]"
+    channel: yoga/edge
   octavia-diskimage-retrofit:
-    charm: cs:~openstack-charmers-next/octavia-diskimage-retrofit
+    charm: ch:octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: *series
+    channel: yoga/edge
   placement:
-    charm: cs:~openstack-charmers-next/placement
+    charm: ch:placement
     num_units: 1
     constraints: mem=1G
     options:
       openstack-origin: *openstack-origin
       debug: true
+    channel: yoga/edge
   vault:
-    charm: cs:~openstack-charmers-next/vault
+    charm: ch:vault
     num_units: 1
+    channel: 1.7/edge

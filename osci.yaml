@@ -1,7 +1,7 @@
 - project:
     templates:
       - charm-unit-jobs-py38
-      - charm-unit-jobs-py39
+      - charm-unit-jobs-py310
     check:
       jobs:
       - focal-xena-ha
@@ -9,10 +9,6 @@
       - focal-yoga-ha:
           voting: false
       - focal-yoga-ha-ovn:
-          voting: false
-      - impish-xena-ha:
-          voting: false
-      - impish-xena-ha-ovn:
           voting: false
       - jammy-yoga-ha:
           voting: false
@@ -29,7 +25,6 @@
     dependencies:
       - osci-lint
       - tox-py38
-      - tox-py39
       - charm-build
     vars:
       tox_extra_args: focal-xena-ha
@@ -54,20 +49,6 @@
       - focal-xena-ha
     vars:
       tox_extra_args: focal-yoga-ha-ovn
-- job:
-    name: impish-xena-ha-ovn
-    parent: func-target
-    dependencies:
-      - focal-xena-ha
-    vars:
-      tox_extra_args: impish-xena-ha-ovn
-- job:
-    name: impish-xena-ha
-    parent: func-target
-    dependencies:
-      - focal-xena-ha
-    vars:
-      tox_extra_args: impish-xena-ha
 - job:
     name: jammy-yoga-ha-ovn
     parent: func-target

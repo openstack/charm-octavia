@@ -10,8 +10,6 @@ smoke_bundles:
 dev_bundles:
 - focal-yoga-ha-ovn
 - focal-yoga-ha
-- impish-xena-ha-ovn
-- impish-xena-ha
 - jammy-yoga-ha-ovn
 - jammy-yoga-ha
 
@@ -74,7 +72,5 @@ tests_options:
   policyd:
     service: octavia
   force_deploy:
-    - impish-xena-ha-ovn
-    - impish-xena-ha
     - jammy-yoga-ha-ovn
     - jammy-yoga-ha

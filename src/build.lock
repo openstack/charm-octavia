@@ -1,854 +1,890 @@
 {
   "locks": [
     {
-      "item": "layer:leadership",
-      "vcs": null,
-      "url": "https://git.launchpad.net/layer-leadership",
-      "branch": "cc5bd3f49b2fa5e6c3ab2336763c313ec8bf083f",
       "type": "layer",
+      "item": "layer:leadership",
+      "url": "https://git.launchpad.net/layer-leadership",
+      "vcs": null,
+      "branch": "refs/heads/master",
       "commit": "cc5bd3f49b2fa5e6c3ab2336763c313ec8bf083f"
     },
     {
-      "item": "layer:options",
-      "vcs": null,
-      "url": "https://github.com/juju-solutions/layer-options.git",
       "type": "layer",
-      "branch": "fcdcea4e5de3e1556c24e6704607862d0ba00a56",
+      "item": "layer:options",
+      "url": "https://github.com/juju-solutions/layer-options.git",
+      "vcs": null,
+      "branch": "refs/heads/master",
       "commit": "fcdcea4e5de3e1556c24e6704607862d0ba00a56"
     },
     {
+      "type": "layer",
       "item": "layer:basic",
-      "vcs": null,
       "url": "https://github.com/juju-solutions/layer-basic.git",
-      "type": "layer",
-      "branch": "a3ff62c32c993d80417f6e093e3ef95e42f62083",
-      "commit": "a3ff62c32c993d80417f6e093e3ef95e42f62083"
+      "vcs": null,
+      "branch": "refs/heads/master",
+      "commit": "22780cbce9e77e44bed5abaa3ab0005167801df4"
     },
     {
+      "type": "layer",
       "item": "layer:openstack",
-      "vcs": null,
       "url": "https://github.com/openstack/charm-layer-openstack",
-      "type": "layer",
-      "branch": "5999eeaa5d007b6ae8dc12753976ef11f76684ee",
-      "commit": "5999eeaa5d007b6ae8dc12753976ef11f76684ee"
+      "vcs": null,
+      "branch": "refs/heads/master",
+      "commit": "e0f700eacb026235e1a04e7cbc28dfbe9d4e4520"
     },
     {
+      "type": "layer",
       "item": "layer:openstack-principle",
-      "vcs": null,
       "url": "https://github.com/openstack/charm-layer-openstack-principle",
-      "type": "layer",
-      "branch": "8100de4b24ab361423363c75599124708169d871",
-      "commit": "8100de4b24ab361423363c75599124708169d871"
+      "vcs": null,
+      "branch": "refs/heads/master",
+      "commit": "2541283a7f9c3fa923c0fccd7257e217e11dadcd"
     },
     {
-      "item": "layer:openstack-api",
-      "vcs": null,
-      "url": "https://github.com/openstack/charm-layer-openstack-api",
       "type": "layer",
-      "branch": "34311a62e963d0ce903b7ddb9d70b8f071f71651",
+      "item": "layer:openstack-api",
+      "url": "https://github.com/openstack/charm-layer-openstack-api",
+      "vcs": null,
+      "branch": "refs/heads/master",
       "commit": "34311a62e963d0ce903b7ddb9d70b8f071f71651"
     },
     {
-      "item": "octavia",
-      "vcs": null,
-      "url": null,
       "type": "layer",
-      "branch": "07f19fb8f2a76cf507ba2fd553861e97cf3b3149",
-      "commit": "07f19fb8f2a76cf507ba2fd553861e97cf3b3149"
+      "item": "octavia",
+      "url": null,
+      "vcs": null,
+      "branch": "refs/heads/stable/xena",
+      "commit": "refs/heads/stable/xena"
     },
     {
-      "item": "interface:tls-certificates",
-      "vcs": null,
-      "url": "https://github.com/juju-solutions/interface-tls-certificates",
       "type": "layer",
-      "branch": "d9850016d930a6d507b9fd45e2598d327922b140",
+      "item": "interface:tls-certificates",
+      "url": "https://github.com/juju-solutions/interface-tls-certificates",
+      "vcs": null,
+      "branch": "refs/heads/master",
       "commit": "d9850016d930a6d507b9fd45e2598d327922b140"
     },
     {
-      "item": "interface:mysql-shared",
-      "vcs": null,
-      "url": "https://github.com/openstack/charm-interface-mysql-shared",
       "type": "layer",
-      "branch": "06675c43c9f48ffa98b2abf2ddca137f8d18f31c",
-      "commit": "06675c43c9f48ffa98b2abf2ddca137f8d18f31c"
+      "item": "interface:mysql-shared",
+      "url": "https://github.com/openstack/charm-interface-mysql-shared",
+      "vcs": null,
+      "branch": "refs/heads/master",
+      "commit": "f90f8c6edce21e4da3a872f0f9d6761730ce025d"
     },
     {
-      "item": "interface:rabbitmq",
-      "vcs": null,
-      "url": "https://github.com/openstack/charm-interface-rabbitmq",
       "type": "layer",
-      "branch": "383121fc584d2d3bf9d233eba0d3708398a4c468",
+      "item": "interface:rabbitmq",
+      "url": "https://github.com/openstack/charm-interface-rabbitmq",
+      "vcs": null,
+      "branch": "refs/heads/master",
       "commit": "383121fc584d2d3bf9d233eba0d3708398a4c468"
     },
     {
+      "type": "layer",
       "item": "interface:keystone",
-      "vcs": null,
       "url": "https://github.com/openstack/charm-interface-keystone",
-      "type": "layer",
-      "branch": "a48a1e826ac0a74ab05a16c441cda4e4b34b1241",
-      "commit": "a48a1e826ac0a74ab05a16c441cda4e4b34b1241"
+      "vcs": null,
+      "branch": "refs/heads/master",
+      "commit": "501af18b3036f5af92990bc39e750e76e393e5eb"
     },
     {
+      "type": "layer",
       "item": "interface:hacluster",
-      "vcs": null,
       "url": "https://github.com/openstack/charm-interface-hacluster.git",
-      "type": "layer",
-      "branch": "8125a7baecccf9b0869e515b92300dde3a86f31b",
-      "commit": "8125a7baecccf9b0869e515b92300dde3a86f31b"
+      "vcs": null,
+      "branch": "refs/heads/master",
+      "commit": "2b714e90b1b8845ce7390bb1dad5a56a65437907"
     },
     {
-      "item": "interface:openstack-ha",
-      "vcs": null,
-      "url": "https://github.com/openstack/charm-interface-openstack-ha",
       "type": "layer",
-      "branch": "a3b00e5b5fd857d130698c5cfe4b918877f0ab80",
+      "item": "interface:openstack-ha",
+      "url": "https://github.com/openstack/charm-interface-openstack-ha",
+      "vcs": null,
+      "branch": "refs/heads/master",
       "commit": "a3b00e5b5fd857d130698c5cfe4b918877f0ab80"
     },
     {
+      "type": "layer",
       "item": "interface:neutron-load-balancer",
-      "vcs": null,
       "url": "https://github.com/openstack/charm-interface-neutron-load-balancer.git",
-      "type": "layer",
-      "branch": "94897d4743e56ec647fb81cccf2807b091123e21",
-      "commit": "94897d4743e56ec647fb81cccf2807b091123e21"
+      "vcs": null,
+      "branch": "refs/heads/master",
+      "commit": "232bf9bad4536ea20f26831b6a31b55b778315d9"
     },
     {
+      "type": "layer",
       "item": "interface:neutron-plugin",
-      "vcs": null,
       "url": "https://github.com/openstack/charm-interface-neutron-plugin",
-      "type": "layer",
-      "branch": "677f1a666ad8935c31fa5c0cb228c46aa5b80ea1",
-      "commit": "677f1a666ad8935c31fa5c0cb228c46aa5b80ea1"
+      "vcs": null,
+      "branch": "refs/heads/master",
+      "commit": "3fba729d3e2856a9cab4de71c1252388213b9844"
     },
     {
+      "type": "layer",
       "item": "interface:ovsdb-subordinate",
-      "vcs": null,
       "url": "https://opendev.org/x/charm-interface-ovsdb.git",
-      "type": "layer",
-      "branch": "55e82469e841aa2e9acac3a8940077ea8d42b150",
-      "commit": "55e82469e841aa2e9acac3a8940077ea8d42b150"
+      "vcs": null,
+      "branch": "6b52c09958ab7d1ec483e461682182c6b33ad639",
+      "commit": "6b52c09958ab7d1ec483e461682182c6b33ad639"
     },
     {
-      "item": "interface:ovsdb-cms",
-      "vcs": null,
-      "url": "https://opendev.org/x/charm-interface-ovsdb.git",
       "type": "layer",
-      "branch": "55e82469e841aa2e9acac3a8940077ea8d42b150",
-      "commit": "55e82469e841aa2e9acac3a8940077ea8d42b150"
+      "item": "interface:ovsdb-cms",
+      "url": "https://opendev.org/x/charm-interface-ovsdb.git",
+      "vcs": null,
+      "branch": "6b52c09958ab7d1ec483e461682182c6b33ad639",
+      "commit": "6b52c09958ab7d1ec483e461682182c6b33ad639"
     },
     {
       "type": "layer",
       "item": "interface:nrpe-external-master",
       "url": "https://github.com/canonical/nrpe-external-master-interface",
       "vcs": null,
-      "branch": "95d744d1dbc4d86fb0462283c9371619bf5bbc24",
+      "branch": "refs/heads/master",
       "commit": "95d744d1dbc4d86fb0462283c9371619bf5bbc24"
     },
     {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.versionedobjects",
-      "version": "1.37.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "jsonpointer",
-      "version": "2.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "wrapt",
-      "version": "1.13.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "setuptools_scm",
-      "version": "3.4.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "iso8601",
-      "version": "0.1.16"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "jsonpatch",
-      "version": "1.32"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.middleware",
-      "version": "3.38.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "pyaml",
-      "version": "21.10.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "idna",
-      "version": "2.10"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "osprofiler",
-      "version": "2.9.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "beautifulsoup4",
-      "version": "4.10.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "rfc3986",
-      "version": "1.5.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.db",
-      "version": "6.0.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "dogpile.cache",
-      "version": "0.9.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "tenacity",
-      "version": "7.0.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "testtools",
-      "version": "2.5.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "keystoneauth1",
-      "version": "4.1.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "jmespath",
-      "version": "0.10.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "WebTest",
-      "version": "2.0.35"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "sqlalchemy-migrate",
-      "version": "0.13.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "WebOb",
-      "version": "1.8.7"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "os-ken",
-      "version": "0.4.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.log",
-      "version": "3.45.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "simplejson",
-      "version": "3.17.5"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.config",
-      "version": "7.0.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "futurist",
-      "version": "1.10.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.concurrency",
-      "version": "3.31.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "vine",
-      "version": "1.3.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "neutron-lib",
-      "version": "1.31.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "certifi",
-      "version": "2021.10.8"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.serialization",
-      "version": "2.29.3"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "pyinotify",
-      "version": "0.9.6"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "testscenarios",
-      "version": "0.5.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "ovs",
-      "version": "2.13.3"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "Tempita",
-      "version": "0.5.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "sortedcontainers",
-      "version": "2.4.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "sqlparse",
-      "version": "0.4.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "pytz",
-      "version": "2021.3"
-    },
-    {
-      "vcs": "git",
-      "url": "git+https://github.com/openstack/charms.openstack.git",
-      "package": "charms.openstack",
-      "branch": "10627ee5f991c268f174d6d100e218a0e1867af1",
-      "version": "10627ee5f991c268f174d6d100e218a0e1867af1",
-      "type": "python_module"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "waitress",
-      "version": "1.4.4"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "psutil",
-      "version": "5.8.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "Babel",
-      "version": "2.9.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "cryptography",
-      "version": "2.3.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "pip",
-      "version": "18.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "PasteDeploy",
-      "version": "2.1.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "cliff",
-      "version": "3.1.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "osc-lib",
-      "version": "2.0.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "repoze.lru",
-      "version": "0.7"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "extras",
-      "version": "1.0.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "SQLAlchemy",
-      "version": "1.3.24"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "pyparsing",
-      "version": "2.4.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "pytest-runner",
-      "version": "5.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "testresources",
-      "version": "2.0.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "PyYAML",
-      "version": "5.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "MarkupSafe",
-      "version": "1.1.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "munch",
-      "version": "2.5.0"
-    },
-    {
-      "vcs": "git",
-      "url": "git+https://github.com/juju/charm-helpers.git",
-      "package": "charmhelpers",
-      "branch": "26efcd0da51d580f68ead2ca13c38f58766f8a14",
-      "version": "26efcd0da51d580f68ead2ca13c38f58766f8a14",
-      "type": "python_module"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.service",
-      "version": "1.41.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "pycparser",
-      "version": "2.20"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "setuptools",
-      "version": "41.6.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "kombu",
-      "version": "4.6.11"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "urllib3",
-      "version": "1.26.7"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "wcwidth",
-      "version": "0.2.5"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "python-dateutil",
-      "version": "2.8.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "alembic",
-      "version": "1.4.3"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "Paste",
-      "version": "3.5.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "python-editor",
-      "version": "1.0.4"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "os-client-config",
-      "version": "2.1.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "chardet",
-      "version": "4.0.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "fasteners",
-      "version": "0.16.3"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "charms.reactive",
-      "version": "1.4.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "toml",
-      "version": "0.10.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "requestsexceptions",
-      "version": "1.4.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "tinyrpc",
-      "version": "1.1.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.i18n",
-      "version": "3.25.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "cffi",
-      "version": "1.15.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "requests",
-      "version": "2.25.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "os-traits",
-      "version": "2.2.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "netaddr",
-      "version": "0.7.19"
-    },
-    {
-      "vcs": null,
       "type": "python_module",
       "package": "netifaces",
+      "vcs": null,
       "version": "0.11.0"
     },
     {
-      "vcs": null,
       "type": "python_module",
-      "package": "yappi",
-      "version": "1.3.3"
+      "package": "prometheus_client",
+      "vcs": null,
+      "version": "0.14.1"
     },
     {
-      "vcs": null,
       "type": "python_module",
-      "package": "pbr",
-      "version": "5.6.0"
+      "package": "oslo.service",
+      "vcs": null,
+      "version": "2.8.0"
     },
     {
-      "vcs": null,
       "type": "python_module",
-      "package": "openstacksdk",
-      "version": "0.47.0"
-    },
-    {
+      "package": "requestsexceptions",
       "vcs": null,
-      "type": "python_module",
-      "package": "amqp",
-      "version": "2.6.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "appdirs",
-      "version": "1.4.4"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "pyperclip",
-      "version": "1.8.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "zipp",
-      "version": "1.2.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "stevedore",
-      "version": "1.32.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "os-service-types",
-      "version": "1.7.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "decorator",
-      "version": "5.1.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "debtcollector",
-      "version": "1.22.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "python-keystoneclient",
-      "version": "3.22.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "Mako",
-      "version": "1.1.5"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "statsd",
-      "version": "3.3.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "pecan",
       "version": "1.4.0"
     },
     {
-      "vcs": null,
-      "type": "python_module",
-      "package": "fixtures",
-      "version": "3.0.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.utils",
-      "version": "3.42.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "dnspython",
-      "version": "1.16.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "eventlet",
-      "version": "0.32.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "soupsieve",
-      "version": "2.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "importlib_metadata",
-      "version": "2.1.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "python-neutronclient",
-      "version": "7.1.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "Routes",
-      "version": "2.5.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "setproctitle",
-      "version": "1.1.10"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "prettytable",
-      "version": "0.7.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "python-novaclient",
-      "version": "16.0.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "Jinja2",
-      "version": "2.10.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.messaging",
-      "version": "10.5.0"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "greenlet",
-      "version": "1.1.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.policy",
-      "version": "2.4.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "cachetools",
-      "version": "4.2.1"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "wheel",
-      "version": "0.33.6"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
-      "package": "oslo.context",
-      "version": "2.23.1"
-    },
-    {
-      "vcs": null,
       "type": "python_module",
       "package": "msgpack",
+      "vcs": null,
+      "version": "1.0.3"
+    },
+    {
+      "type": "python_module",
+      "package": "packaging",
+      "vcs": null,
+      "version": "21.3"
+    },
+    {
+      "type": "python_module",
+      "package": "testscenarios",
+      "vcs": null,
+      "version": "0.5.0"
+    },
+    {
+      "type": "python_module",
+      "package": "os-traits",
+      "vcs": null,
+      "version": "2.7.0"
+    },
+    {
+      "type": "python_module",
+      "package": "cliff",
+      "vcs": null,
+      "version": "3.8.0"
+    },
+    {
+      "type": "python_module",
+      "package": "fasteners",
+      "vcs": null,
+      "version": "0.17.3"
+    },
+    {
+      "type": "python_module",
+      "package": "repoze.lru",
+      "vcs": null,
+      "version": "0.7"
+    },
+    {
+      "type": "python_module",
+      "package": "cffi",
+      "vcs": null,
+      "version": "1.15.0"
+    },
+    {
+      "type": "python_module",
+      "package": "alembic",
+      "vcs": null,
+      "version": "1.7.7"
+    },
+    {
+      "type": "python_module",
+      "package": "Tempita",
+      "vcs": null,
+      "version": "0.4"
+    },
+    {
+      "type": "python_module",
+      "package": "python-neutronclient",
+      "vcs": null,
+      "version": "7.8.0"
+    },
+    {
+      "type": "python_module",
+      "package": "yappi",
+      "vcs": null,
+      "version": "1.3.3"
+    },
+    {
+      "type": "python_module",
+      "package": "rfc3986",
+      "vcs": null,
+      "version": "2.0.0"
+    },
+    {
+      "type": "python_module",
+      "package": "osc-lib",
+      "vcs": null,
+      "version": "2.5.0"
+    },
+    {
+      "type": "python_module",
+      "package": "wheel",
+      "vcs": null,
+      "version": "0.37.1"
+    },
+    {
+      "type": "python_module",
+      "package": "requests",
+      "vcs": null,
+      "version": "2.27.1"
+    },
+    {
+      "type": "python_module",
+      "package": "iso8601",
+      "vcs": null,
       "version": "1.0.2"
     },
     {
-      "vcs": null,
       "type": "python_module",
-      "package": "cmd2",
-      "version": "0.8.9"
+      "package": "oslo.serialization",
+      "vcs": null,
+      "version": "4.3.0"
     },
     {
+      "type": "python_module",
+      "package": "bcrypt",
       "vcs": null,
+      "version": "3.2.2"
+    },
+    {
+      "type": "python_module",
+      "package": "dogpile.cache",
+      "vcs": null,
+      "version": "1.1.5"
+    },
+    {
+      "type": "python_module",
+      "package": "pyaml",
+      "vcs": null,
+      "version": "21.10.1"
+    },
+    {
+      "type": "python_module",
+      "package": "extras",
+      "vcs": null,
+      "version": "1.0.0"
+    },
+    {
+      "type": "python_module",
+      "package": "pyinotify",
+      "vcs": null,
+      "version": "0.9.6"
+    },
+    {
+      "type": "python_module",
+      "package": "sortedcontainers",
+      "vcs": null,
+      "version": "2.4.0"
+    },
+    {
+      "type": "python_module",
+      "package": "importlib_metadata",
+      "vcs": null,
+      "version": "3.0.0"
+    },
+    {
+      "type": "python_module",
+      "package": "eventlet",
+      "vcs": null,
+      "version": "0.33.1"
+    },
+    {
+      "type": "python_module",
+      "package": "cachetools",
+      "vcs": null,
+      "version": "4.2.1"
+    },
+    {
+      "type": "python_module",
+      "package": "charms.reactive",
+      "vcs": null,
+      "version": "1.5.0"
+    },
+    {
+      "type": "python_module",
+      "package": "Jinja2",
+      "vcs": null,
+      "version": "3.1.2"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.versionedobjects",
+      "vcs": null,
+      "version": "2.6.0"
+    },
+    {
+      "type": "python_module",
+      "package": "colorama",
+      "vcs": null,
+      "version": "0.4.4"
+    },
+    {
+      "type": "python_module",
+      "package": "kombu",
+      "vcs": null,
+      "version": "5.2.4"
+    },
+    {
       "type": "python_module",
       "package": "logutils",
+      "vcs": null,
       "version": "0.3.5"
     },
     {
+      "type": "python_module",
+      "package": "Paste",
       "vcs": null,
+      "version": "3.5.0"
+    },
+    {
+      "type": "python_module",
+      "package": "Routes",
+      "vcs": null,
+      "version": "2.5.1"
+    },
+    {
+      "type": "python_module",
+      "package": "pytz",
+      "vcs": null,
+      "version": "2022.1"
+    },
+    {
+      "type": "python_module",
+      "package": "Mako",
+      "vcs": null,
+      "version": "1.1.6"
+    },
+    {
+      "type": "python_module",
+      "package": "statsd",
+      "vcs": null,
+      "version": "3.3.0"
+    },
+    {
+      "type": "python_module",
+      "package": "greenlet",
+      "vcs": null,
+      "version": "1.1.2"
+    },
+    {
+      "type": "python_module",
+      "package": "decorator",
+      "vcs": null,
+      "version": "5.1.1"
+    },
+    {
+      "type": "python_module",
+      "package": "toml",
+      "vcs": null,
+      "version": "0.10.2"
+    },
+    {
+      "type": "python_module",
+      "package": "osprofiler",
+      "vcs": null,
+      "version": "3.4.3"
+    },
+    {
+      "type": "python_module",
+      "package": "wrapt",
+      "vcs": null,
+      "version": "1.14.1"
+    },
+    {
+      "type": "python_module",
+      "package": "idna",
+      "vcs": null,
+      "version": "3.3"
+    },
+    {
+      "type": "python_module",
+      "package": "attrs",
+      "vcs": null,
+      "version": "21.4.0"
+    },
+    {
+      "type": "python_module",
+      "package": "waitress",
+      "vcs": null,
+      "version": "2.1.1"
+    },
+    {
+      "type": "python_module",
+      "package": "netaddr",
+      "vcs": null,
+      "version": "0.7.19"
+    },
+    {
+      "type": "python_module",
+      "package": "testtools",
+      "vcs": null,
+      "version": "2.5.0"
+    },
+    {
+      "type": "python_module",
+      "package": "prettytable",
+      "vcs": null,
+      "version": "3.3.0"
+    },
+    {
+      "type": "python_module",
+      "package": "setproctitle",
+      "vcs": null,
+      "version": "1.2.3"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.i18n",
+      "vcs": null,
+      "version": "5.1.0"
+    },
+    {
+      "type": "python_module",
+      "package": "pip",
+      "vcs": null,
+      "version": "22.0.4"
+    },
+    {
+      "type": "python_module",
+      "package": "jsonpointer",
+      "vcs": null,
+      "version": "2.3"
+    },
+    {
+      "type": "python_module",
+      "package": "fixtures",
+      "vcs": null,
+      "version": "4.0.0"
+    },
+    {
+      "type": "python_module",
+      "package": "vine",
+      "vcs": null,
+      "version": "5.0.0"
+    },
+    {
+      "type": "python_module",
+      "package": "certifi",
+      "vcs": null,
+      "version": "2021.10.8"
+    },
+    {
+      "type": "python_module",
+      "package": "munch",
+      "vcs": null,
+      "version": "2.5.0"
+    },
+    {
+      "type": "python_module",
+      "package": "flit_core",
+      "vcs": null,
+      "version": "3.7.1"
+    },
+    {
+      "type": "python_module",
+      "package": "ovs",
+      "vcs": null,
+      "version": "2.17.1.post1"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.metrics",
+      "vcs": null,
+      "version": "0.4.0"
+    },
+    {
+      "type": "python_module",
+      "package": "wcwidth",
+      "vcs": null,
+      "version": "0.2.5"
+    },
+    {
+      "type": "python_module",
+      "package": "python-novaclient",
+      "vcs": null,
+      "version": "17.7.0"
+    },
+    {
+      "type": "python_module",
+      "package": "pytest-runner",
+      "vcs": null,
+      "version": "5.2"
+    },
+    {
+      "type": "python_module",
+      "package": "pyperclip",
+      "vcs": null,
+      "version": "1.8.2"
+    },
+    {
+      "type": "python_module",
+      "package": "os-service-types",
+      "vcs": null,
+      "version": "1.7.0"
+    },
+    {
+      "type": "python_module",
+      "package": "amqp",
+      "vcs": null,
+      "version": "5.1.1"
+    },
+    {
+      "type": "python_module",
+      "package": "psutil",
+      "vcs": null,
+      "version": "5.9.0"
+    },
+    {
+      "type": "python_module",
+      "package": "keystoneauth1",
+      "vcs": null,
+      "version": "4.5.0"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.concurrency",
+      "vcs": null,
+      "version": "4.5.1"
+    },
+    {
+      "type": "python_module",
+      "package": "os-ken",
+      "vcs": null,
+      "version": "2.3.1"
+    },
+    {
+      "type": "python_module",
+      "package": "importlib_resources",
+      "vcs": null,
+      "version": "4.0.0"
+    },
+    {
+      "type": "python_module",
+      "package": "PasteDeploy",
+      "vcs": null,
+      "version": "2.1.1"
+    },
+    {
+      "type": "python_module",
+      "package": "zipp",
+      "vcs": null,
+      "version": "1.2.0"
+    },
+    {
+      "type": "python_module",
+      "package": "PyYAML",
+      "vcs": null,
+      "version": "5.3.1"
+    },
+    {
+      "type": "python_module",
+      "package": "debtcollector",
+      "vcs": null,
+      "version": "2.5.0"
+    },
+    {
+      "type": "python_module",
+      "package": "WebOb",
+      "vcs": null,
+      "version": "1.8.7"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.messaging",
+      "vcs": null,
+      "version": "12.14.0"
+    },
+    {
+      "type": "python_module",
+      "package": "setuptools_scm",
+      "vcs": null,
+      "version": "3.4.1"
+    },
+    {
+      "type": "python_module",
+      "package": "neutron-lib",
+      "vcs": null,
+      "version": "2.21.0"
+    },
+    {
+      "type": "python_module",
+      "package": "setuptools",
+      "vcs": null,
+      "version": "62.1.0"
+    },
+    {
+      "type": "python_module",
+      "package": "pbr",
+      "vcs": null,
+      "version": "5.9.0"
+    },
+    {
+      "type": "python_module",
+      "package": "simplejson",
+      "vcs": null,
+      "version": "3.17.6"
+    },
+    {
+      "type": "python_module",
+      "package": "stevedore",
+      "vcs": null,
+      "version": "3.5.0"
+    },
+    {
+      "type": "python_module",
+      "package": "WebTest",
+      "vcs": null,
+      "version": "3.0.0"
+    },
+    {
       "type": "python_module",
       "package": "six",
+      "vcs": null,
       "version": "1.16.0"
+    },
+    {
+      "type": "python_module",
+      "package": "poetry-core",
+      "vcs": null,
+      "version": "1.0.8"
+    },
+    {
+      "type": "python_module",
+      "package": "jsonpatch",
+      "vcs": null,
+      "version": "1.32"
+    },
+    {
+      "type": "python_module",
+      "package": "soupsieve",
+      "vcs": null,
+      "version": "2.1"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.db",
+      "vcs": null,
+      "version": "11.3.0"
+    },
+    {
+      "type": "python_module",
+      "package": "charms.openstack",
+      "url": "git+https://github.com/openstack/charms.openstack.git",
+      "branch": "refs/heads/stable/xena",
+      "version": "efd2fa19678d0e26878d80227d9d1f68abea6496",
+      "vcs": "git"
+    },
+    {
+      "type": "python_module",
+      "package": "sqlparse",
+      "vcs": null,
+      "version": "0.4.2"
+    },
+    {
+      "type": "python_module",
+      "package": "dnspython",
+      "vcs": null,
+      "version": "1.16.0"
+    },
+    {
+      "type": "python_module",
+      "package": "python-dateutil",
+      "vcs": null,
+      "version": "2.8.2"
+    },
+    {
+      "type": "python_module",
+      "package": "charmhelpers",
+      "url": "git+https://github.com/juju/charm-helpers.git",
+      "branch": "refs/heads/stable/xena",
+      "version": "d2b093b715ff0a328e548265a82119562ce6c5e2",
+      "vcs": "git"
+    },
+    {
+      "type": "python_module",
+      "package": "pyparsing",
+      "vcs": null,
+      "version": "2.4.2"
+    },
+    {
+      "type": "python_module",
+      "package": "tenacity",
+      "vcs": null,
+      "version": "8.0.1"
+    },
+    {
+      "type": "python_module",
+      "package": "pycparser",
+      "vcs": null,
+      "version": "2.21"
+    },
+    {
+      "type": "python_module",
+      "package": "openstacksdk",
+      "vcs": null,
+      "version": "0.61.0"
+    },
+    {
+      "type": "python_module",
+      "package": "sqlalchemy-migrate",
+      "vcs": null,
+      "version": "0.13.0"
+    },
+    {
+      "type": "python_module",
+      "package": "beautifulsoup4",
+      "vcs": null,
+      "version": "4.11.1"
+    },
+    {
+      "type": "python_module",
+      "package": "pecan",
+      "vcs": null,
+      "version": "1.4.1"
+    },
+    {
+      "type": "python_module",
+      "package": "cryptography",
+      "vcs": null,
+      "version": "3.3.2"
+    },
+    {
+      "type": "python_module",
+      "package": "cmd2",
+      "vcs": null,
+      "version": "1.4.0"
+    },
+    {
+      "type": "python_module",
+      "package": "python-keystoneclient",
+      "vcs": null,
+      "version": "4.4.0"
+    },
+    {
+      "type": "python_module",
+      "package": "os-client-config",
+      "vcs": null,
+      "version": "2.1.0"
+    },
+    {
+      "type": "python_module",
+      "package": "charset-normalizer",
+      "vcs": null,
+      "version": "2.0.12"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.context",
+      "vcs": null,
+      "version": "4.1.0"
+    },
+    {
+      "type": "python_module",
+      "package": "jmespath",
+      "vcs": null,
+      "version": "1.0.0"
+    },
+    {
+      "type": "python_module",
+      "package": "testresources",
+      "vcs": null,
+      "version": "2.0.1"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.config",
+      "vcs": null,
+      "version": "8.8.0"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.policy",
+      "vcs": null,
+      "version": "3.12.1"
+    },
+    {
+      "type": "python_module",
+      "package": "SQLAlchemy",
+      "vcs": null,
+      "version": "1.4.36"
+    },
+    {
+      "type": "python_module",
+      "package": "urllib3",
+      "vcs": null,
+      "version": "1.26.9"
+    },
+    {
+      "type": "python_module",
+      "package": "futurist",
+      "vcs": null,
+      "version": "2.4.1"
+    },
+    {
+      "type": "python_module",
+      "package": "MarkupSafe",
+      "vcs": null,
+      "version": "2.1.1"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.utils",
+      "vcs": null,
+      "version": "4.13.0"
+    },
+    {
+      "type": "python_module",
+      "package": "appdirs",
+      "vcs": null,
+      "version": "1.4.4"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.log",
+      "vcs": null,
+      "version": "4.8.0"
+    },
+    {
+      "type": "python_module",
+      "package": "oslo.middleware",
+      "vcs": null,
+      "version": "4.5.1"
     }
   ]
 }

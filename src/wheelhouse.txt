@@ -9,13 +9,27 @@ python-novaclient
 python-neutronclient
 # REMOVEME -- fix for https://github.com/pyparsing/pyparsing/issues/164
 pyparsing==2.4.2
+poetry-core
 neutron_lib
+# neutron-lib indirectly requires Tempits (neutron-lib -> oslo.db -> sqlalchemy-migrate -> Tempita)
+# and Tempita is incompatible with setuptools 58+
+Tempita<0.5
 pytest-runner
 # python-zipp 2.x introduces a requirement for setuptools 42.x which is not available.
 # resolve conflict:
 # layer-basic requires setuptools<42, zipp>=2.0.0 requires setuptools>42
 # LP: #1862186
-zipp < 2.0.0
+zipp<2.0.0
+# Mako, importlib_metadata, importlib_resources, cmd2, pytest-runner, soupsieve, cliff all pinned
+# for compat with setuptools<42
+importlib_metadata<3.1.0
+importlib_resources<4.1.0
+cmd2<1.5.0
+pytest-runner<5.3.0
+soupsieve<2.2
+Mako<1.2.0
+cliff<3.9.0  # cliff 3.9 includes dep on autopage which is dep on setuptools>42
+
 tenacity
 # cryptography 3.4 introduces a requirement for rust code in the module.  As it has to be compiled
 # on the machine during install, this breaks installs.  Instead pin to <3.4 until a solution can be
@@ -23,6 +37,6 @@ tenacity
 # LP: #1915171
 cryptography<3.4
 
-git+https://github.com/openstack/charms.openstack.git@stable/21.10#egg=charms.openstack
+git+https://github.com/openstack/charms.openstack.git@stable/xena#egg=charms.openstack
 
-git+https://github.com/juju/charm-helpers.git@stable/21.10#egg=charmhelpers
+git+https://github.com/juju/charm-helpers.git@stable/xena#egg=charmhelpers

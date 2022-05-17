@@ -1,35 +1,16 @@
 charm_name: octavia
 
 gate_bundles:
-- bionic-rocky-ha
-- bionic-stein-ha
-- bionic-train-ha-ovn
-- bionic-train-ha
-- bionic-ussuri-ha-ovn
-- bionic-ussuri-ha
-- focal-ussuri-ha-ovn
-- focal-ussuri-ha
 - focal-victoria-ha-ovn
 - focal-victoria-ha
 - no-amphora: focal-victoria-no-amphora
 - focal-wallaby-ha-ovn
 - focal-wallaby-ha
-- groovy-victoria-ha-ovn
-- groovy-victoria-ha
-- hirsute-wallaby-ha-ovn
-- hirsute-wallaby-ha
 
 smoke_bundles:
-- focal-ussuri-ha-ovn
-- focal-ussuri-ha
+- focal-wallaby-ha
 
-dev_bundles:
-- bionic-rocky-ha
-- bionic-rocky-lxd
-- focal-xena-ha-ovn
-- focal-xena-ha
-- impish-xena-ha-ovn
-- impish-xena-ha
+dev_bundles: []
 
 comment: |
   The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
@@ -88,8 +69,4 @@ tests:
 tests_options:
   policyd:
     service: octavia
-  force_deploy:
-    - groovy-victoria-ha-ovn
-    - groovy-victoria-ha
-    - impish-xena-ha-ovn
-    - impish-xena-ha
+  force_deploy: []

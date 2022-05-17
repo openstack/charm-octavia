@@ -90,36 +90,46 @@ relations:
 - ["vault-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 applications:
   glance:
-    charm: cs:~openstack-charmers/glance
+    charm: ch:glance
     num_units: 1
     options:
       openstack-origin: *openstack-origin
+    channel: wallaby/edge
   keystone:
-    charm: cs:~openstack-charmers/keystone
+    charm: ch:keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
+    channel: wallaby/edge
   octavia-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0/edge
   keystone-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0/edge
   nova-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0/edge
   glance-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0/edge
   neutron-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0/edge
   placement-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0/edge
   vault-mysql-router:
-    charm: cs:~openstack-charmers/mysql-router
+    charm: ch:mysql-router
+    channel: 8.0/edge
   mysql-innodb-cluster:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers/mysql-innodb-cluster
+    charm: ch:mysql-innodb-cluster
     num_units: 3
+    channel: 8.0/edge
   neutron-api:
     constraints: cores=4
-    charm: cs:~openstack-charmers/neutron-api
+    charm: ch:neutron-api
     num_units: 1
     options:
       openstack-origin: *openstack-origin
@@ -127,52 +137,62 @@ applications:
       flat-network-providers: physnet1
       enable-ml2-port-security: True
       neutron-security-groups: True
+    channel: wallaby/edge
   nova-cloud-controller:
     constraints: mem=7168M
-    charm: cs:~openstack-charmers/nova-cloud-controller
+    charm: ch:nova-cloud-controller
     num_units: 1
     options:
       openstack-origin: *openstack-origin
       debug: True
       network-manager: Neutron
+    channel: wallaby/edge
   nova-compute:
     constraints: mem=7168M
-    charm: cs:~openstack-charmers/nova-compute
+    charm: ch:nova-compute
     num_units: 2
     options:
       openstack-origin: *openstack-origin
       debug: True
+    channel: wallaby/edge
   ovn-chassis-octavia:
-    charm: cs:~openstack-charmers/ovn-chassis
+    charm: ch:ovn-chassis
+    channel: latest/edge
   octavia:
     constraints: cores=8
     series: *series
-    charm: ../../../octavia
+    charm: ../../../octavia.charm
     num_units: 1
     options:
       openstack-origin: *openstack-origin
       debug: True
       enable-amphora: False
   rabbitmq-server:
-    charm: cs:~openstack-charmers/rabbitmq-server
+    charm: ch:rabbitmq-server
     num_units: 1
+    channel: 3.8/edge
   placement:
-    charm: cs:~openstack-charmers/placement
+    charm: ch:placement
     num_units: 1
     constraints: mem=1G
     options:
       openstack-origin: *openstack-origin
       debug: true
+    channel: wallaby/edge
   neutron-api-plugin-ovn:
-    charm: cs:~openstack-charmers/neutron-api-plugin-ovn
+    charm: ch:neutron-api-plugin-ovn
+    channel: wallaby/edge
   ovn-central:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers/ovn-central
+    charm: ch:ovn-central
     num_units: 3
     options:
       source: *openstack-origin
+    channel: latest/edge
   ovn-chassis:
-    charm: cs:~openstack-charmers/ovn-chassis
+    charm: ch:ovn-chassis
+    channel: latest/edge
   vault:
-    charm: cs:~openstack-charmers/vault
+    charm: ch:vault
     num_units: 1
+    channel: 1.7/edge

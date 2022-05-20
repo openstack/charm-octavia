@@ -351,12 +351,6 @@
     {
       "vcs": null,
       "type": "python_module",
-      "package": "Tempita",
-      "version": "0.5.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
       "package": "sortedcontainers",
       "version": "2.4.0"
     },
@@ -486,8 +480,8 @@
       "vcs": "git",
       "url": "git+https://github.com/juju/charm-helpers.git",
       "package": "charmhelpers",
-      "branch": "26efcd0da51d580f68ead2ca13c38f58766f8a14",
-      "version": "26efcd0da51d580f68ead2ca13c38f58766f8a14",
+      "branch": "a99a667d343ab3c11074d8bc8c6d8b5d638f73b7",
+      "version": "a99a667d343ab3c11074d8bc8c6d8b5d638f73b7",
       "type": "python_module"
     },
     {

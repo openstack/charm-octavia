@@ -18,8 +18,8 @@ description: |
 tags:
 - openstack
 series:
-- focal
 - jammy
+- kinetic
 subordinate: false
 provides:
   nrpe-external-master:

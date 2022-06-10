@@ -1,17 +1,19 @@
 charm_name: octavia
 
 gate_bundles:
-- focal-xena-ha-ovn
-- focal-xena-ha
-
-smoke_bundles:
-- focal-xena-ha
-
-dev_bundles:
-- focal-yoga-ha-ovn
-- focal-yoga-ha
 - jammy-yoga-ha-ovn
 - jammy-yoga-ha
+
+smoke_bundles:
+- jammy-yoga-ha
+
+dev_bundles:
+- jammy-yoga-ha-ovn
+- jammy-yoga-ha
+- jammy-zed-ha-ovn
+- jammy-zed-ha
+- kinetic-zed-ha-ovn
+- kinetic-zed-ha
 
 
 comment: |
@@ -72,5 +74,5 @@ tests_options:
   policyd:
     service: octavia
   force_deploy:
-    - jammy-yoga-ha-ovn
-    - jammy-yoga-ha
+    - kinetic-zed-ha-ovn
+    - kinetic-zed-ha

@@ -1,9 +1,9 @@
 variables:
-  openstack-origin: &openstack-origin cloud:focal-yoga
+  openstack-origin: &openstack-origin distro
 
-local_overlay_enabled: False
+local_overlay_enabled: True
 
-series: &series focal
+series: &series kinetic
 relations:
 - - glance:image-service
   - nova-cloud-controller:image-service
@@ -97,39 +97,39 @@ applications:
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: yoga/edge
+    channel: latest/edge
   keystone:
     charm: ch:keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: yoga/edge
+    channel: latest/edge
   octavia-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: latest/edge
   keystone-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: latest/edge
   nova-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: latest/edge
   glance-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: latest/edge
   neutron-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: latest/edge
   placement-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: latest/edge
   vault-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: latest/edge
   mysql-innodb-cluster:
     constraints: mem=3072M
     charm: ch:mysql-innodb-cluster
     num_units: 3
-    channel: 8.0.19/edge
+    channel: latest/edge
   neutron-api:
     charm: ch:neutron-api
     num_units: 1
@@ -141,7 +141,7 @@ applications:
       neutron-security-groups: True
       enable-dvr: True
       manage-neutron-plugin-legacy-mode: True
-    channel: yoga/edge
+    channel: latest/edge
   neutron-openvswitch:
     series: *series
     charm: ch:neutron-openvswitch
@@ -153,7 +153,7 @@ applications:
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
       bridge-mappings: physnet1:br-ex
-    channel: yoga/edge
+    channel: latest/edge
   neutron-openvswitch-octavia:
     series: *series
     charm: ch:neutron-openvswitch
@@ -162,7 +162,7 @@ applications:
       debug: True
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
-    channel: yoga/edge
+    channel: latest/edge
   nova-cloud-controller:
     constraints: mem=7168M
     charm: ch:nova-cloud-controller
@@ -171,7 +171,7 @@ applications:
       openstack-origin: *openstack-origin
       debug: True
       network-manager: Neutron
-    channel: yoga/edge
+    channel: latest/edge
   nova-compute:
     constraints: mem=7168M
     charm: ch:nova-compute
@@ -179,15 +179,15 @@ applications:
     options:
       openstack-origin: *openstack-origin
       debug: True
-    channel: yoga/edge
+    channel: latest/edge
   hacluster-octavia:
     charm: ch:hacluster
     num_units: 0
-    channel: 2.0.3/edge
+    channel: latest/edge
   octavia:
     constraints: cores=8
     series: *series
-    charm: ../../../octavia_ubuntu-20.04-amd64.charm
+    charm: ../../../octavia_ubuntu-22.04-amd64_ubuntu-22.10-amd64.charm
     num_units: 3
     options:
       openstack-origin: *openstack-origin
@@ -197,7 +197,7 @@ applications:
   rabbitmq-server:
     charm: ch:rabbitmq-server
     num_units: 1
-    channel: 3.8/edge
+    channel: latest/edge
   glance-simplestreams-sync:
     charm: ch:glance-simplestreams-sync
     num_units: 1
@@ -207,17 +207,16 @@ applications:
                       name_prefix: 'ubuntu:released',
                       path: 'streams/v1/index.sjson', max: 1,
                       item_filters: [
-                        'release~(focal)',
+                        'release~(kinetic)',
                         'arch~(x86_64|amd64)',
                         'ftype~(disk1.img|disk.img)']}]"
-    channel: yoga/edge
+    channel: latest/edge
   octavia-diskimage-retrofit:
     charm: ch:octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: *series
-      retrofit-uca-pocket: yoga
-    channel: yoga/edge
+    channel: latest/edge
   placement:
     charm: ch:placement
     num_units: 1
@@ -225,8 +224,8 @@ applications:
     options:
       openstack-origin: *openstack-origin
       debug: true
-    channel: yoga/edge
+    channel: latest/edge
   vault:
     charm: ch:vault
     num_units: 1
-    channel: 1.7/edge
+    channel: latest/edge

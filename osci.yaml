@@ -1,18 +1,17 @@
 - project:
     templates:
-      - charm-unit-jobs-py38
       - charm-unit-jobs-py310
     check:
       jobs:
-      - focal-xena-ha
-      - focal-xena-ha-ovn
-      - focal-yoga-ha:
+      - jammy-yoga-ha
+      - jammy-yoga-ha-ovn
+      - jammy-zed-ha:
           voting: false
-      - focal-yoga-ha-ovn:
+      - jammy-zed-ha-ovn:
           voting: false
-      - jammy-yoga-ha:
+      - kinetic-zed-ha:
           voting: false
-      - jammy-yoga-ha-ovn:
+      - kinetic-zed:
           voting: false
     vars:
       needs_charm_build: true
@@ -21,46 +20,47 @@
       charmcraft_channel: 2.0/stable
 
 - job:
-    name: focal-xena-ha
+    name: jammy-yoga-ha
     parent: func-target
     dependencies:
       - osci-lint
-      - tox-py38
+      - name: tox-py310
+        soft: true
       - charm-build
     vars:
-      tox_extra_args: focal-xena-ha
-- job:
-    name: focal-xena-ha-ovn
-    parent: func-target
-    dependencies:
-      - focal-xena-ha
-    vars:
-      tox_extra_args: focal-xena-ha-ovn
-- job:
-    name: focal-yoga-ha
-    parent: func-target
-    dependencies:
-      - focal-xena-ha
-    vars:
-      tox_extra_args: focal-yoga-ha
-- job:
-    name: focal-yoga-ha-ovn
-    parent: func-target
-    dependencies:
-      - focal-xena-ha
-    vars:
-      tox_extra_args: focal-yoga-ha-ovn
+      tox_extra_args: jammy-yoga-ha
 - job:
     name: jammy-yoga-ha-ovn
     parent: func-target
     dependencies:
-      - focal-xena-ha
+      - jammy-yoga-ha
     vars:
       tox_extra_args: jammy-yoga-ha-ovn
 - job:
-    name: jammy-yoga-ha
+    name: jammy-zed-ha
     parent: func-target
     dependencies:
-      - focal-xena-ha
+      - jammy-yoga-ha
     vars:
-      tox_extra_args: jammy-yoga-ha
+      tox_extra_args: jammy-zed-ha
+- job:
+    name: jammy-zed-ha-ovn
+    parent: func-target
+    dependencies:
+      - jammy-yoga-ha
+    vars:
+      tox_extra_args: jammy-zed-ha-ovn
+- job:
+    name: kinetic-zed-ha
+    parent: func-target
+    dependencies:
+      - jammy-yoga-ha
+    vars:
+      tox_extra_args: kinetic-zed-ha
+- job:
+    name: kinetic-zed-ha-ovn
+    parent: func-target
+    dependencies:
+      - jammy-yoga-ha
+    vars:
+      tox_extra_args: kinetic-zed-ha-ovn

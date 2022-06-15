@@ -109,37 +109,37 @@ applications:
   octavia-mysql-router:
     series: *series
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   keystone-mysql-router:
     series: *series
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   nova-mysql-router:
     series: *series
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   glance-mysql-router:
     series: *series
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   neutron-mysql-router:
     series: *series
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   placement-mysql-router:
     series: *series
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   vault-mysql-router:
     series: *series
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   mysql-innodb-cluster:
     series: *series
     constraints: mem=3072M
     charm: ch:mysql-innodb-cluster
     num_units: 3
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   neutron-api:
     series: *series
     charm: ch:neutron-api
@@ -197,7 +197,7 @@ applications:
     series: *series
     charm: ch:hacluster
     num_units: 0
-    channel: 2.0.3/edge
+    channel: 2.4/edge
   octavia:
     constraints: cores=8
     series: *series
@@ -212,7 +212,7 @@ applications:
     series: *series
     charm: ch:rabbitmq-server
     num_units: 1
-    channel: 3.8/edge
+    channel: 3.9/edge
   glance-simplestreams-sync:
     series: *series
     charm: ch:glance-simplestreams-sync

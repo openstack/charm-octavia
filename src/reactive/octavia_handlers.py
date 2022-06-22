@@ -220,6 +220,7 @@ def render(*args):
                 'ovsdb-cms.available',
             ))
         octavia_charm.configure_ssl()
+        octavia_charm.upgrade_if_available(args)
         octavia_charm.enable_webserver_site()
         octavia_charm.assess_status()
     reactive.set_state('config.rendered')

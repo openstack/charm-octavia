@@ -351,12 +351,6 @@
     {
       "vcs": null,
       "type": "python_module",
-      "package": "Tempita",
-      "version": "0.5.2"
-    },
-    {
-      "vcs": null,
-      "type": "python_module",
       "package": "sortedcontainers",
       "version": "2.4.0"
     },
@@ -376,7 +370,7 @@
       "vcs": "git",
       "url": "git+https://github.com/openstack/charms.openstack.git",
       "package": "charms.openstack",
-      "branch": "10627ee5f991c268f174d6d100e218a0e1867af1",
+      "branch": "stable/train",
       "version": "10627ee5f991c268f174d6d100e218a0e1867af1",
       "type": "python_module"
     },
@@ -486,8 +480,8 @@
       "vcs": "git",
       "url": "git+https://github.com/juju/charm-helpers.git",
       "package": "charmhelpers",
-      "branch": "26efcd0da51d580f68ead2ca13c38f58766f8a14",
-      "version": "26efcd0da51d580f68ead2ca13c38f58766f8a14",
+      "branch": "stable/train",
+      "version": "13fc2babe1999df87aaf149c549d8140289837a3",
       "type": "python_module"
     },
     {

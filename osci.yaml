@@ -1,171 +1,37 @@
 - project:
     templates:
-      - charm-unit-jobs
+      - charm-unit-jobs-py36
     check:
       jobs:
-      - charm-build
+      - bionic-rocky-ha
       - bionic-stein-ha
-      - bionic-train-ha-ovn
       - bionic-train-ha
-      - bionic-ussuri-ha-ovn
-      - bionic-ussuri-ha
-      - focal-ussuri-ha-ovn
-      - focal-ussuri-ha
-      - focal-victoria-ha-ovn
-      - focal-victoria-ha
-      - focal-victoria-no-amphora
-      - groovy-victoria-ha-ovn
-      - groovy-victoria-ha
-      # LP: #1913024 is fixed for bionic and focal, but not for hirsute/wallaby
-      - focal-wallaby-ha-ovn:
-          voting: false
-      - focal-wallaby-ha
-      - focal-xena-ha:
-          voting: false
-      - focal-xena-ha-ovn:
-          voting: false
-      # LP: #1913024 is fixed for bionic and focal, but not for hirsute/wallaby
-      - hirsute-wallaby-ha-ovn:
-         voting: false
-      - hirsute-wallaby-ha
-      - impish-xena-ha:
-          voting: false
-      - impish-xena-ha-ovn:
-          voting: false
     vars:
       needs_charm_build: true
       charm_build_name: octavia
+      build_type: charmcraft
 
+- job:
+    name: bionic-rocky-ha
+    parent: func-target
+    dependencies:
+      - charm-build
+      - osci-lint
+      - tox-py36
+    vars:
+      tox_extra_args: bionic-rocky-ha
 - job:
     name: bionic-stein-ha
     parent: func-target
-    dependencies: &smoke-jobs
-        - bionic-train-ha-ovn
-        - bionic-ussuri-ha-ovn
-        - focal-ussuri-ha-ovn
-        - focal-victoria-ha-ovn
-        - groovy-victoria-ha-ovn
-        # - focal-wallaby-ha-ovn
-        # - hirsute-wallaby-ha-ovn
+    dependencies:
+      - bionic-rocky-ha
     vars:
       tox_extra_args: bionic-stein-ha
-- job:
-    name: bionic-train-ha-ovn
-    parent: func-target
-    dependencies: &lint-jobs
-        - osci-lint
-        - tox-py35
-        - tox-py36
-        - tox-py37
-        - tox-py38
-        - charm-build
-    vars:
-      tox_extra_args: bionic-train-ha-ovn
+
 - job:
     name: bionic-train-ha
     parent: func-target
-    dependencies: *smoke-jobs
+    dependencies:
+      - bionic-rocky-ha
     vars:
       tox_extra_args: bionic-train-ha
-- job:
-    name: bionic-ussuri-ha-ovn
-    parent: func-target
-    dependencies: *lint-jobs
-    vars:
-      tox_extra_args: bionic-ussuri-ha-ovn
-- job:
-    name: bionic-ussuri-ha
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: bionic-ussuri-ha
-- job:
-    name: focal-ussuri-ha-ovn
-    parent: func-target
-    dependencies: *lint-jobs
-    vars:
-      tox_extra_args: focal-ussuri-ha-ovn
-- job:
-    name: focal-ussuri-ha
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: focal-ussuri-ha
-- job:
-    name: focal-victoria-ha-ovn
-    parent: func-target
-    dependencies: *lint-jobs
-    vars:
-      tox_extra_args: focal-victoria-ha-ovn
-- job:
-    name: focal-victoria-ha
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: focal-victoria-ha
-- job:
-    name: focal-victoria-no-amphora
-    parent: func-target
-    dependencies: *lint-jobs
-    vars:
-      tox_extra_args: focal-victoria-no-amphora
-- job:
-    name: groovy-victoria-ha-ovn
-    parent: func-target
-    dependencies: *lint-jobs
-    vars:
-      tox_extra_args: groovy-victoria-ha-ovn
-- job:
-    name: groovy-victoria-ha
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: groovy-victoria-ha
-- job:
-    name: focal-wallaby-ha-ovn
-    parent: func-target
-    dependencies: *lint-jobs
-    vars:
-      tox_extra_args: focal-wallaby-ha-ovn
-- job:
-    name: focal-xena-ha-ovn
-    parent: func-target
-    dependencies: *lint-jobs
-    vars:
-      tox_extra_args: focal-xena-ha-ovn
-- job:
-    name: focal-wallaby-ha
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: focal-wallaby-ha
-- job:
-    name: focal-xena-ha
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: focal-xena-ha
-- job:
-    name: hirsute-wallaby-ha-ovn
-    parent: func-target
-    dependencies: *lint-jobs
-    vars:
-      tox_extra_args: hirsute-wallaby-ha-ovn
-- job:
-    name: hirsute-wallaby-ha
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: hirsute-wallaby-ha
-- job:
-    name: impish-xena-ha-ovn
-    parent: func-target
-    dependencies: *lint-jobs
-    vars:
-      tox_extra_args: impish-xena-ha-ovn
-- job:
-    name: impish-xena-ha
-    parent: func-target
-    dependencies: *smoke-jobs
-    vars:
-      tox_extra_args: impish-xena-ha

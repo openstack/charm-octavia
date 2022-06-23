@@ -76,21 +76,24 @@ relations:
   - octavia-diskimage-retrofit:certificates
 applications:
   glance:
-    charm: cs:~openstack-charmers/glance
+    charm: ch:glance
     num_units: 1
     options:
       openstack-origin: cloud:bionic-stein
+    channel: train/edge
   keystone:
-    charm: cs:~openstack-charmers/keystone
+    charm: ch:keystone
     num_units: 1
     options:
       openstack-origin: cloud:bionic-stein
+    channel: train/edge
   mysql:
     constraints: mem=3072M
-    charm: cs:~openstack-charmers/percona-cluster
+    charm: ch:percona-cluster
     num_units: 1
+    channel: 5.7/edge
   neutron-api:
-    charm: cs:~openstack-charmers/neutron-api
+    charm: ch:neutron-api
     num_units: 1
     options:
       openstack-origin: cloud:bionic-stein
@@ -99,9 +102,10 @@ applications:
       enable-ml2-port-security: True
       neutron-security-groups: True
       enable-dvr: True
+    channel: train/edge
   neutron-openvswitch:
     series: bionic
-    charm: cs:~openstack-charmers/neutron-openvswitch
+    charm: ch:neutron-openvswitch
     num_units: 0
     options:
       debug: True
@@ -110,36 +114,41 @@ applications:
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
       bridge-mappings: physnet1:br-ex
+    channel: train/edge
   neutron-openvswitch-octavia:
     series: bionic
-    charm: cs:~openstack-charmers/neutron-openvswitch
+    charm: ch:neutron-openvswitch
     num_units: 0
     options:
       debug: True
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
+    channel: train/edge
   nova-cloud-controller:
     constraints: mem=7168M
-    charm: cs:~openstack-charmers/nova-cloud-controller
+    charm: ch:nova-cloud-controller
     num_units: 1
     options:
       openstack-origin: cloud:bionic-stein
       debug: True
       network-manager: Neutron
+    channel: train/edge
   nova-compute:
     constraints: mem=7168M
-    charm: cs:~openstack-charmers/nova-compute
+    charm: ch:nova-compute
     num_units: 2
     options:
       openstack-origin: cloud:bionic-stein
       debug: True
+    channel: train/edge
   hacluster-octavia:
-    charm: cs:~openstack-charmers/hacluster
+    charm: ch:hacluster
     num_units: 0
+    channel: 1.1.18/edge
   octavia:
+    charm: ../../../octavia.charm
     constraints: cores=8
     series: bionic
-    charm: ../../../octavia
     num_units: 3
     options:
       openstack-origin: cloud:bionic-stein
@@ -147,20 +156,24 @@ applications:
       loadbalancer-topology: 'ACTIVE_STANDBY'
       vip: 'ADD YOUR VIP HERE'
   rabbitmq-server:
-    charm: cs:~openstack-charmers/rabbitmq-server
+    charm: ch:rabbitmq-server
     num_units: 1
+    channel: 3.6/edge
   glance-simplestreams-sync:
-    charm: cs:~openstack-charmers/glance-simplestreams-sync
+    charm: ch:glance-simplestreams-sync
     num_units: 1
     options:
       source: ppa:simplestreams-dev/trunk
       use_swift: False
+    channel: train/edge
   octavia-diskimage-retrofit:
-    charm: cs:~openstack-charmers/octavia-diskimage-retrofit
+    charm: ch:octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-uca-pocket: stein
       retrofit-series: bionic
+    channel: train/edge
   vault:
-    charm: cs:~openstack-charmers/vault
+    charm: ch:vault
     num_units: 1
+    channel: 1.6/edge

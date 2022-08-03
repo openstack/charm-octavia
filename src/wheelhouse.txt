@@ -1,3 +1,7 @@
+# Add in Cython for msgpack and setuptools if they need it; for some reason dependency detection in
+# charm-build is not picking up the dependency, probably because it is optional, but somehow is
+# triggered in LP: #1983388
+Cython==0.29.32
 # cachetools > 4.2.1 requires setuptools >= 46.4 which breaks most install targets
 cachetools<4.2.2
 # Several dependencies now require setuptools-scm>=3.0,<=3.4.1 which requires toml

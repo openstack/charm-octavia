@@ -196,3 +196,5 @@ options:
       Number of days left for the Octavia certificates, used for secure
       communication between the controller and the amphora instances,
       to expire before raising a Critical alert.
+  openstack-origin:
+    default: yoga

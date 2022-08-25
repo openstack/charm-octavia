@@ -19,7 +19,7 @@ tags:
 - openstack
 series:
 - focal
-- impish
+- jammy
 subordinate: false
 provides:
   nrpe-external-master:

@@ -196,3 +196,26 @@ options:
       Number of days left for the Octavia certificates, used for secure
       communication between the controller and the amphora instances,
       to expire before raising a Critical alert.
+  connection-max-retries:
+    default: 120
+    type: int
+    description: |
+      Retry threshold for connecting to amphorae. This is used when waiting
+      for a new amphora to become available as well as during a failover.
+  connection-retry-interval:
+    default: 5
+    type: int
+    description: |
+      Retry timeout between connection attempts in seconds. This is used
+      when waiting for a new amphora to become available as well as during a
+      failover.
+  active-connection-max-retries:
+    default: 15
+    type: int
+    description: |
+      Retry threshold for connecting to an active amphora.
+  active-connection-retry-interval:
+    default: 2
+    type: int
+    description: |
+      Retry timeout between connection attempts in seconds for active amphora.

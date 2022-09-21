@@ -63,6 +63,51 @@ charms_openstack.charm.use_defaults('charm.default-select-release',
                                     'config.changed')
 
 
+def get_address_on_mgmt_interface():
+    """
+    Check for an address assigned to the managament interface and return it.
+
+    Follow the same logic as used by health_manager_bind_ip(),
+    since that's the reason we need to check for an address.
+
+    :returns: the address if an address was found, otherwise None
+    :rtype: Optional[str]
+    """
+    for af in ['AF_INET6', 'AF_INET']:
+        try:
+            ips = ch_net_ip.get_iface_addr(
+                iface=OCTAVIA_MGMT_INTF, inet_type=af
+            )
+            ch_core.hookenv.log(
+                'Checking for address on mgmt interface; '
+                'found these IPs on {} ({}): {}'.format(
+                    OCTAVIA_MGMT_INTF, af, ips,
+                ),
+                level=ch_core.hookenv.DEBUG,
+            )
+
+            ips = [ip for ip in ips if '%' not in ip]
+            if ips:
+                ch_core.hookenv.log(
+                    'Returning address found on mgmt interface: {}'.format(
+                        ips[0],
+                    ),
+                    level=ch_core.hookenv.DEBUG,
+                )
+                return ips[0]
+        except Exception as e:
+            # ch_net_ip.get_iface_addr() throws an exception of type
+            # Exception when the requested interface does not exist or if
+            # it has no addresses in the requested address family.
+            ch_core.hookenv.log(
+                'Checking for address on mgmt interface failed: {}'.format(e),
+                level=ch_core.hookenv.DEBUG,
+            )
+            pass
+
+    return None
+
+
 @charms_openstack.adapters.config_property
 def health_manager_hwaddr(cls):
     """Return hardware address for Health Manager interface.
@@ -100,21 +145,18 @@ def health_manager_bind_ip(cls):
     :returns: IP address of unit local Health Manager interface.
     :rtype: str
     """
-    ip_list = []
-    for af in ['AF_INET6', 'AF_INET']:
-        try:
-            ip_list.extend(
-                (ip for ip in
-                    ch_net_ip.get_iface_addr(iface=OCTAVIA_MGMT_INTF,
-                                             inet_type=af)
-                    if '%' not in ip))
-        except Exception:
-            # ch_net_ip.get_iface_addr() throws an exception of type
-            # Exception when the requested interface does not exist or if
-            # it has no addresses in the requested address family.
-            pass
-    if ip_list:
-        return ip_list[0]
+    ip = get_address_on_mgmt_interface()
+    if ip:
+        return ip
+
+    # we should only get to here if setup_hm_port has failed
+    # or never been called.
+    # because that function should create the interface
+    # that we're querying above.
+    ch_core.hookenv.log(
+        'health_manager_bind_ip failed to discover any addresses',
+        level=ch_core.hookenv.WARNING
+    )
 
 
 @charms_openstack.adapters.config_property
@@ -434,6 +476,26 @@ class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
                  'Missing required certificate configuration, please '
                  'examine documentation')]
         return states_to_check
+
+    def custom_assess_status_last_check(self):
+        """Add extra status checks.
+
+        This is called by the base charm class assess_status handler,
+        after all other checks.
+
+        This is a good place to put additional information about the running
+        service, such as cluster status etc.
+
+        Return (None, None) if the status is okay (i.e. the unit is active).
+        Return ('active', message) do shortcut and force the unit to the active
+        status.
+        Return (other_status, message) to set the status to desired state.
+
+        :returns: None, None - no action in this function.
+        """
+        if not get_address_on_mgmt_interface():
+            return ('blocked', 'no address on mgmt interface')
+        return (None, None)
 
     def get_amqp_credentials(self):
         """Configure the AMQP credentials for Octavia."""

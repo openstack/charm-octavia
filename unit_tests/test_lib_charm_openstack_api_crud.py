@@ -303,6 +303,10 @@ class TestAPICrud(test_utils.PatchHelper):
         nc.list_networks.return_value = {'networks': [{'id': network_uuid,
                                                        'mtu': 9000}]}
 
+        self.patch_object(octavia.ch_net_ip, 'get_iface_addr')
+        self.get_iface_addr.return_value = [
+            'fe80:db8:42%eth0', '2001:db8:42::42', '127.0.0.1'
+        ]
         self.patch('subprocess.check_output', 'check_output')
         self.patch('subprocess.check_call', 'check_call')
         self.patch_object(api_crud, 'get_hm_port')

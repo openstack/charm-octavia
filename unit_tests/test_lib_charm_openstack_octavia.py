@@ -50,14 +50,10 @@ class TestOctaviaCharmConfigProperties(Helper):
         self.assertEqual(octavia.health_manager_bind_ip(cls), data[1])
         self.get_iface_addr.assert_any_call(iface=octavia.OCTAVIA_MGMT_INTF,
                                             inet_type='AF_INET6')
-        self.get_iface_addr.assert_any_call(iface=octavia.OCTAVIA_MGMT_INTF,
-                                            inet_type='AF_INET')
         self.get_iface_addr.return_value = [data[2]]
         self.assertEqual(octavia.health_manager_bind_ip(cls), data[2])
         self.get_iface_addr.assert_any_call(iface=octavia.OCTAVIA_MGMT_INTF,
                                             inet_type='AF_INET6')
-        self.get_iface_addr.assert_any_call(iface=octavia.OCTAVIA_MGMT_INTF,
-                                            inet_type='AF_INET')
 
     def test_heartbeat_key(self):
         cls = mock.MagicMock()

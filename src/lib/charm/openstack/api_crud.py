@@ -26,6 +26,7 @@ import neutronclient
 import socket
 import subprocess
 import tenacity
+import time
 
 from keystoneauth1 import identity as keystone_identity
 from keystoneauth1 import session as keystone_session
@@ -507,6 +508,38 @@ def ensure_hm_port_mtu(identity_service):
         ch_core.hookenv.log('mgmt network not found - cannot set mtu')
 
 
+def wait_for_address_on_mgmt_interface():
+    """Poll for an address on the management interface.
+
+    :returns: True if an address was found before timing out, else False
+    :rtype: bool
+    """
+    # Sometimes RA packets are not sent in response immediately,
+    # so we must wait for the next one to be sent in the default interval.
+    # The default interval is 10 minutes,
+    # so we must allow for polling at least that long.
+    # LP: #1965883
+    # 90 * 10 seconds = 15 minutes
+    POLL_TRIES = 90
+    POLL_INTERVAL = 10
+
+    for _ in range(POLL_TRIES):
+        ch_core.hookenv.log('polling for address on mgmt interface',
+                            level=ch_core.hookenv.DEBUG)
+        if octavia.get_address_on_mgmt_interface():
+            ch_core.hookenv.log(
+                'address found on mgmt interface',
+                level=ch_core.hookenv.INFO
+            )
+            return True
+
+        time.sleep(POLL_INTERVAL)
+
+    ch_core.hookenv.log('timed out waiting for address on mgmt interface',
+                        level=ch_core.hookenv.WARNING)
+    return False
+
+
 def setup_hm_port(identity_service, octavia_charm, host_id=None):
     """Create a per unit Neutron and OVS port for Octavia Health Manager.
 
@@ -602,6 +635,10 @@ def setup_hm_port(identity_service, octavia_charm, host_id=None):
         toggle_hm_port(identity_service,
                        octavia_charm.local_unit_name,
                        enabled=True)
+
+    if not wait_for_address_on_mgmt_interface():
+        return False
+
     return unit_changed
 
 

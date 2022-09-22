@@ -44,7 +44,7 @@ target_deploy_status:
 configure:
 - zaza.openstack.charm_tests.vault.setup.auto_initialize
 - zaza.openstack.charm_tests.glance_simplestreams_sync.setup.sync_images
-- zaza.openstack.charm_tests.octavia.setup.ensure_lts_images
+- zaza.openstack.charm_tests.glance.setup.add_lts_image
 - zaza.openstack.charm_tests.octavia.diskimage_retrofit.setup.retrofit_amphora_image
 - zaza.openstack.charm_tests.octavia.setup.configure_octavia
 - zaza.openstack.charm_tests.nova.setup.create_flavors

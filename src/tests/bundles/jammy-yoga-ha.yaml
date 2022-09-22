@@ -106,30 +106,30 @@ applications:
     channel: yoga/edge
   octavia-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   keystone-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   nova-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   glance-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   neutron-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   placement-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   vault-mysql-router:
     charm: ch:mysql-router
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   mysql-innodb-cluster:
     constraints: mem=3072M
     charm: ch:mysql-innodb-cluster
     num_units: 3
-    channel: 8.0.19/edge
+    channel: 8.0/edge
   neutron-api:
     charm: ch:neutron-api
     num_units: 1
@@ -181,13 +181,14 @@ applications:
       debug: True
     channel: yoga/edge
   hacluster-octavia:
+    series: *series
     charm: ch:hacluster
     num_units: 0
-    channel: 2.0.3/edge
+    channel: 2.4/edge
   octavia:
     constraints: cores=8
     series: *series
-    charm: ../../../octavia.charm
+    charm: ../../../octavia_ubuntu-22.04-amd64.charm
     num_units: 3
     options:
       openstack-origin: *openstack-origin
@@ -197,7 +198,7 @@ applications:
   rabbitmq-server:
     charm: ch:rabbitmq-server
     num_units: 1
-    channel: 3.8/edge
+    channel: 3.9/edge
   glance-simplestreams-sync:
     charm: ch:glance-simplestreams-sync
     num_units: 1
@@ -207,16 +208,16 @@ applications:
                       name_prefix: 'ubuntu:released',
                       path: 'streams/v1/index.sjson', max: 1,
                       item_filters: [
-                        'release~(bionic|focal|hirsute)',
+                        'release~(jammy)',
                         'arch~(x86_64|amd64)',
                         'ftype~(disk1.img|disk.img)']}]"
-    channel: yoga/edge
+    channel: latest/edge
   octavia-diskimage-retrofit:
     charm: ch:octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: *series
-    channel: yoga/edge
+    channel: latest/edge
   placement:
     charm: ch:placement
     num_units: 1

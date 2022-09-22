@@ -171,12 +171,13 @@ applications:
     charm: ch:hacluster
     channel: 2.0.3/edge
   ovn-chassis-octavia:
+    series: *series
     charm: ch:ovn-chassis
-    channel: latest/edge
+    channel: 22.03/edge
   octavia:
     constraints: cores=8
     series: *series
-    charm: ../../../octavia.charm
+    charm: ../../../octavia_ubuntu-20.04-amd64.charm
     num_units: 3
     options:
       openstack-origin: *openstack-origin
@@ -191,13 +192,20 @@ applications:
     num_units: 1
     options:
       use_swift: False
+      mirror_list: "[{url: 'http://cloud-images.ubuntu.com/releases/',
+                      name_prefix: 'ubuntu:released',
+                      path: 'streams/v1/index.sjson', max: 1,
+                      item_filters: [
+                        'release~(focal)',
+                        'arch~(x86_64|amd64)',
+                        'ftype~(disk1.img|disk.img)']}]"
     channel: yoga/edge
   octavia-diskimage-retrofit:
     charm: ch:octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: *series
-      retrofit-uca-pocket: wallaby
+      retrofit-uca-pocket: yoga
     channel: yoga/edge
   placement:
     charm: ch:placement
@@ -216,10 +224,10 @@ applications:
     num_units: 3
     options:
       source: *openstack-origin
-    channel: latest/edge
+    channel: 22.03/edge
   ovn-chassis:
     charm: ch:ovn-chassis
-    channel: latest/edge
+    channel: 22.03/edge
   vault:
     charm: ch:vault
     num_units: 1

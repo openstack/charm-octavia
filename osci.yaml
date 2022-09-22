@@ -18,6 +18,7 @@
       needs_charm_build: true
       charm_build_name: octavia
       build_type: charmcraft
+      charmcraft_channel: 2.0/stable
 
 - job:
     name: focal-xena-ha

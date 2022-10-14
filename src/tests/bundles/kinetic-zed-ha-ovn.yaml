@@ -105,39 +105,39 @@ applications:
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: latest/edge
+    channel: zed/edge
   keystone:
     charm: ch:keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: latest/edge
+    channel: zed/edge
   octavia-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   keystone-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   nova-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   glance-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   neutron-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   placement-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   vault-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   mysql-innodb-cluster:
     constraints: mem=3072M
     charm: ch:mysql-innodb-cluster
     num_units: 3
-    channel: latest/edge
+    channel: 8.0/edge
   neutron-api:
     constraints: cores=4
     charm: ch:neutron-api
@@ -148,7 +148,7 @@ applications:
       flat-network-providers: physnet1
       enable-ml2-port-security: True
       neutron-security-groups: True
-    channel: latest/edge
+    channel: zed/edge
   nova-cloud-controller:
     constraints: mem=7168M
     charm: ch:nova-cloud-controller
@@ -157,7 +157,7 @@ applications:
       openstack-origin: *openstack-origin
       debug: True
       network-manager: Neutron
-    channel: latest/edge
+    channel: zed/edge
   nova-compute:
     constraints: mem=7168M
     charm: ch:nova-compute
@@ -165,11 +165,11 @@ applications:
     options:
       openstack-origin: *openstack-origin
       debug: True
-    channel: latest/edge
+    channel: zed/edge
   hacluster-octavia:
     series: *series
     charm: ch:hacluster
-    channel: latest/edge
+    channel: 2.4/edge
   ovn-chassis-octavia:
     series: *series
     charm: ch:ovn-chassis
@@ -188,7 +188,7 @@ applications:
   rabbitmq-server:
     charm: ch:rabbitmq-server
     num_units: 1
-    channel: latest/edge
+    channel: 3.9/edge
   glance-simplestreams-sync:
     charm: ch:glance-simplestreams-sync
     num_units: 1
@@ -201,13 +201,13 @@ applications:
                         'release~(kinetic)',
                         'arch~(x86_64|amd64)',
                         'ftype~(disk1.img|disk.img)']}]"
-    channel: latest/edge
+    channel: zed/edge
   octavia-diskimage-retrofit:
     charm: ch:octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: *series
-    channel: latest/edge
+    channel: zed/edge
   placement:
     charm: ch:placement
     num_units: 1
@@ -215,10 +215,10 @@ applications:
     options:
       openstack-origin: *openstack-origin
       debug: true
-    channel: latest/edge
+    channel: zed/edge
   neutron-api-plugin-ovn:
     charm: ch:neutron-api-plugin-ovn
-    channel: latest/edge
+    channel: zed/edge
   ovn-central:
     constraints: mem=3072M
     charm: ch:ovn-central

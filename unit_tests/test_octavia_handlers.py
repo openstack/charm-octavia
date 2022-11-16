@@ -206,6 +206,8 @@ class TestOctaviaHandlers(test_utils.PatchHelper):
             ('arg1', 'arg2'), 'ovsdb-subordinate.available',
             'ovsdb-cms.available')
         self.octavia_charm.configure_ssl.assert_called_once_with()
+        self.octavia_charm.upgrade_if_available.assert_called_once_with(
+            ('arg1', 'arg2'))
         self.octavia_charm.enable_webserver_site.assert_called_once_with()
         self.octavia_charm.assess_status.assert_called_once_with()
         self.set_state.assert_called_once_with('config.rendered')

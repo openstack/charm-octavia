@@ -17,7 +17,7 @@
       needs_charm_build: true
       charm_build_name: octavia
       build_type: charmcraft
-      charmcraft_channel: 2.0/stable
+      charmcraft_channel: 2.1/stable
 
 - job:
     name: jammy-yoga-ha
@@ -28,39 +28,39 @@
         soft: true
       - charm-build
     vars:
-      tox_extra_args: jammy-yoga-ha
+      tox_extra_args: '-- jammy-yoga-ha'
 - job:
     name: jammy-yoga-ha-ovn
     parent: func-target
     dependencies:
       - jammy-yoga-ha
     vars:
-      tox_extra_args: jammy-yoga-ha-ovn
+      tox_extra_args: '-- jammy-yoga-ha-ovn'
 - job:
     name: jammy-zed-ha
     parent: func-target
     dependencies:
       - jammy-yoga-ha
     vars:
-      tox_extra_args: jammy-zed-ha
+      tox_extra_args: '-- jammy-zed-ha'
 - job:
     name: jammy-zed-ha-ovn
     parent: func-target
     dependencies:
       - jammy-yoga-ha
     vars:
-      tox_extra_args: jammy-zed-ha-ovn
+      tox_extra_args: '-- jammy-zed-ha-ovn'
 - job:
     name: kinetic-zed-ha
     parent: func-target
     dependencies:
       - jammy-yoga-ha
     vars:
-      tox_extra_args: kinetic-zed-ha
+      tox_extra_args: '-- kinetic-zed-ha'
 - job:
     name: kinetic-zed-ha-ovn
     parent: func-target
     dependencies:
       - jammy-yoga-ha
     vars:
-      tox_extra_args: kinetic-zed-ha-ovn
+      tox_extra_args: '-- kinetic-zed-ha-ovn'

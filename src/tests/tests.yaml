@@ -1,19 +1,19 @@
 charm_name: octavia
 
 gate_bundles:
-- jammy-yoga-ha-ovn
-- jammy-yoga-ha
-
-smoke_bundles:
-- jammy-yoga-ha
-
-dev_bundles:
-- jammy-yoga-ha-ovn
-- jammy-yoga-ha
 - jammy-zed-ha-ovn
 - jammy-zed-ha
+
+smoke_bundles:
+- jammy-zed-ha
+
+dev_bundles:
+- jammy-antelope-ha-ovn
+- jammy-antelope-ha
 - kinetic-zed-ha-ovn
 - kinetic-zed-ha
+- lunar-antelope-ha-ovn
+- lunar-antelope-ha
 
 
 comment: |
@@ -76,3 +76,5 @@ tests_options:
   force_deploy:
     - kinetic-zed-ha-ovn
     - kinetic-zed-ha
+    - lunar-antelope-ha-ovn
+    - lunar-antelope-ha

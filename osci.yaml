@@ -3,15 +3,19 @@
       - charm-unit-jobs-py310
     check:
       jobs:
-      - jammy-yoga-ha
-      - jammy-yoga-ha-ovn
-      - jammy-zed-ha:
-          voting: false
-      - jammy-zed-ha-ovn:
-          voting: false
+      - jammy-zed-ha
+      - jammy-zed-ha-ovn
       - kinetic-zed-ha:
           voting: false
-      - kinetic-zed:
+      - kinetic-zed-ha-ovn:
+          voting: false
+      - jammy-antelope-ha:
+          voting: false
+      - jammy-antelope-ha-ovn:
+          voting: false
+      - lunar-antelope-ha:
+          voting: false
+      - lunar-antelope-ha-ovn:
           voting: false
     vars:
       needs_charm_build: true
@@ -20,7 +24,7 @@
       charmcraft_channel: 2.1/stable
 
 - job:
-    name: jammy-yoga-ha
+    name: jammy-zed-ha
     parent: func-target
     dependencies:
       - osci-lint
@@ -28,39 +32,53 @@
         soft: true
       - charm-build
     vars:
-      tox_extra_args: '-- jammy-yoga-ha'
-- job:
-    name: jammy-yoga-ha-ovn
-    parent: func-target
-    dependencies:
-      - jammy-yoga-ha
-    vars:
-      tox_extra_args: '-- jammy-yoga-ha-ovn'
-- job:
-    name: jammy-zed-ha
-    parent: func-target
-    dependencies:
-      - jammy-yoga-ha
-    vars:
       tox_extra_args: '-- jammy-zed-ha'
 - job:
     name: jammy-zed-ha-ovn
     parent: func-target
     dependencies:
-      - jammy-yoga-ha
+      - jammy-zed-ha
     vars:
       tox_extra_args: '-- jammy-zed-ha-ovn'
 - job:
     name: kinetic-zed-ha
     parent: func-target
     dependencies:
-      - jammy-yoga-ha
+      - jammy-zed-ha
     vars:
       tox_extra_args: '-- kinetic-zed-ha'
 - job:
     name: kinetic-zed-ha-ovn
     parent: func-target
     dependencies:
-      - jammy-yoga-ha
+      - jammy-zed-ha
     vars:
       tox_extra_args: '-- kinetic-zed-ha-ovn'
+- job:
+    name: jammy-antelope-ha
+    parent: func-target
+    dependencies:
+      - jammy-zed-ha
+    vars:
+      tox_extra_args: '-- jammy-antelope-ha'
+- job:
+    name: jammy-antelope-ha-ovn
+    parent: func-target
+    dependencies:
+      - jammy-zed-ha
+    vars:
+      tox_extra_args: '-- jammy-antelope-ha-ovn'
+- job:
+    name: lunar-antelope-ha
+    parent: func-target
+    dependencies:
+      - jammy-zed-ha
+    vars:
+      tox_extra_args: '-- lunar-antelope-ha'
+- job:
+    name: lunar-antelope-ha-ovn
+    parent: func-target
+    dependencies:
+      - jammy-zed-ha
+    vars:
+      tox_extra_args: '-- lunar-antelope-ha-ovn'

@@ -3,7 +3,7 @@ variables:
 
 local_overlay_enabled: True
 
-series: &series kinetic
+series: &series lunar
 relations:
 - - glance:image-service
   - nova-cloud-controller:image-service

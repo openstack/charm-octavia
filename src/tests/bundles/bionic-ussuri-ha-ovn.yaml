@@ -193,4 +193,4 @@ applications:
   vault:
     charm: ch:vault
     num_units: 1
-    channel: 1.7/edge
+    channel: 1.6/edge

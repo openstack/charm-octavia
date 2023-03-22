@@ -5,13 +5,11 @@
       jobs:
       - jammy-yoga-ha
       - jammy-yoga-ha-ovn
-      - jammy-zed-ha:
-          voting: false
-      - jammy-zed-ha-ovn:
-          voting: false
+      - jammy-zed-ha
+      - jammy-zed-ha-ovn
       - kinetic-zed-ha:
           voting: false
-      - kinetic-zed:
+      - kinetic-zed-ha-ovn:
           voting: false
     vars:
       needs_charm_build: true
@@ -54,13 +52,13 @@
     name: kinetic-zed-ha
     parent: func-target
     dependencies:
-      - jammy-yoga-ha
+      - jammy-zed-ha
     vars:
       tox_extra_args: kinetic-zed-ha
 - job:
     name: kinetic-zed-ha-ovn
     parent: func-target
     dependencies:
-      - jammy-yoga-ha
+      - kinetic-zed-ha
     vars:
       tox_extra_args: kinetic-zed-ha-ovn

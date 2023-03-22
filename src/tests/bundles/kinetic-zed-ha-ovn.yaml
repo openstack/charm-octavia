@@ -173,7 +173,7 @@ applications:
   ovn-chassis-octavia:
     series: *series
     charm: ch:ovn-chassis
-    channel: 22.03/edge
+    channel: 22.09/edge
     options:
       ovn-source: distro
   octavia:
@@ -225,10 +225,10 @@ applications:
     num_units: 3
     options:
       source: *openstack-origin
-    channel: 22.03/edge
+    channel: 22.09/edge
   ovn-chassis:
     charm: ch:ovn-chassis
-    channel: 22.03/edge
+    channel: 22.09/edge
     options:
       ovn-source: distro
   vault:

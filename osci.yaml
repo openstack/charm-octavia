@@ -6,14 +6,10 @@
       jobs:
       - focal-xena-ha
       - focal-xena-ha-ovn
-      - focal-yoga-ha:
-          voting: false
-      - focal-yoga-ha-ovn:
-          voting: false
-      - jammy-yoga-ha:
-          voting: false
-      - jammy-yoga-ha-ovn:
-          voting: false
+      - focal-yoga-ha
+      - focal-yoga-ha-ovn
+      - jammy-yoga-ha
+      - jammy-yoga-ha-ovn
     vars:
       needs_charm_build: true
       charm_build_name: octavia

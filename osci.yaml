@@ -5,14 +5,8 @@
       jobs:
       - jammy-zed-ha
       - jammy-zed-ha-ovn
-      - kinetic-zed-ha:
-          voting: false
-      - kinetic-zed-ha-ovn:
-          voting: false
-      - jammy-antelope-ha:
-          voting: false
-      - jammy-antelope-ha-ovn:
-          voting: false
+      - jammy-antelope-ha
+      - jammy-antelope-ha-ovn
       - lunar-antelope-ha:
           voting: false
       - lunar-antelope-ha-ovn:
@@ -40,20 +34,6 @@
       - jammy-zed-ha
     vars:
       tox_extra_args: '-- jammy-zed-ha-ovn'
-- job:
-    name: kinetic-zed-ha
-    parent: func-target
-    dependencies:
-      - jammy-zed-ha
-    vars:
-      tox_extra_args: '-- kinetic-zed-ha'
-- job:
-    name: kinetic-zed-ha-ovn
-    parent: func-target
-    dependencies:
-      - jammy-zed-ha
-    vars:
-      tox_extra_args: '-- kinetic-zed-ha-ovn'
 - job:
     name: jammy-antelope-ha
     parent: func-target

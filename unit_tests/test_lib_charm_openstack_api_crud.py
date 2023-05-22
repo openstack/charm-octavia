@@ -295,6 +295,14 @@ class TestAPICrud(test_utils.PatchHelper):
         nc.delete_port.assert_called_with('fake-port-uuid')
 
     def test_setup_hm_port(self):
+        self.patch_object(api_crud, 'session_from_identity_service')
+        self.patch_object(api_crud, 'init_neutron_client')
+        nc = mock.MagicMock()
+        self.init_neutron_client.return_value = nc
+        network_uuid = 'fake-network-uuid'
+        nc.list_networks.return_value = {'networks': [{'id': network_uuid,
+                                                       'mtu': 9000}]}
+
         self.patch('subprocess.check_output', 'check_output')
         self.patch('subprocess.check_call', 'check_call')
         self.patch_object(api_crud, 'get_hm_port')
@@ -341,10 +349,21 @@ class TestAPICrud(test_utils.PatchHelper):
             mock.call(['ip', 'link', 'set', 'o-hm0', 'up', 'address',
                        'fake-mac-address']),
         ])
-        self.check_call.assert_called_with(
-            ['ip', 'link', 'set', api_crud.octavia.OCTAVIA_MGMT_INTF,
-             'up', 'address', port_mac_address])
-        self.toggle_hm_port.assert_called
+        self.check_call.assert_has_calls([
+            mock.call(['ovs-vsctl', '--', 'add-port', 'br-int', 'o-hm0', '--',
+                       'set', 'Interface', 'o-hm0', 'type=internal', '--',
+                       'set', 'Interface', 'o-hm0',
+                       'external-ids:iface-status=active',
+                       '--', 'set', 'Interface', 'o-hm0',
+                       'external-ids:attached-mac=fake-mac-address', '--',
+                       'set', 'Interface', 'o-hm0',
+                       'external-ids:iface-id=fake-port-uuid',
+                       '--', 'set', 'Interface', 'o-hm0',
+                       'external-ids:skip_cleanup=true']),
+            mock.call(['ip', 'link', 'set', 'o-hm0', 'up', 'address',
+                       'fake-mac-address']),
+            mock.call(['ovs-vsctl', 'set', 'Interface', 'o-hm0', 'mtu=9000']),
+            mock.call(['ip', 'link', 'set', 'o-hm0', 'mtu', '9000'])])
 
     def test_get_port_ip_unit_map(self):
         self.patch_object(api_crud, 'session_from_identity_service')

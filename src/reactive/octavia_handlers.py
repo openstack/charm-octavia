@@ -126,6 +126,17 @@ def setup_neutron_lbaas_proxy():
         neutron.publish_load_balancer_info('octavia', octavia_url)
 
 
+@reactive.when('is-update-status-hook', 'octavia.hm-port.available')
+def ensure_hm_port_mtu():
+    try:
+        identity_service = reactive.endpoint_from_flag(
+            'identity-service.available')
+        api_crud.ensure_hm_port_mtu(identity_service)
+    except Exception:
+        ch_core.hookenv.log('failed to ensure health manager port mtu',
+                            level=ch_core.hookenv.DEBUG)
+
+
 @reactive.when('config.default.enable-amphora',
                'charm.octavia.action_setup_hm_port')
 def action_setup_hm_port():

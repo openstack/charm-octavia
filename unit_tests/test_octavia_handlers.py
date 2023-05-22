@@ -36,6 +36,8 @@ class TestRegisteredHooks(test_utils.TestRegisteredHooks):
         ]
         hook_set = {
             'when': {
+                'ensure_hm_port_mtu': ('is-update-status-hook',
+                                       'octavia.hm-port.available'),
                 'render': ('shared-db.available',
                            'identity-service.available',
                            'amqp.available',

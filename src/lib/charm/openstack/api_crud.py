@@ -455,6 +455,35 @@ def wait_for_hm_port_bound(identity_service, local_unit_name):
         return False
 
 
+def ensure_hm_port_mtu(identity_service):
+    """
+    Ensure the Octavia health manager port has the same mtu as the network it
+    is attached to. This is to ensure that of the mtu changes in Neutron it is
+    reflected here as well.
+    """
+    session = session_from_identity_service(identity_service)
+    nc = init_neutron_client(session)
+    resp = nc.list_networks(tags='charm-octavia')
+    if len(resp['networks']) > 0:
+        network = resp['networks'][0]
+        ch_core.hookenv.log('ensuring mgmt network {} mtu={}'.
+                            format(network['id'], network['mtu']),
+                            level=ch_core.hookenv.DEBUG)
+        try:
+            subprocess.check_call(
+                ['ovs-vsctl', 'set', 'Interface', octavia.OCTAVIA_MGMT_INTF,
+                 'mtu={}'.format(network['mtu'])])
+            subprocess.check_call(
+                ['ip', 'link', 'set', octavia.OCTAVIA_MGMT_INTF, 'mtu',
+                 str(network['mtu'])])
+        except subprocess.CalledProcessError as exc:
+            ch_core.hookenv.log("failed to apply mtu to interface '{}': {}".
+                                format(octavia.OCTAVIA_MGMT_INTF, exc),
+                                level=ch_core.hookenv.DEBUG)
+    else:
+        ch_core.hookenv.log('mgmt network not found - cannot set mtu')
+
+
 def setup_hm_port(identity_service, octavia_charm, host_id=None):
     """Create a per unit Neutron and OVS port for Octavia Health Manager.
 
@@ -523,6 +552,10 @@ def setup_hm_port(identity_service, octavia_charm, host_id=None):
         else:
             # unknown error, raise
             raise e
+
+    # NOTE: apply this always to ensure consistency
+    ensure_hm_port_mtu(identity_service)
+
     if (not hm_port['admin_state_up'] or
             not is_hm_port_bound(identity_service,
                                  octavia_charm.local_unit_name) or

@@ -12,6 +12,7 @@ parts:
       - libxslt1-dev
       - rustc
       - cargo
+      - pkg-config
     build-environment:
       - MAKEFLAGS: -j$(nproc)
       - CHARM_INTERFACES_DIR: /root/project/interfaces/

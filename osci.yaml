@@ -4,13 +4,10 @@
     check:
       jobs:
       - charm-build
-      - focal-wallaby-ha-ovn:
-          voting: false
+      - focal-wallaby-ha-ovn
       - focal-wallaby-ha
-      - focal-xena-ha:
-          voting: false
-      - focal-xena-ha-ovn:
-          voting: false
+      - focal-xena-ha
+      - focal-xena-ha-ovn
     vars:
       needs_charm_build: true
       charm_build_name: octavia

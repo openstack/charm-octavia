@@ -3,22 +3,28 @@
       - charm-unit-jobs-py310
     check:
       jobs:
-      - jammy-zed-ha
-      - jammy-zed-ha-ovn
       - jammy-antelope-ha
       - jammy-antelope-ha-ovn
+      - jammy-bobcat-ha:
+          voting: false
+      - jammy-bobcat-ha-ovn:
+          voting: false
       - lunar-antelope-ha:
           voting: false
       - lunar-antelope-ha-ovn:
+          voting: false
+      - mantic-bobcat-ha:
+          voting: false
+      - mantic-bobcat-ha-ovn:
           voting: false
     vars:
       needs_charm_build: true
       charm_build_name: octavia
       build_type: charmcraft
-      charmcraft_channel: 2.1/stable
+      charmcraft_channel: 2.x/edge
 
 - job:
-    name: jammy-zed-ha
+    name: jammy-antelope-ha
     parent: func-target
     dependencies:
       - osci-lint
@@ -26,39 +32,53 @@
         soft: true
       - charm-build
     vars:
-      tox_extra_args: '-- jammy-zed-ha'
-- job:
-    name: jammy-zed-ha-ovn
-    parent: func-target
-    dependencies:
-      - jammy-zed-ha
-    vars:
-      tox_extra_args: '-- jammy-zed-ha-ovn'
-- job:
-    name: jammy-antelope-ha
-    parent: func-target
-    dependencies:
-      - jammy-zed-ha
-    vars:
       tox_extra_args: '-- jammy-antelope-ha'
 - job:
     name: jammy-antelope-ha-ovn
     parent: func-target
     dependencies:
-      - jammy-zed-ha
+      - jammy-antelope-ha
     vars:
       tox_extra_args: '-- jammy-antelope-ha-ovn'
 - job:
-    name: lunar-antelope-ha
+    name: jammy-bobcat-ha
     parent: func-target
     dependencies:
-      - jammy-zed-ha
+      - jammy-antelope-ha
     vars:
-      tox_extra_args: '-- lunar-antelope-ha'
+      tox_extra_args: '-- jammy-bobcat-ha'
 - job:
-    name: lunar-antelope-ha-ovn
+    name: jammy-bobcat-ha-ovn
     parent: func-target
     dependencies:
-      - jammy-zed-ha
+      - jammy-antelope-ha
     vars:
-      tox_extra_args: '-- lunar-antelope-ha-ovn'
+      tox_extra_args: '-- jammy-bobcat-ha-ovn'
+- job:
+    name: lunar-bobcat-ha
+    parent: func-target
+    dependencies:
+      - jammy-antelope-ha
+    vars:
+      tox_extra_args: '-- lunar-bobcat-ha'
+- job:
+    name: lunar-bobcat-ha-ovn
+    parent: func-target
+    dependencies:
+      - jammy-antelope-ha
+    vars:
+      tox_extra_args: '-- lunar-bobcat-ha-ovn'
+- job:
+    name: mantic-bobcat-ha
+    parent: func-target
+    dependencies:
+      - jammy-antelope-ha
+    vars:
+      tox_extra_args: '-- mantic-bobcat-ha'
+- job:
+    name: mantic-bobcat-ha-ovn
+    parent: func-target
+    dependencies:
+      - jammy-antelope-ha
+    vars:
+      tox_extra_args: '-- mantic-bobcat-ha-ovn'

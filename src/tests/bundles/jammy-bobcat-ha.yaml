@@ -1,5 +1,5 @@
 variables:
-  openstack-origin: &openstack-origin cloud:jammy-antelope
+  openstack-origin: &openstack-origin cloud:jammy-bobcat
 
 local_overlay_enabled: True
 
@@ -216,7 +216,7 @@ applications:
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: *series
-      retrofit-uca-pocket: antelope
+      retrofit-uca-pocket: bobcat
     channel: latest/edge
   placement:
     charm: ch:placement

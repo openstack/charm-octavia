@@ -1,17 +1,19 @@
 charm_name: octavia
 
 gate_bundles:
-- jammy-zed-ha-ovn
-- jammy-zed-ha
-
-smoke_bundles:
-- jammy-zed-ha
-
-dev_bundles:
 - jammy-antelope-ha-ovn
 - jammy-antelope-ha
+
+smoke_bundles:
+- jammy-antelope-ha
+
+dev_bundles:
+- jammy-bobcat-ha-ovn
+- jammy-bobcat-ha
 - lunar-antelope-ha-ovn
 - lunar-antelope-ha
+- mantic-bobcat-ha-ovn
+- mantic-bobat-ha
 
 
 comment: |
@@ -73,4 +75,6 @@ tests_options:
     service: octavia
   force_deploy:
     - lunar-antelope-ha-ovn
+    - mantic-bobcat-ha-ovn
     - lunar-antelope-ha
+    - mantic-bobcat-ha

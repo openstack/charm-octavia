@@ -879,6 +879,12 @@
       "package": "testresources",
       "vcs": null,
       "version": "2.0.1"
+    },
+    {
+      "type": "python_module",
+      "package": "Cython",
+      "vcs": null,
+      "version": "0.29.36"
     }
   ]
 }

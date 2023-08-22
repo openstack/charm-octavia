@@ -29,8 +29,8 @@
       "vcs": null,
       "url": "https://github.com/openstack/charm-layer-openstack",
       "type": "layer",
-      "branch": "5999eeaa5d007b6ae8dc12753976ef11f76684ee",
-      "commit": "5999eeaa5d007b6ae8dc12753976ef11f76684ee"
+      "branch": "e0f700eacb026235e1a04e7cbc28dfbe9d4e4520",
+      "commit": "e0f700eacb026235e1a04e7cbc28dfbe9d4e4520"
     },
     {
       "item": "layer:openstack-principle",
@@ -85,8 +85,8 @@
       "vcs": null,
       "url": "https://github.com/openstack/charm-interface-keystone",
       "type": "layer",
-      "branch": "a48a1e826ac0a74ab05a16c441cda4e4b34b1241",
-      "commit": "a48a1e826ac0a74ab05a16c441cda4e4b34b1241"
+      "branch": "501af18b3036f5af92990bc39e750e76e393e5eb",
+      "commit": "501af18b3036f5af92990bc39e750e76e393e5eb"
     },
     {
       "item": "interface:hacluster",

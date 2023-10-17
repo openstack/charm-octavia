@@ -9,10 +9,6 @@
           voting: false
       - jammy-bobcat-ha-ovn:
           voting: false
-      - lunar-antelope-ha:
-          voting: false
-      - lunar-antelope-ha-ovn:
-          voting: false
       - mantic-bobcat-ha:
           voting: false
       - mantic-bobcat-ha-ovn:
@@ -21,7 +17,7 @@
       needs_charm_build: true
       charm_build_name: octavia
       build_type: charmcraft
-      charmcraft_channel: 2.x/edge
+      charmcraft_channel: 2.x/stable
 
 - job:
     name: jammy-antelope-ha
@@ -54,20 +50,6 @@
       - jammy-antelope-ha
     vars:
       tox_extra_args: '-- jammy-bobcat-ha-ovn'
-- job:
-    name: lunar-bobcat-ha
-    parent: func-target
-    dependencies:
-      - jammy-antelope-ha
-    vars:
-      tox_extra_args: '-- lunar-bobcat-ha'
-- job:
-    name: lunar-bobcat-ha-ovn
-    parent: func-target
-    dependencies:
-      - jammy-antelope-ha
-    vars:
-      tox_extra_args: '-- lunar-bobcat-ha-ovn'
 - job:
     name: mantic-bobcat-ha
     parent: func-target

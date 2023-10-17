@@ -97,39 +97,39 @@ applications:
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: latest/edge
+    channel: 2023.2/edge
   keystone:
     charm: ch:keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: latest/edge
+    channel: 2023.2/edge
   octavia-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   keystone-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   nova-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   glance-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   neutron-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   placement-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   vault-mysql-router:
     charm: ch:mysql-router
-    channel: latest/edge
+    channel: 8.0/edge
   mysql-innodb-cluster:
     constraints: mem=3072M
     charm: ch:mysql-innodb-cluster
     num_units: 3
-    channel: latest/edge
+    channel: 8.0/edge
   neutron-api:
     charm: ch:neutron-api
     num_units: 1
@@ -141,7 +141,7 @@ applications:
       neutron-security-groups: True
       enable-dvr: True
       manage-neutron-plugin-legacy-mode: True
-    channel: latest/edge
+    channel: 2023.2/edge
   neutron-openvswitch:
     series: *series
     charm: ch:neutron-openvswitch
@@ -153,7 +153,7 @@ applications:
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
       bridge-mappings: physnet1:br-ex
-    channel: latest/edge
+    channel: 2023.2/edge
   neutron-openvswitch-octavia:
     series: *series
     charm: ch:neutron-openvswitch
@@ -162,7 +162,7 @@ applications:
       debug: True
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
-    channel: latest/edge
+    channel: 2023.2/edge
   nova-cloud-controller:
     constraints: mem=7168M
     charm: ch:nova-cloud-controller
@@ -171,7 +171,7 @@ applications:
       openstack-origin: *openstack-origin
       debug: True
       network-manager: Neutron
-    channel: latest/edge
+    channel: 2023.2/edge
   nova-compute:
     constraints: mem=7168M
     charm: ch:nova-compute
@@ -179,11 +179,11 @@ applications:
     options:
       openstack-origin: *openstack-origin
       debug: True
-    channel: latest/edge
+    channel: 2023.2/edge
   hacluster-octavia:
     charm: ch:hacluster
     num_units: 0
-    channel: latest/edge
+    channel: 2.4/edge
   octavia:
     constraints: cores=8
     series: *series
@@ -197,7 +197,7 @@ applications:
   rabbitmq-server:
     charm: ch:rabbitmq-server
     num_units: 1
-    channel: latest/edge
+    channel: 3.9/edge
   glance-simplestreams-sync:
     charm: ch:glance-simplestreams-sync
     num_units: 1
@@ -210,14 +210,14 @@ applications:
                         'release~(jammy)',
                         'arch~(x86_64|amd64)',
                         'ftype~(disk1.img|disk.img)']}]"
-    channel: latest/edge
+    channel: 2023.2/edge
   octavia-diskimage-retrofit:
     charm: ch:octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: *series
       retrofit-uca-pocket: antelope
-    channel: latest/edge
+    channel: 2023.2/edge
   placement:
     charm: ch:placement
     num_units: 1
@@ -225,8 +225,8 @@ applications:
     options:
       openstack-origin: *openstack-origin
       debug: true
-    channel: latest/edge
+    channel: 2023.2/edge
   vault:
     charm: ch:vault
     num_units: 1
-    channel: latest/edge
+    channel: 1.8/edge

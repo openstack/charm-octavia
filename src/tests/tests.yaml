@@ -10,8 +10,6 @@ smoke_bundles:
 dev_bundles:
 - jammy-bobcat-ha-ovn
 - jammy-bobcat-ha
-- lunar-antelope-ha-ovn
-- lunar-antelope-ha
 - mantic-bobcat-ha-ovn
 - mantic-bobat-ha
 
@@ -74,7 +72,5 @@ tests_options:
   policyd:
     service: octavia
   force_deploy:
-    - lunar-antelope-ha-ovn
     - mantic-bobcat-ha-ovn
-    - lunar-antelope-ha
     - mantic-bobcat-ha

@@ -34,7 +34,7 @@ from keystoneauth1 import exceptions as keystone_exceptions
 from neutronclient.v2_0 import client as neutron_client
 from novaclient import client as nova_client
 
-import neutron_lib.constants
+import neutron_lib.services.trunk.constants
 
 import charm.openstack.octavia as octavia  # for constants
 
@@ -359,8 +359,12 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address,
             # 1: https://github.com/openstack/neutron/blob/
             #      50308c03c960bd6e566f328a790b8e05f5e92ead/
             #      neutron/common/utils.py#L200
+            #
+            # NOTE(tkajinam): This implementation may need to be updated
+            # because the current logic heavily depends on neutron's internal
+            # behavior.
             'device_owner': (
-                neutron_lib.constants.DEVICE_OWNER_LOADBALANCERV2),
+                neutron_lib.services.trunk.constants.TRUNK_SUBPORT_OWNER),
             'security_groups': [
                 health_secgrp['id'],
             ],
@@ -385,24 +389,37 @@ def get_hm_port(identity_service, local_unit_name, local_unit_address,
             nc.add_tag('ports', hm_port['id'], 'charm-octavia')
         except NEUTRON_TEMP_EXCS as e:
             raise APIUnavailable('neutron', 'ports', e)
-    elif hm_port.get(
-            'binding:host_id') != port_template['port']['binding:host_id']:
-        # Ensure binding:host_id is up to date on a existing port
-        #
-        # In the event of a need to update it, we bring the port down to make
-        # sure Neutron rebuilds the port correctly.
-        #
-        # Our caller, ``setup_hm_port``, will toggle the port admin status.
-        try:
-            nc.update_port(hm_port['id'], {
-                'port': {
-                    'admin_state_up': False,
-                    'binding:host_id': port_template['port'][
-                        'binding:host_id'],
-                }
-            })
-        except NEUTRON_TEMP_EXCS as e:
-            raise APIUnavailable('neutron', 'ports', e)
+    else:
+        if (hm_port.get('binding:host_id') !=
+                port_template['port']['binding:host_id']):
+            # Ensure binding:host_id is up to date on a existing port
+            #
+            # In the event of a need to update it, we bring the port down to
+            # make sure Neutron rebuilds the port correctly.
+            #
+            # Our caller, ``setup_hm_port``, will toggle the port admin status.
+            try:
+                nc.update_port(hm_port['id'], {
+                    'port': {
+                        'admin_state_up': False,
+                        'binding:host_id': port_template['port'][
+                            'binding:host_id'],
+                    }
+                })
+            except NEUTRON_TEMP_EXCS as e:
+                raise APIUnavailable('neutron', 'ports', e)
+
+        if (hm_port.get('device_owner') !=
+                port_template['port']['device_owner']):
+            try:
+                nc.update_port(hm_port['id'], {
+                    'port': {
+                        'device_owner': port_template['port']['device_owner']
+                    }
+                })
+            except NEUTRON_TEMP_EXCS as e:
+                raise APIUnavailable('neutron', 'ports', e)
+
     return hm_port
 
 

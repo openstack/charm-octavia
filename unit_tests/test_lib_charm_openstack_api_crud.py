@@ -186,7 +186,8 @@ class TestAPICrud(test_utils.PatchHelper):
         self.patch('charms.reactive.set_flag', 'set_flag')
         identity_service = mock.MagicMock()
         self.patch_object(api_crud, 'neutron_lib')
-        self.neutron_lib.constants.DEVICE_OWNER_LOADBALANCERV2 = 'fakeowner'
+        self.neutron_lib.services.trunk.constants.TRUNK_SUBPORT_OWNER = (
+            'fakeowner')
         self.patch_object(api_crud, 'lookup_hm_port')
         self.lookup_hm_port.return_value = None
         result = api_crud.get_hm_port(identity_service,

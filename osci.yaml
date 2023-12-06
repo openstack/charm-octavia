@@ -28,6 +28,7 @@
 - job:
     name: bionic-train-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - bionic-train-ha
     vars:
@@ -35,6 +36,7 @@
 - job:
     name: bionic-ussuri-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - bionic-train-ha
     vars:
@@ -49,6 +51,7 @@
 - job:
     name: focal-ussuri-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - bionic-train-ha
     vars:
@@ -56,6 +59,7 @@
 - job:
     name: focal-ussuri-ha
     parent: func-target
+    timeout: 18000
     dependencies:
       - bionic-train-ha
     vars:

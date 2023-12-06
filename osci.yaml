@@ -30,6 +30,7 @@
 - job:
     name: jammy-yoga-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - jammy-yoga-ha
     vars:
@@ -44,6 +45,7 @@
 - job:
     name: jammy-zed-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - jammy-yoga-ha
     vars:
@@ -58,6 +60,7 @@
 - job:
     name: kinetic-zed-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - kinetic-zed-ha
     vars:

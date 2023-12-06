@@ -16,6 +16,7 @@
 - job:
     name: focal-wallaby-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - focal-wallaby-ha
     vars:
@@ -23,6 +24,7 @@
 - job:
     name: focal-xena-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - focal-wallaby-ha
     vars:

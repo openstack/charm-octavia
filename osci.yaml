@@ -30,6 +30,7 @@
 - job:
     name: jammy-zed-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - jammy-zed-ha
     vars:
@@ -44,6 +45,7 @@
 - job:
     name: jammy-antelope-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - jammy-zed-ha
     vars:
@@ -58,6 +60,7 @@
 - job:
     name: lunar-antelope-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - jammy-zed-ha
     vars:

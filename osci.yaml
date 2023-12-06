@@ -16,6 +16,7 @@
 - job:
     name: focal-ussuri-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - charm-build
       - osci-lint
@@ -32,6 +33,7 @@
 - job:
     name: focal-victoria-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - focal-ussuri-ha-ovn
     vars:

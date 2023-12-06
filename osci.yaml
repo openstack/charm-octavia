@@ -32,6 +32,7 @@
 - job:
     name: jammy-antelope-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - jammy-antelope-ha
     vars:
@@ -46,6 +47,7 @@
 - job:
     name: jammy-bobcat-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - jammy-antelope-ha
     vars:
@@ -60,6 +62,7 @@
 - job:
     name: mantic-bobcat-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - jammy-antelope-ha
     vars:

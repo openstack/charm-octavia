@@ -27,6 +27,7 @@
 - job:
     name: focal-xena-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - focal-xena-ha
     vars:
@@ -41,6 +42,7 @@
 - job:
     name: focal-yoga-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - focal-xena-ha
     vars:
@@ -48,6 +50,7 @@
 - job:
     name: jammy-yoga-ha-ovn
     parent: func-target
+    timeout: 18000
     dependencies:
       - focal-xena-ha
     vars:

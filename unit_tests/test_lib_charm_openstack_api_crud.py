@@ -74,9 +74,9 @@ class TestAPICrud(test_utils.PatchHelper):
     def test_endpoint_type(self):
         self.patch_object(api_crud.ch_core.hookenv, 'config')
         self.config.return_value = False
-        self.assertEquals(api_crud.endpoint_type(), 'publicURL')
+        self.assertEqual(api_crud.endpoint_type(), 'publicURL')
         self.config.return_value = True
-        self.assertEquals(api_crud.endpoint_type(), 'internalURL')
+        self.assertEqual(api_crud.endpoint_type(), 'internalURL')
 
     def test_session_from_identity_service(self):
         self.patch_object(api_crud, 'keystone_identity')
@@ -158,11 +158,11 @@ class TestAPICrud(test_utils.PatchHelper):
         with self.assertRaises(api_crud.DuplicateResource):
             api_crud.lookup_hm_port(nc, 'fake-unit-name')
         nc.list_ports.return_value = {'ports': ['first']}
-        self.assertEquals(
+        self.assertEqual(
             api_crud.lookup_hm_port(nc, 'fake-unit-name'),
             'first')
         nc.list_ports.return_value = {}
-        self.assertEquals(
+        self.assertEqual(
             api_crud.lookup_hm_port(nc, 'fake-unit-name'),
             None)
 
@@ -254,7 +254,7 @@ class TestAPICrud(test_utils.PatchHelper):
         self.patch_object(api_crud, 'init_neutron_client')
         self.patch_object(api_crud, 'lookup_hm_port')
         self.lookup_hm_port.return_value = None
-        self.assertEquals(
+        self.assertEqual(
             api_crud.is_hm_port_bound('ids', 'fake-unit-name'), None)
         self.lookup_hm_port.assert_called_once_with(
             mock.ANY, 'fake-unit-name')
@@ -386,8 +386,8 @@ class TestAPICrud(test_utils.PatchHelper):
             ],
         }
         identity_service = mock.MagicMock()
-        self.assertEquals(api_crud.get_port_ip_unit_map(identity_service),
-                          {'lb-0': '2001:db8:42::1', 'lb-1': '2001:db8:42::2'})
+        self.assertEqual(api_crud.get_port_ip_unit_map(identity_service),
+                         {'lb-0': '2001:db8:42::1', 'lb-1': '2001:db8:42::2'})
         self.init_neutron_client.assert_called_once_with(
             self.session_from_identity_service())
 

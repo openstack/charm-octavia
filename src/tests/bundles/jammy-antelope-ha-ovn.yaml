@@ -116,13 +116,13 @@ applications:
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: latest/edge
+    channel: 2024.1/edge
   keystone:
     charm: ch:keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: latest/edge
+    channel: 2024.1/edge
   cinder-mysql-router:
     charm: ch:mysql-router
     channel: latest/edge
@@ -192,7 +192,7 @@ applications:
       flat-network-providers: physnet1
       enable-ml2-port-security: True
       neutron-security-groups: True
-    channel: latest/edge
+    channel: 2024.1/edge
   nova-cloud-controller:
     constraints: mem=7168M
     charm: ch:nova-cloud-controller
@@ -201,15 +201,15 @@ applications:
       openstack-origin: *openstack-origin
       debug: True
       network-manager: Neutron
-    channel: latest/edge
+    channel: 2024.1/edge
   nova-compute:
-    constraints: mem=7168M
+    constraints: mem=7168M cores=8 root-disk=40G
     charm: ch:nova-compute
     num_units: 2
     options:
       openstack-origin: *openstack-origin
       debug: True
-    channel: latest/edge
+    channel: 2024.1/edge
   hacluster-octavia:
     series: *series
     charm: ch:hacluster
@@ -217,7 +217,7 @@ applications:
   ovn-chassis-octavia:
     series: *series
     charm: ch:ovn-chassis
-    channel: latest/edge
+    channel: 24.03/edge
   octavia:
     constraints: cores=8
     series: *series
@@ -243,14 +243,14 @@ applications:
                         'release~(jammy)',
                         'arch~(x86_64|amd64)',
                         'ftype~(disk1.img|disk.img)']}]"
-    channel: latest/edge
+    channel: 2024.1/edge
   octavia-diskimage-retrofit:
     charm: ch:octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: *series
-      retrofit-uca-pocket: antelope
-    channel: latest/edge
+      retrofit-uca-pocket: bobcat
+    channel: 2024.1/edge
   placement:
     charm: ch:placement
     num_units: 1
@@ -258,20 +258,20 @@ applications:
     options:
       openstack-origin: *openstack-origin
       debug: true
-    channel: latest/edge
+    channel: 2024.1/edge
   neutron-api-plugin-ovn:
     charm: ch:neutron-api-plugin-ovn
-    channel: latest/edge
+    channel: 2024.1/edge
   ovn-central:
     constraints: mem=3072M
     charm: ch:ovn-central
     num_units: 3
     options:
       source: *openstack-origin
-    channel: latest/edge
+    channel: 24.03/edge
   ovn-chassis:
     charm: ch:ovn-chassis
-    channel: latest/edge
+    channel: 24.03/edge
   vault:
     charm: ch:vault
     num_units: 1

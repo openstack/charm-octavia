@@ -1,5 +1,5 @@
 variables:
-  openstack-origin: &openstack-origin cloud:jammy-bobcat
+  openstack-origin: &openstack-origin cloud:jammy-caracal
 
 local_overlay_enabled: True
 
@@ -43,6 +43,20 @@ relations:
   - nova-cloud-controller:neutron-api
 - - neutron-api:neutron-load-balancer
   - octavia:neutron-api
+- - rabbitmq-server:amqp
+  - neutron-openvswitch:amqp
+- - neutron-api:neutron-plugin-api
+  - neutron-openvswitch:neutron-plugin-api
+- - neutron-openvswitch:neutron-plugin
+  - nova-compute:neutron-plugin
+- - rabbitmq-server:amqp
+  - neutron-openvswitch-octavia:amqp
+- - neutron-api:neutron-plugin-api
+  - neutron-openvswitch-octavia:neutron-plugin-api
+- - neutron-openvswitch-octavia:neutron-plugin
+  - octavia:neutron-openvswitch
+- - hacluster-octavia:ha
+  - octavia:ha
 - - glance-simplestreams-sync:juju-info
   - octavia-diskimage-retrofit:juju-info
 - - keystone:identity-service
@@ -52,48 +66,24 @@ relations:
 - [ placement, placement-mysql-router ]
 - [ placement, keystone ]
 - [ placement, nova-cloud-controller ]
-- - neutron-api-plugin-ovn:neutron-plugin
-  - neutron-api:neutron-plugin-api-subordinate
 - - vault:shared-db
   - vault-mysql-router:shared-db
-- - ovn-central:certificates
-  - vault:certificates
-- - ovn-central:ovsdb-cms
-  - neutron-api-plugin-ovn:ovsdb-cms
-- - neutron-api:certificates
-  - vault:certificates
-- - ovn-chassis:nova-compute
-  - nova-compute:neutron-plugin
-- - ovn-chassis-octavia:ovsdb-subordinate
-  - octavia:ovsdb-subordinate
-- - ovn-chassis-octavia:certificates
-  - vault:certificates
-- - ovn-chassis-octavia:ovsdb
-  - ovn-central:ovsdb
-- - ovn-central:ovsdb-cms
-  - octavia:ovsdb-cms
-- - ovn-chassis:certificates
-  - vault:certificates
-- - ovn-chassis:ovsdb
-  - ovn-central:ovsdb
-- - vault:certificates
-  - neutron-api-plugin-ovn:certificates
 - - vault:certificates
   - glance:certificates
 - - vault:certificates
   - keystone:certificates
 - - vault:certificates
-  - nova-cloud-controller:certificates
+  - neutron-api:certificates
 - - vault:certificates
-  - placement:certificates
+  - nova-cloud-controller:certificates
 - - vault:certificates
   - octavia:certificates
 - - vault:certificates
+  - octavia-diskimage-retrofit:certificates
+- - vault:certificates
   - glance-simplestreams-sync:certificates
 - - vault:certificates
-  - cinder:certificates
-- - hacluster-octavia:ha
-  - octavia:ha
+  - placement:certificates
 - ["octavia-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 - ["keystone-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 - ["nova-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
@@ -101,15 +91,6 @@ relations:
 - ["neutron-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 - ["placement-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 - ["vault-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
-- ["cinder-ceph:storage-backend", "cinder:storage-backend"]
-- ["nova-compute:ceph-access", "cinder-ceph:ceph-access"]
-- ["ceph-mon:client", "cinder-ceph:ceph"]
-- ["ceph-mon:osd", "ceph-osd:mon"]
-- ["cinder:shared-db", "cinder-mysql-router:shared-db"]
-- ["cinder-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
-- ["cinder:identity-service", "keystone:identity-service"]
-- ["cinder:amqp", "rabbitmq-server:amqp"]
-- ["cinder:image-service", "glance:image-service"]
 applications:
   glance:
     charm: ch:glance
@@ -123,9 +104,6 @@ applications:
     options:
       openstack-origin: *openstack-origin
     channel: 2024.1/edge
-  cinder-mysql-router:
-    charm: ch:mysql-router
-    channel: latest/edge
   octavia-mysql-router:
     charm: ch:mysql-router
     channel: latest/edge
@@ -152,38 +130,7 @@ applications:
     charm: ch:mysql-innodb-cluster
     num_units: 3
     channel: latest/edge
-  ceph-osd:
-    charm: ch:ceph-osd
-    num_units: 3
-    storage:
-      osd-devices: '40G'
-    options:
-      source: *openstack-origin
-    channel: reef/candidate
-  ceph-mon:
-    charm: ch:ceph-mon
-    num_units: 1
-    options:
-      source: *openstack-origin
-      monitor-count: '1'
-    channel: reef/candidate
-  cinder:
-    charm: ch:cinder
-    num_units: 1
-    storage:
-      block-devices: '40G'
-    options:
-      openstack-origin: *openstack-origin
-      glance-api-version: 2
-      block-device: None
-      overwrite: "true"
-      image-volume-cache-enabled: true
-    channel: latest/edge
-  cinder-ceph:
-    charm: ch:cinder-ceph
-    channel: latest/edge
   neutron-api:
-    constraints: cores=4
     charm: ch:neutron-api
     num_units: 1
     options:
@@ -192,6 +139,29 @@ applications:
       flat-network-providers: physnet1
       enable-ml2-port-security: True
       neutron-security-groups: True
+      enable-dvr: True
+      manage-neutron-plugin-legacy-mode: True
+    channel: 2024.1/edge
+  neutron-openvswitch:
+    series: *series
+    charm: ch:neutron-openvswitch
+    num_units: 0
+    options:
+      debug: True
+      enable-local-dhcp-and-metadata: True
+      use-dvr-snat: True
+      prevent-arp-spoofing: False
+      firewall-driver: openvswitch
+      bridge-mappings: physnet1:br-ex
+    channel: 2024.1/edge
+  neutron-openvswitch-octavia:
+    series: *series
+    charm: ch:neutron-openvswitch
+    num_units: 0
+    options:
+      debug: True
+      prevent-arp-spoofing: False
+      firewall-driver: openvswitch
     channel: 2024.1/edge
   nova-cloud-controller:
     constraints: mem=7168M
@@ -211,13 +181,9 @@ applications:
       debug: True
     channel: 2024.1/edge
   hacluster-octavia:
-    series: *series
     charm: ch:hacluster
+    num_units: 0
     channel: latest/edge
-  ovn-chassis-octavia:
-    series: *series
-    charm: ch:ovn-chassis
-    channel: 24.03/edge
   octavia:
     constraints: cores=8
     series: *series
@@ -227,6 +193,7 @@ applications:
       openstack-origin: *openstack-origin
       debug: True
       loadbalancer-topology: 'ACTIVE_STANDBY'
+      vip: 'ADD YOUR VIP HERE'
   rabbitmq-server:
     charm: ch:rabbitmq-server
     num_units: 1
@@ -259,19 +226,6 @@ applications:
       openstack-origin: *openstack-origin
       debug: true
     channel: 2024.1/edge
-  neutron-api-plugin-ovn:
-    charm: ch:neutron-api-plugin-ovn
-    channel: 2024.1/edge
-  ovn-central:
-    constraints: mem=3072M
-    charm: ch:ovn-central
-    num_units: 3
-    options:
-      source: *openstack-origin
-    channel: 24.03/edge
-  ovn-chassis:
-    charm: ch:ovn-chassis
-    channel: 24.03/edge
   vault:
     charm: ch:vault
     num_units: 1

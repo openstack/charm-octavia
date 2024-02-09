@@ -5,24 +5,23 @@
       jobs:
       - jammy-antelope-ha
       - jammy-antelope-ha-ovn
-      - jammy-bobcat-ha:
+      - jammy-bobcat-ha
+      - jammy-bobcat-ha-ovn
+      - jammy-caracal-ha
+      - jammy-caracal-ha-ovn
+      - noble-caracal-ha:
           voting: false
-      - jammy-bobcat-ha-ovn:
+      - noble-caracal-ha-ovn:
           voting: false
     vars:
       needs_charm_build: true
       charm_build_name: octavia
       build_type: charmcraft
-      charmcraft_channel: 2.x/candidate
+      charmcraft_channel: 2.x/stable
 
 - job:
     name: jammy-antelope-ha
     parent: func-target
-    dependencies:
-      - osci-lint
-      - name: tox-py310
-        soft: true
-      - charm-build
     vars:
       tox_extra_args: '-- jammy-antelope-ha'
 - job:
@@ -48,3 +47,32 @@
       - jammy-antelope-ha
     vars:
       tox_extra_args: '-- jammy-bobcat-ha-ovn'
+- job:
+    name: jammy-caracal-ha
+    parent: func-target
+    dependencies:
+      - jammy-antelope-ha
+    vars:
+      tox_extra_args: '-- jammy-caracal-ha'
+- job:
+    name: jammy-caracal-ha-ovn
+    parent: func-target
+    timeout: 18000
+    dependencies:
+      - jammy-antelope-ha
+    vars:
+      tox_extra_args: '-- jammy-caracal-ha-ovn'
+- job:
+    name: noble-caracal-ha
+    parent: func-target
+    dependencies:
+      - jammy-antelope-ha
+    vars:
+      tox_extra_args: '-- noble-caracal-ha'
+- job:
+    name: noble-caracal-ha-ovn
+    parent: func-target
+    dependencies:
+      - jammy-antelope-ha
+    vars:
+      tox_extra_args: '-- noble-caracal-ha-ovn'

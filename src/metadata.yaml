@@ -17,10 +17,9 @@ description: |
   OpenStack Rocky or later is required.
 docs: https://discourse.charmhub.io/t/octavia-docs-index/11221
 tags:
-- openstack
+  - openstack
 series:
-- jammy
-- mantic
+  - jammy
 subordinate: false
 provides:
   nrpe-external-master:

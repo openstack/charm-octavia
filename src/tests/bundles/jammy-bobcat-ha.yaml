@@ -108,13 +108,13 @@ applications:
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: latest/edge
+    channel: 2024.1/edge
   keystone:
     charm: ch:keystone
     num_units: 1
     options:
       openstack-origin: *openstack-origin
-    channel: latest/edge
+    channel: 2024.1/edge
   cinder-mysql-router:
     charm: ch:mysql-router
     channel: latest/edge
@@ -185,7 +185,7 @@ applications:
       neutron-security-groups: True
       enable-dvr: True
       manage-neutron-plugin-legacy-mode: True
-    channel: latest/edge
+    channel: 2024.1/edge
   neutron-openvswitch:
     series: *series
     charm: ch:neutron-openvswitch
@@ -197,7 +197,7 @@ applications:
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
       bridge-mappings: physnet1:br-ex
-    channel: latest/edge
+    channel: 2024.1/edge
   neutron-openvswitch-octavia:
     series: *series
     charm: ch:neutron-openvswitch
@@ -206,7 +206,7 @@ applications:
       debug: True
       prevent-arp-spoofing: False
       firewall-driver: openvswitch
-    channel: latest/edge
+    channel: 2024.1/edge
   nova-cloud-controller:
     constraints: mem=7168M
     charm: ch:nova-cloud-controller
@@ -215,15 +215,15 @@ applications:
       openstack-origin: *openstack-origin
       debug: True
       network-manager: Neutron
-    channel: latest/edge
+    channel: 2024.1/edge
   nova-compute:
-    constraints: mem=7168M
+    constraints: mem=7168M cores=8 root-disk=40G
     charm: ch:nova-compute
     num_units: 2
     options:
       openstack-origin: *openstack-origin
       debug: True
-    channel: latest/edge
+    channel: 2024.1/edge
   hacluster-octavia:
     charm: ch:hacluster
     num_units: 0
@@ -254,14 +254,14 @@ applications:
                         'release~(jammy)',
                         'arch~(x86_64|amd64)',
                         'ftype~(disk1.img|disk.img)']}]"
-    channel: latest/edge
+    channel: 2024.1/edge
   octavia-diskimage-retrofit:
     charm: ch:octavia-diskimage-retrofit
     options:
       amp-image-tag: 'octavia-amphora'
       retrofit-series: *series
       retrofit-uca-pocket: bobcat
-    channel: latest/edge
+    channel: 2024.1/edge
   placement:
     charm: ch:placement
     num_units: 1
@@ -269,7 +269,7 @@ applications:
     options:
       openstack-origin: *openstack-origin
       debug: true
-    channel: latest/edge
+    channel: 2024.1/edge
   vault:
     charm: ch:vault
     num_units: 1

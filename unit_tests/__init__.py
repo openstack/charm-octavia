@@ -72,6 +72,8 @@ sys.modules['novaclient'] = novaclient
 neutron_lib = mock.MagicMock()
 sys.modules['neutron_lib'] = neutron_lib
 sys.modules['neutron_lib.constants'] = neutron_lib.constants
+sys.modules['neutron_lib.services.trunk.constants'] = (
+    neutron_lib.services.trunk.constants)
 neutronclient = mock.MagicMock()
 sys.modules['neutronclient'] = neutronclient
 sys.modules['neutronclient.v2_0'] = neutronclient.v2_0

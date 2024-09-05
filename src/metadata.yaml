@@ -18,8 +18,6 @@ description: |
 docs: https://discourse.charmhub.io/t/octavia-docs-index/11221
 tags:
 - openstack
-series:
-- jammy
 - mantic
 subordinate: false
 provides:

@@ -17,7 +17,7 @@
       needs_charm_build: true
       charm_build_name: octavia
       build_type: charmcraft
-      charmcraft_channel: 2.x/candidate
+      charmcraft_channel: 3.x/candidate
 
 - job:
     name: jammy-antelope-ha

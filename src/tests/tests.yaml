@@ -1,18 +1,14 @@
 charm_name: octavia
 
 gate_bundles:
-- jammy-antelope-ha-ovn
-- jammy-antelope-ha
+- noble-caracal-ha
 
 smoke_bundles:
-- jammy-antelope-ha
+- noble-caracal-ha
 
 dev_bundles:
-- jammy-bobcat-ha-ovn
-- jammy-bobcat-ha
-- mantic-bobcat-ha-ovn
-- mantic-bobat-ha
-
+- noble-caracal-ha-ovn
+- noble-caracal-ha
 
 comment: |
   The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
@@ -72,5 +68,5 @@ tests_options:
   policyd:
     service: octavia
   force_deploy:
-    - mantic-bobcat-ha-ovn
-    - mantic-bobcat-ha
+    - noble-caracal-ha-ovn
+    - noble-caracal-ha

@@ -21,3 +21,4 @@ simplejson
 # requirements.txt
 importlib-metadata<3.0.0; python_version < '3.6'
 importlib-resources<3.0.0; python_version < '3.6'
+openstacksdk==0.61.0

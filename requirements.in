@@ -7,3 +7,4 @@
 git+https://github.com/juju/charm-tools.git
 
 simplejson
+openstacksdk==3.0.0

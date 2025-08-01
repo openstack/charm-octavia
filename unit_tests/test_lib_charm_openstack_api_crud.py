@@ -21,6 +21,8 @@ import charms_openstack.test_utils as test_utils
 import charm.openstack.octavia as octavia  # for constants
 import charm.openstack.api_crud as api_crud
 
+from openstack import connection
+
 
 class FakeNeutronConflictException(Exception):
     pass
@@ -298,12 +300,12 @@ class TestAPICrud(test_utils.PatchHelper):
     def test_setup_hm_port(self):
         self.patch_object(api_crud, 'session_from_identity_service')
         self.patch_object(api_crud, 'init_neutron_client')
-        nc = mock.MagicMock()
-        self.init_neutron_client.return_value = nc
+        self.patch_object(connection, 'Connection')
+        conn = mock.MagicMock()
+        self.Connection.return_value = conn
         network_uuid = 'fake-network-uuid'
-        nc.list_networks.return_value = {'networks': [{'id': network_uuid,
-                                                       'mtu': 9000}]}
-
+        conn.network.networks.return_value = [{'id': network_uuid,
+                                               'mtu': 9000}]
         self.patch_object(octavia.ch_net_ip, 'get_iface_addr')
         self.get_iface_addr.return_value = [
             'fe80:db8:42%eth0', '2001:db8:42::42', '127.0.0.1'

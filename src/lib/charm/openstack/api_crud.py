@@ -33,6 +33,7 @@ from keystoneauth1 import session as keystone_session
 from keystoneauth1 import exceptions as keystone_exceptions
 from neutronclient.v2_0 import client as neutron_client
 from novaclient import client as nova_client
+from openstack import connection
 
 import neutron_lib.services.trunk.constants
 
@@ -503,10 +504,12 @@ def ensure_hm_port_mtu(identity_service):
     reflected here as well.
     """
     session = session_from_identity_service(identity_service)
-    nc = init_neutron_client(session)
-    resp = nc.list_networks(tags='charm-octavia')
-    if len(resp['networks']) > 0:
-        network = resp['networks'][0]
+    conn = connection.Connection(session=session,
+                                 compute_api_version='2',
+                                 identity_interface='internal')
+    net_resp = list(conn.network.networks(tags='charm-octavia'))
+    if len(net_resp) > 0:
+        network = net_resp[0]
         ch_core.hookenv.log('ensuring mgmt network {} mtu={}'.
                             format(network['id'], network['mtu']),
                             level=ch_core.hookenv.DEBUG)

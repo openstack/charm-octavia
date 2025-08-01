@@ -7,3 +7,4 @@
 charm-tools<3.1
 
 simplejson
+openstacksdk==0.101.0

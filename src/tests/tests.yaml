@@ -10,10 +10,6 @@ dev_bundles:
 - noble-caracal-ha-ovn
 - noble-caracal-ha
 
-comment: |
-  The `bionic-rocky-lxd` bundle currently fails due to a bug in LXD.
-    https://github.com/lxc/lxd/issues/4947
-
 target_deploy_status:
   octavia:
     workload-status: blocked

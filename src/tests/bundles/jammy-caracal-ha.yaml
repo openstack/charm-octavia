@@ -63,9 +63,9 @@ relations:
   - glance-simplestreams-sync:identity-service
 - - keystone:identity-credentials
   - octavia-diskimage-retrofit:identity-credentials
-- [ placement, placement-mysql-router ]
-- [ placement, keystone ]
-- [ placement, nova-cloud-controller ]
+- [placement, placement-mysql-router]
+- [placement, keystone]
+- [placement, nova-cloud-controller]
 - - vault:shared-db
   - vault-mysql-router:shared-db
 - - vault:certificates
@@ -84,6 +84,8 @@ relations:
   - glance-simplestreams-sync:certificates
 - - vault:certificates
   - placement:certificates
+- - vault:certificates
+  - cinder:certificates
 - ["octavia-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 - ["keystone-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 - ["nova-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
@@ -91,6 +93,15 @@ relations:
 - ["neutron-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 - ["placement-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
 - ["vault-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["cinder-ceph:storage-backend", "cinder:storage-backend"]
+- ["nova-compute:ceph-access", "cinder-ceph:ceph-access"]
+- ["ceph-mon:client", "cinder-ceph:ceph"]
+- ["ceph-mon:osd", "ceph-osd:mon"]
+- ["cinder:shared-db", "cinder-mysql-router:shared-db"]
+- ["cinder-mysql-router:db-router", "mysql-innodb-cluster:db-router"]
+- ["cinder:identity-service", "keystone:identity-service"]
+- ["cinder:amqp", "rabbitmq-server:amqp"]
+- ["cinder:image-service", "glance:image-service"]
 applications:
   glance:
     charm: ch:glance
@@ -104,6 +115,9 @@ applications:
     options:
       openstack-origin: *openstack-origin
     channel: 2024.1/edge
+  cinder-mysql-router:
+    charm: ch:mysql-router
+    channel: latest/edge
   octavia-mysql-router:
     charm: ch:mysql-router
     channel: latest/edge
@@ -129,6 +143,36 @@ applications:
     constraints: mem=3072M
     charm: ch:mysql-innodb-cluster
     num_units: 3
+    channel: latest/edge
+  ceph-osd:
+    charm: ch:ceph-osd
+    num_units: 3
+    storage:
+      osd-devices: '40G'
+    options:
+      source: *openstack-origin
+    channel: squid/edge
+  ceph-mon:
+    charm: ch:ceph-mon
+    num_units: 1
+    options:
+      source: *openstack-origin
+      monitor-count: '1'
+    channel: squid/edge
+  cinder:
+    charm: ch:cinder
+    num_units: 1
+    storage:
+      block-devices: '40G'
+    options:
+      openstack-origin: *openstack-origin
+      glance-api-version: 2
+      block-device: None
+      overwrite: "true"
+      image-volume-cache-enabled: true
+    channel: latest/edge
+  cinder-ceph:
+    charm: ch:cinder-ceph
     channel: latest/edge
   neutron-api:
     charm: ch:neutron-api
@@ -173,7 +217,7 @@ applications:
       network-manager: Neutron
     channel: 2024.1/edge
   nova-compute:
-    constraints: mem=7168M cores=8 root-disk=40G
+    constraints: root-disk=80G mem=8G
     charm: ch:nova-compute
     num_units: 2
     options:

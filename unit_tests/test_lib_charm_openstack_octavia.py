@@ -209,3 +209,19 @@ class TestOctaviaCharm(Helper):
         self.target.configuration_class = configuration_class
         self.assertEqual(self.target.local_unit_name,
                          configuration_class().local_unit_name)
+
+    @mock.patch.object(octavia, "get_address_on_mgmt_interface")
+    def test_custom_assess_status_last_check(
+            self,
+            mock_get_address_on_mgmt_interface):
+        self.patch('charmhelpers.core.hookenv.config', 'config')
+        self.config.return_value = False
+        c = octavia.VictoriaOctaviaCharm()
+        self.assertEqual((None, None), c.custom_assess_status_last_check())
+        mock_get_address_on_mgmt_interface.assert_not_called()
+        mock_get_address_on_mgmt_interface.reset_mock()
+        self.config.return_value = True
+        mock_get_address_on_mgmt_interface.return_value = False
+        self.assertEqual(('blocked', 'no address on mgmt interface'),
+                         c.custom_assess_status_last_check())
+        mock_get_address_on_mgmt_interface.assert_called_once()

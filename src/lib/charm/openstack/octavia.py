@@ -493,8 +493,9 @@ class BaseOctaviaCharm(ch_plugins.PolicydOverridePlugin,
 
         :returns: None, None - no action in this function.
         """
-        if not get_address_on_mgmt_interface():
-            return ('blocked', 'no address on mgmt interface')
+        if ch_core.hookenv.config('enable-amphora'):
+            if not get_address_on_mgmt_interface():
+                return ('blocked', 'no address on mgmt interface')
         return (None, None)
 
     def get_amqp_credentials(self):

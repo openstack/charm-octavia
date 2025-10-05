@@ -69,8 +69,8 @@ def configure_resources(*args):
                             .format(e))
         return
     if network and secgrp:
-        leadership.leader_set({'amp-boot-network-list': network['id'],
-                               'amp-secgroup-list': secgrp['id']})
+        leadership.leader_set({'amp-boot-network-list': network.id,
+                               'amp-secgroup-list': secgrp.id})
     if reactive.is_flag_set('config.default.custom-amp-flavor-id'):
         # NOTE(fnordahl): custom flavor provided through configuration is
         # handled in the charm class configuration property.

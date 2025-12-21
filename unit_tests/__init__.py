@@ -75,3 +75,4 @@ sys.modules['neutron_lib.constants'] = neutron_lib.constants
 neutronclient = mock.MagicMock()
 sys.modules['neutronclient'] = neutronclient
 sys.modules['neutronclient.v2_0'] = neutronclient.v2_0
+sys.modules['openstack'] = mock.MagicMock()

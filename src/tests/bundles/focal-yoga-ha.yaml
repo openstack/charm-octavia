@@ -231,7 +231,7 @@ applications:
   octavia:
     constraints: cores=8
     series: *series
-    charm: ../../../octavia.charm
+    charm: ../../../octavia_ubuntu@20.04-amd64.charm
     num_units: 3
     options:
       openstack-origin: *openstack-origin

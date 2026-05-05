@@ -5,6 +5,7 @@ parts:
     plugin: reactive
     reactive-charm-build-arguments:
       - --binary-wheels-from-source
+      - --use-lock-file-branches
     build-packages:
       - tox
       - git
@@ -13,26 +14,25 @@ parts:
       - libssl-dev
       - libxml2-dev
       - libxslt1-dev
-      - rustc
-      - cargo
+      - rustc-1.91
+      - cargo-1.91
       - pkg-config
     source: src/
     build-snaps:
-      - charm/latest/edge
+      - charm/3.x/stable
     build-environment:
       - CHARM_INTERFACES_DIR: $CRAFT_PROJECT_DIR/interfaces/
       - CHARM_LAYERS_DIR: $CRAFT_PROJECT_DIR/layers/
-base: ubuntu@24.04
+    override-build: |
+      if ! [[ -f /usr/bin/rustc ]]; then ln --symbolic rustc-1.91 /usr/bin/rustc; fi
+      if ! [[ -f /usr/bin/cargo ]]; then ln --symbolic cargo-1.91 /usr/bin/cargo; fi
+      craftctl default
 platforms:
-  amd64:
-    build-on: amd64
-    build-for: amd64
-  arm64:
-    build-on: arm64
-    build-for: arm64
-  ppc64el:
-    build-on: ppc64el
-    build-for: ppc64el
-  s390x:
-    build-on: s390x
-    build-for: s390x
+  ubuntu@22.04:amd64:
+  ubuntu@22.04:arm64:
+  ubuntu@22.04:ppc64el:
+  ubuntu@22.04:s390x:
+  ubuntu@24.04:amd64:
+  ubuntu@24.04:arm64:
+  ubuntu@24.04:ppc64el:
+  ubuntu@24.04:s390x:

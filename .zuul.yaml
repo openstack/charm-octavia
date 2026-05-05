@@ -5,6 +5,7 @@
 
     check:
       jobs:
-        - charmbuild
+        - charmbuild:
+            timeout: 10800
     vars:
       charm_build_name: octavia

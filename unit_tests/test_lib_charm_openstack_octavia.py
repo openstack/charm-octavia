@@ -121,8 +121,8 @@ class TestOctaviaCharm(Helper):
         # remove the 'is_flag_set' patch so the tests can use it
         self._patches['is_flag_set'].stop()
         setattr(self, 'is_flag_set', None)
-        del(self._patches['is_flag_set'])
-        del(self._patches_start['is_flag_set'])
+        del self._patches['is_flag_set']
+        del self._patches_start['is_flag_set']
 
     def test_optional_ovn_provider_driver(self):
         self.assertFalse('octavia-driver-agent' in self.target.packages)

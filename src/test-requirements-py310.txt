@@ -629,7 +629,7 @@ zaza==2024.1.1
     # via
     #   -r test-requirements.in
     #   zaza-openstack
-zaza-openstack @ git+https://github.com/dosaboy/zaza-openstack-tests.git@zed-zaza-juju-pin
+zaza-openstack @ git+https://github.com/openstack-charmers/zaza-openstack-tests.git@stable/zed
     # via -r test-requirements.in
 
 # The following packages are considered to be unsafe in a requirements file:

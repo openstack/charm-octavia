@@ -6,6 +6,7 @@ parts:
     reactive-charm-build-arguments:
       - --binary-wheels-from-source
       - --use-lock-file-branches
+      - --verbose
     build-packages:
       - tox
       - git

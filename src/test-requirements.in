@@ -8,3 +8,5 @@
 zaza==2024.*
 git+https://github.com/openstack-charmers/zaza-openstack-tests.git@stable/yoga#egg=zaza.openstack
 
+setuptools<82.0.0
+git+https://github.com/juju/charm-tools.git

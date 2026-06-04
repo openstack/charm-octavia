@@ -4,7 +4,7 @@
 #
 #    pip-compile --output-file=test-requirements-py312.txt --unsafe-package=juju --unsafe-package=kubernetes test-requirements.in
 #
-certifi==2026.4.22
+certifi==2026.5.20
     # via requests
 cffi==2.0.0
     # via cryptography
@@ -22,7 +22,7 @@ cliff==2.18.0
     #   stestr
 cmd2==0.8.9
     # via cliff
-coverage==7.14.0
+coverage==7.14.1
     # via -r test-requirements.in
 cryptography==3.3.2
     # via
@@ -34,13 +34,13 @@ flake8==7.1.1
     # via -r test-requirements.in
 hvac==2.4.0
     # via -r test-requirements.in
-idna==3.15
+idna==3.18
     # via requests
 iso8601==2.1.0
     # via python-subunit
 jinja2==3.1.6
     # via charmhelpers
-lxml==6.1.0
+lxml==6.1.1
     # via -r test-requirements.in
 markupsafe==3.0.3
     # via jinja2
@@ -91,7 +91,7 @@ pyyaml==6.0.3
     #   pyaml
     #   python-subunit
     #   stestr
-requests==2.34.0
+requests==2.34.2
     # via
     #   -r test-requirements.in
     #   hvac
@@ -105,7 +105,7 @@ six==1.17.0
     #   pyopenssl
 stestr==4.2.1
     # via -r test-requirements.in
-stevedore==5.7.0
+stevedore==5.8.0
     # via cliff
 tenacity==9.1.4
     # via -r test-requirements.in

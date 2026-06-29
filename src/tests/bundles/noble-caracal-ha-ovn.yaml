@@ -239,6 +239,10 @@ applications:
     charm: ch:octavia-diskimage-retrofit
     options:
       amp-image-tag: "octavia-amphora"
+      # Work around noble defaulting to 2.0/stable while no snap is published
+      # there. Remove once octavia-diskimage-retrofit publishes or defaults to
+      # a valid noble snap channel.
+      channel: 2.0/edge
       retrofit-series: *series
       retrofit-uca-pocket: caracal
     channel: latest/edge
@@ -263,6 +267,8 @@ applications:
   ovn-chassis:
     charm: ch:ovn-chassis
     channel: latest/edge
+    options:
+      prefer-chassis-as-gw: True
   vault:
     charm: ch:vault
     num_units: 1
